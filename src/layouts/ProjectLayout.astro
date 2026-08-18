@@ -1,0 +1,47 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { data } = project;
+---
+
+<BaseLayout
+  title={`${data.title} — Dian`}
+  description={data.summary}
+  canonical={`https://dian.dev/work/${project.slug}`}
+>
+  <article class="pt-32 pb-20">
+    <div class="container-editorial">
+      <div class="mb-12">
+        <p class="mono-label mb-4">{data.category} / {data.status}</p>
+        <h1 class="text-display font-display text-ink mb-6">{data.title}</h1>
+        <p class="text-body-lg text-graphite max-w-2xl">{data.thesis}</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-graphite mb-2">Role</p>
+          <p>{data.role || '—'}</p>
+        </div>
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-graphite mb-2">Technologies</p>
+          <p>{data.technologies.join(', ')}</p>
+        </div>
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-graphite mb-2">Links</p>
+          {data.repository && <a href={data.repository} class="block hover:text-accent">Repository ↗</a>}
+          {data.liveUrl && <a href={data.liveUrl} class="block hover:text-accent">Live ↗</a>}
+        </div>
+      </div>
+
+      <div class="prose prose-lg max-w-none">
+        <slot />
+      </div>
+    </div>
+  </article>
+</BaseLayout>

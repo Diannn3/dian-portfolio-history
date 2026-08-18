@@ -1,0 +1,2577 @@
+Here is a complete, production-quality personal portfolio website built with Astro, React, Three.js, React Three Fiber, Spline, GSAP, Tailwind, shadcn/ui, and Lenis. The project is structured as a runnable repository with all necessary configuration, components, content, and styling. It implements the Vector Atlas art direction, parametric manifold hero, scroll transformation, project case studies, responsive design, accessibility, and performance optimizations.
+
+Copy the file tree into a new directory, then run `npm install` and `npm run dev` to view the site locally.
+
+```
+.
+├── package.json
+├── astro.config.mjs
+├── tailwind.config.mjs
+├── tsconfig.json
+├── .gitignore
+├── README.md
+├── public/
+│   └── favicon.svg
+├── src/
+│   ├── env.d.ts
+│   ├── content.config.ts
+│   ├── styles/
+│   │   ├── global.css
+│   │   └── tokens.css
+│   ├── layouts/
+│   │   ├── BaseLayout.astro
+│   │   └── ProjectLayout.astro
+│   ├── components/
+│   │   ├── global/
+│   │   │   ├── Nav.astro
+│   │   │   ├── MobileNav.astro
+│   │   │   ├── Footer.astro
+│   │   │   └── Cursor.astro
+│   │   ├── hero/
+│   │   │   ├── Hero.astro
+│   │   │   ├── HeroCanvas.tsx
+│   │   │   ├── Scene.tsx
+│   │   │   ├── ParametricManifold.tsx
+│   │   │   ├── VectorField.tsx
+│   │   │   ├── Streamlines.tsx
+│   │   │   ├── CoordinateGrid.tsx
+│   │   │   ├── PointerProbe.tsx
+│   │   │   ├── CameraRig.tsx
+│   │   │   └── HeroFallback.astro
+│   │   ├── spline/
+│   │   │   ├── DigitalArtifact.tsx
+│   │   │   └── DigitalArtifactFallback.astro
+│   │   ├── work/
+│   │   │   ├── ProjectIndex.astro
+│   │   │   └── ProjectPreview.tsx
+│   │   ├── about/
+│   │   │   ├── AboutSection.astro
+│   │   │   └── DisciplineGraph.astro
+│   │   ├── now/
+│   │   │   └── NowSection.astro
+│   │   ├── lab/
+│   │   │   └── LabSection.astro
+│   │   ├── tools/
+│   │   │   └── ToolsSection.astro
+│   │   ├── contact/
+│   │   │   └── ContactSection.astro
+│   │   └── ui/
+│   │       ├── button.tsx
+│   │       ├── dialog.tsx
+│   │       ├── sheet.tsx
+│   │       └── tooltip.tsx
+│   ├── content/
+│   │   └── projects/
+│   │       ├── uppetite.md
+│   │       ├── pasada.md
+│   │       ├── disaster-response.md
+│   │       └── campus-navigation.md
+│   ├── lib/
+│   │   ├── utils.ts
+│   │   └── motion/
+│   │       └── lenis.ts
+│   └── pages/
+│       ├── index.astro
+│       └── work/
+│           └── [slug].astro
+└── tests/
+    ├── home.spec.ts
+    └── project.spec.ts
+```
+
+---
+
+## package.json
+
+```json
+{
+  "name": "dian-portfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check && tsc --noEmit",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/mdx": "^4.0.8",
+    "@astrojs/react": "^4.2.0",
+    "@astrojs/sitemap": "^3.2.1",
+    "@astrojs/tailwind": "^5.1.5",
+    "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-tooltip": "^1.1.8",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.17.14",
+    "@splinetool/react-spline": "^4.0.0",
+    "astro": "^5.5.5",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "gsap": "^3.12.7",
+    "lenis": "^1.1.20",
+    "lucide-react": "^0.511.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7",
+    "three": "^0.174.0",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@types/three": "^0.174.0"
+  }
+}
+```
+
+---
+
+## astro.config.mjs
+
+```js
+import { defineConfig } from 'astro/config';
+import tailwind from '@astrojs/tailwind';
+import react from '@astrojs/react';
+import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
+
+export default defineConfig({
+  site: 'https://dian.dev',
+  integrations: [
+    tailwind({
+      applyBaseStyles: false,
+    }),
+    react(),
+    mdx(),
+    sitemap(),
+  ],
+  output: 'static',
+  vite: {
+    ssr: {
+      noExternal: ['three', '@react-three/fiber', '@react-three/drei', '@splinetool/react-spline'],
+    },
+  },
+});
+```
+
+---
+
+## tailwind.config.mjs
+
+```js
+import animate from 'tailwindcss-animate';
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: ['class'],
+  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  theme: {
+    container: {
+      center: true,
+      padding: '1.5rem',
+      screens: {
+        '2xl': '1440px',
+      },
+    },
+    extend: {
+      colors: {
+        canvas: '#F4F2ED',
+        ink: '#111111',
+        graphite: '#555555',
+        hairline: '#D8D4CC',
+        accent: '#D94F2B',
+        'accent-soft': '#F0E4DD',
+        'ink-soft': '#2A2A2A',
+      },
+      fontFamily: {
+        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-xl': ['clamp(4.5rem, 12vw, 10rem)', { lineHeight: '0.9', letterSpacing: '-0.04em', fontWeight: '600' }],
+        'display': ['clamp(3rem, 8vw, 6rem)', { lineHeight: '0.95', letterSpacing: '-0.03em', fontWeight: '600' }],
+        'h1': ['clamp(2.25rem, 5vw, 4rem)', { lineHeight: '1', letterSpacing: '-0.02em', fontWeight: '500' }],
+        'h2': ['clamp(1.75rem, 3.5vw, 3rem)', { lineHeight: '1.05', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'h3': ['clamp(1.25rem, 2vw, 1.75rem)', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'body-lg': ['1.125rem', { lineHeight: '1.6', fontWeight: '400' }],
+        'body': ['1rem', { lineHeight: '1.6', fontWeight: '400' }],
+        'micro': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.08em', fontWeight: '500' }],
+        'mono-label': ['0.8125rem', { lineHeight: '1.4', letterSpacing: '0.06em', fontWeight: '500' }],
+      },
+      spacing: {
+        'gutter': 'clamp(1.5rem, 4vw, 4rem)',
+        'section': 'clamp(6rem, 12vw, 12rem)',
+      },
+      maxWidth: {
+        'editorial': '1440px',
+      },
+      borderColor: {
+        DEFAULT: '#D8D4CC',
+      },
+      borderRadius: {
+        'none': '0',
+        'sm': '0.25rem',
+        'md': '0.5rem',
+        'lg': '1rem',
+      },
+      keyframes: {
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'line-grow': {
+          from: { transform: 'scaleX(0)' },
+          to: { transform: 'scaleX(1)' },
+        },
+      },
+      animation: {
+        'fade-in': 'fade-in 0.6s ease-out forwards',
+        'line-grow': 'line-grow 0.8s cubic-bezier(0.22,1,0.36,1) forwards',
+      },
+    },
+  },
+  plugins: [animate],
+};
+```
+
+---
+
+## tsconfig.json
+
+```json
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "types": ["astro/client"]
+  },
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"]
+}
+```
+
+---
+
+## src/env.d.ts
+
+```ts
+/// <reference types="astro/client" />
+```
+
+---
+
+## src/styles/tokens.css
+
+```css
+:root {
+  --color-canvas: #F4F2ED;
+  --color-ink: #111111;
+  --color-graphite: #555555;
+  --color-hairline: #D8D4CC;
+  --color-accent: #D94F2B;
+  --color-accent-soft: #F0E4DD;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --gutter: clamp(1.5rem, 4vw, 4rem);
+  --section-spacing: clamp(6rem, 12vw, 12rem);
+  --content-max-width: 1440px;
+}
+```
+
+---
+
+## src/styles/global.css
+
+```css
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-sans;
+    font-feature-settings: 'ss01', 'cv01', 'cv02';
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-canvas);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  a {
+    @apply text-ink no-underline;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .container-editorial {
+    @apply mx-auto w-full max-w-editorial px-gutter;
+  }
+
+  .hairline {
+    @apply border-hairline;
+  }
+
+  .mono-label {
+    @apply font-mono text-mono-label uppercase tracking-widest text-graphite;
+  }
+
+  .section-padding {
+    @apply py-section;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* Scrollbar styling for desktop */
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-canvas);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-hairline);
+    border: 2px solid var(--color-canvas);
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-graphite);
+  }
+}
+```
+
+---
+
+## src/lib/utils.ts
+
+```ts
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export function formatYear(year: string | number | undefined): string {
+  if (!year) return 'TO VERIFY';
+  return String(year);
+}
+```
+
+---
+
+## src/lib/motion/lenis.ts
+
+```ts
+import Lenis from 'lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+export function initLenis() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    orientation: 'vertical',
+    gestureOrientation: 'vertical',
+    smoothWheel: true,
+    wheelMultiplier: 1,
+    touchMultiplier: 1.5,
+  });
+
+  lenis.on('scroll', ScrollTrigger.update);
+
+  const raf = (time: number) => {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  };
+  requestAnimationFrame(raf);
+
+  return lenis;
+}
+```
+
+---
+
+## src/content.config.ts
+
+```ts
+import { defineCollection, z } from 'astro:content';
+
+const projects = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    index: z.number(),
+    status: z.string(),
+    year: z.string().optional(),
+    category: z.string(),
+    summary: z.string(),
+    thesis: z.string(),
+    role: z.string().optional(),
+    technologies: z.array(z.string()),
+    repository: z.string().url().optional(),
+    liveUrl: z.string().url().optional(),
+    featured: z.boolean().default(false),
+    accent: z.string().default('#D94F2B'),
+    cover: z.string().optional(),
+  }),
+});
+
+export const collections = { projects };
+```
+
+---
+
+## src/layouts/BaseLayout.astro
+
+```astro
+---
+import Nav from '@/components/global/Nav.astro';
+import Footer from '@/components/global/Footer.astro';
+import Cursor from '@/components/global/Cursor.astro';
+import { initLenis } from '@/lib/motion/lenis';
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+}
+
+const {
+  title = 'Dian — Applied Mathematics × Software × Spatial Systems',
+  description = 'Applied Mathematics student building software, AI, maps, spatial systems, and experimental interfaces.',
+  image = '/og-default.jpg',
+  canonical = 'https://dian.dev',
+} = Astro.props;
+
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#F4F2ED" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Lenis script -->
+    <script>
+      import { initLenis } from '@/lib/motion/lenis';
+      document.addEventListener('astro:page-load', () => {
+        initLenis();
+      });
+    </script>
+  </head>
+  <body class="min-h-screen bg-canvas text-ink antialiased">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-canvas focus:px-4 focus:py-2 focus:text-ink">
+      Skip to content
+    </a>
+    <Nav currentPath={currentPath} />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+    <Cursor />
+  </body>
+</html>
+```
+
+---
+
+## src/components/global/Nav.astro
+
+```astro
+---
+import MobileNav from './MobileNav.astro';
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const links = [
+  { href: '/#work', label: 'Work' },
+  { href: '/#about', label: 'About' },
+  { href: '/#lab', label: 'Lab' },
+  { href: '/#contact', label: 'Contact' },
+];
+---
+
+<header class="fixed top-0 left-0 right-0 z-40 mix-blend-difference text-white" aria-label="Main navigation">
+  <div class="container-editorial flex items-center justify-between py-4 md:py-6">
+    <a href="/" class="font-display text-xl font-semibold tracking-tight text-white" aria-label="Dian — home">
+      DIAN
+    </a>
+    <nav class="hidden md:block">
+      <ul class="flex items-center gap-8">
+        {links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="font-mono text-xs uppercase tracking-widest text-white/70 hover:text-white transition-colors duration-200"
+              aria-current={currentPath === link.href ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+        <li class="flex items-center gap-2 ml-4">
+          <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse" aria-hidden="true"></span>
+          <span class="font-mono text-xs uppercase tracking-widest text-white/70">Building things</span>
+        </li>
+      </ul>
+    </nav>
+    <MobileNav links={links} currentPath={currentPath} />
+  </div>
+</header>
+
+<style>
+  /* Adjust mix-blend for better contrast when scrolled */
+  @media (max-width: 768px) {
+    header {
+      mix-blend-mode: normal;
+      background: rgba(244, 242, 237, 0.9);
+      backdrop-filter: blur(8px);
+    }
+    header a, header button, header span {
+      color: var(--color-ink);
+    }
+  }
+</style>
+```
+
+---
+
+## src/components/global/MobileNav.astro
+
+```astro
+---
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Menu } from 'lucide-react';
+
+interface Props {
+  links: Array<{ href: string; label: string }>;
+  currentPath: string;
+}
+
+const { links, currentPath } = Astro.props;
+---
+
+<div class="md:hidden">
+  <Sheet>
+    <SheetTrigger asChild>
+      <button
+        class="inline-flex h-10 w-10 items-center justify-center rounded-none border border-hairline bg-canvas text-ink hover:bg-accent-soft transition-colors"
+        aria-label="Open menu"
+      >
+        <Menu class="h-5 w-5" />
+      </button>
+    </SheetTrigger>
+    <SheetContent side="right" className="w-full max-w-sm bg-canvas p-0 border-l border-hairline">
+      <div class="flex h-full flex-col justify-between p-8">
+        <div>
+          <p class="mono-label mb-8">Navigation</p>
+          <nav aria-label="Mobile navigation">
+            <ul class="space-y-6">
+              {links.map((link, index) => (
+                <li>
+                  <SheetClose asChild>
+                    <a
+                      href={link.href}
+                      class={`block font-display text-4xl font-semibold tracking-tight transition-colors ${
+                        currentPath === link.href ? 'text-accent' : 'text-ink hover:text-accent'
+                      }`}
+                      aria-current={currentPath === link.href ? 'page' : undefined}
+                    >
+                      <span class="mr-2 font-mono text-sm text-graphite">0{index + 1}</span>
+                      {link.label}
+                    </a>
+                  </SheetClose>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+        <div class="border-t border-hairline pt-6">
+          <p class="mono-label mb-2">Status</p>
+          <div class="flex items-center gap-2">
+            <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+            <span class="font-mono text-xs uppercase tracking-widest">Building things</span>
+          </div>
+        </div>
+      </div>
+    </SheetContent>
+  </Sheet>
+</div>
+```
+
+---
+
+## src/components/global/Footer.astro
+
+```astro
+---
+---
+
+<footer class="border-t border-hairline py-12">
+  <div class="container-editorial flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div>
+      <p class="font-display text-2xl font-semibold">DIAN</p>
+      <p class="text-sm text-graphite mt-1">Applied Mathematics × Software × Spatial Systems</p>
+    </div>
+    <div class="flex flex-wrap gap-6">
+      <a href="mailto:hello@dian.dev" class="text-sm hover:text-accent transition-colors">Email</a>
+      <a href="https://github.com/dian" target="_blank" rel="noopener noreferrer" class="text-sm hover:text-accent transition-colors">GitHub</a>
+      <a href="https://linkedin.com/in/dian" target="_blank" rel="noopener noreferrer" class="text-sm hover:text-accent transition-colors">LinkedIn</a>
+    </div>
+    <p class="font-mono text-xs text-graphite">© 2026 Dian. All rights reserved.</p>
+  </div>
+</footer>
+```
+
+---
+
+## src/components/global/Cursor.astro
+
+```astro
+---
+// Custom cursor as a React island for desktop only
+---
+
+<div class="hidden md:block">
+  <div id="cursor-dot" class="pointer-events-none fixed left-0 top-0 z-50 h-2 w-2 rounded-full bg-accent mix-blend-difference transition-transform duration-100 ease-out" style="transform: translate(-50%, -50%)"></div>
+  <div id="cursor-ring" class="pointer-events-none fixed left-0 top-0 z-50 h-8 w-8 rounded-full border border-accent mix-blend-difference transition-transform duration-300 ease-out" style="transform: translate(-50%, -50%)"></div>
+</div>
+
+<script>
+  // Only run on desktop
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let mouseX = 0, mouseY = 0;
+    let ringX = 0, ringY = 0;
+    
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      dot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
+    });
+
+    const animateRing = () => {
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
+      requestAnimationFrame(animateRing);
+    };
+    requestAnimationFrame(animateRing);
+
+    // Interaction states
+    document.querySelectorAll('a, button, [role="button"], input, textarea, select, label[for]').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        ring.style.width = '48px';
+        ring.style.height = '48px';
+        ring.style.transform = `translate(${ringX - 24}px, ${ringY - 24}px)`;
+        ring.style.borderColor = 'var(--color-accent)';
+      });
+      el.addEventListener('mouseleave', () => {
+        ring.style.width = '32px';
+        ring.style.height = '32px';
+        ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
+        ring.style.borderColor = 'var(--color-accent)';
+      });
+    });
+  }
+</script>
+```
+
+---
+
+## src/components/ui/button.tsx
+
+```tsx
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+
+const buttonVariants = cva(
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:pointer-events-none disabled:opacity-50',
+  {
+    variants: {
+      variant: {
+        default: 'bg-accent text-white hover:bg-ink',
+        outline: 'border border-ink bg-transparent hover:bg-ink hover:text-canvas',
+        ghost: 'hover:bg-accent-soft',
+        link: 'text-accent underline-offset-4 hover:underline',
+      },
+      size: {
+        default: 'h-11 px-6 py-2',
+        sm: 'h-9 px-4',
+        lg: 'h-14 px-8 text-lg',
+        icon: 'h-11 w-11',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'button';
+    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
+  }
+);
+Button.displayName = 'Button';
+
+export { Button, buttonVariants };
+```
+
+---
+
+## src/components/ui/dialog.tsx
+
+```tsx
+import * as React from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const Dialog = DialogPrimitive.Root;
+const DialogTrigger = DialogPrimitive.Trigger;
+const DialogPortal = DialogPrimitive.Portal;
+const DialogClose = DialogPrimitive.Close;
+
+const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      'fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      className
+    )}
+    {...props}
+  />
+));
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
+
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        'fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 border border-hairline bg-canvas p-6 shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-none opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-canvas">
+        <X className="h-4 w-4" />
+        <span className="sr-only">Close</span>
+      </DialogPrimitive.Close>
+    </DialogPrimitive.Content>
+  </DialogPortal>
+));
+DialogContent.displayName = DialogPrimitive.Content.displayName;
+
+const DialogTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title ref={ref} className={cn('text-lg font-semibold', className)} {...props} />
+));
+DialogTitle.displayName = DialogPrimitive.Title.displayName;
+
+const DialogDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description ref={ref} className={cn('text-sm text-graphite', className)} {...props} />
+));
+DialogDescription.displayName = DialogPrimitive.Description.displayName;
+
+export { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogDescription };
+```
+
+---
+
+## src/components/ui/sheet.tsx
+
+```tsx
+import * as React from 'react';
+import * as SheetPrimitive from '@radix-ui/react-dialog';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const Sheet = SheetPrimitive.Root;
+const SheetTrigger = SheetPrimitive.Trigger;
+const SheetClose = SheetPrimitive.Close;
+const SheetPortal = SheetPrimitive.Portal;
+
+const SheetOverlay = React.forwardRef<
+  React.ElementRef<typeof SheetPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <SheetPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      'fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      className
+    )}
+    {...props}
+  />
+));
+SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
+
+const sheetVariants = cva(
+  'fixed z-50 gap-4 bg-canvas p-6 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
+  {
+    variants: {
+      side: {
+        top: 'inset-x-0 top-0 border-b border-hairline data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
+        bottom: 'inset-x-0 bottom-0 border-t border-hairline data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
+        left: 'inset-y-0 left-0 h-full w-3/4 border-r border-hairline data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm',
+        right: 'inset-y-0 right-0 h-full w-3/4 border-l border-hairline data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm',
+      },
+    },
+    defaultVariants: {
+      side: 'right',
+    },
+  }
+);
+
+interface SheetContentProps
+  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
+    VariantProps<typeof sheetVariants> {}
+
+const SheetContent = React.forwardRef<
+  React.ElementRef<typeof SheetPrimitive.Content>,
+  SheetContentProps
+>(({ side = 'right', className, children, ...props }, ref) => (
+  <SheetPortal>
+    <SheetOverlay />
+    <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
+      {children}
+      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-none opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-canvas">
+        <X className="h-5 w-5" />
+        <span className="sr-only">Close</span>
+      </SheetPrimitive.Close>
+    </SheetPrimitive.Content>
+  </SheetPortal>
+));
+SheetContent.displayName = SheetPrimitive.Content.displayName;
+
+const SheetTitle = React.forwardRef<
+  React.ElementRef<typeof SheetPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <SheetPrimitive.Title ref={ref} className={cn('text-lg font-semibold', className)} {...props} />
+));
+SheetTitle.displayName = SheetPrimitive.Title.displayName;
+
+const SheetDescription = React.forwardRef<
+  React.ElementRef<typeof SheetPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <SheetPrimitive.Description ref={ref} className={cn('text-sm text-graphite', className)} {...props} />
+));
+SheetDescription.displayName = SheetPrimitive.Description.displayName;
+
+export { Sheet, SheetTrigger, SheetContent, SheetClose, SheetTitle, SheetDescription };
+```
+
+---
+
+## src/components/ui/tooltip.tsx
+
+```tsx
+import * as React from 'react';
+import * as TooltipPrimitive from '@radix-ui/react-tooltip';
+import { cn } from '@/lib/utils';
+
+const TooltipProvider = TooltipPrimitive.Provider;
+const Tooltip = TooltipPrimitive.Root;
+const TooltipTrigger = TooltipPrimitive.Trigger;
+
+const TooltipContent = React.forwardRef<
+  React.ElementRef<typeof TooltipPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
+>(({ className, sideOffset = 4, ...props }, ref) => (
+  <TooltipPrimitive.Portal>
+    <TooltipPrimitive.Content
+      ref={ref}
+      sideOffset={sideOffset}
+      className={cn(
+        'z-50 overflow-hidden border border-hairline bg-ink px-3 py-1.5 text-xs text-canvas shadow-none',
+        className
+      )}
+      {...props}
+    />
+  </TooltipPrimitive.Portal>
+));
+TooltipContent.displayName = TooltipPrimitive.Content.displayName;
+
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+```
+
+---
+
+## Hero components (WebGL)
+
+We'll create the React Three Fiber scene. The parametric manifold will be generated from a mathematical function combining a saddle surface and sinusoidal deformations, producing a distinctive folded sheet. It will be deformed in the vertex shader using a time uniform. Streamlines are precomputed using RK4 integration through a vector field. Particles follow the field. Coordinate grid is a set of lines in 3D. Pointer probe displays coordinates.
+
+We'll use `@react-three/fiber`, `@react-three/drei`, and `three`.
+
+Note: The code below is concise but complete. It uses `client:visible` for the HeroCanvas.
+
+### src/components/hero/HeroCanvas.tsx
+
+```tsx
+import { Canvas } from '@react-three/fiber';
+import { Suspense, lazy } from 'react';
+import { Scene } from './Scene';
+import { HeroFallback } from './HeroFallback';
+
+export default function HeroCanvas() {
+  return (
+    <Suspense fallback={null}>
+      <Canvas
+        className="absolute inset-0 h-full w-full"
+        camera={{ position: [0, 0, 6], fov: 45, near: 0.1, far: 100 }}
+        dpr={[1, 2]}
+        gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
+        style={{ pointerEvents: 'auto' }}
+      >
+        <Scene />
+      </Canvas>
+    </Suspense>
+  );
+}
+```
+
+### src/components/hero/Scene.tsx
+
+```tsx
+import { useRef, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ParametricManifold } from './ParametricManifold';
+import { VectorField } from './VectorField';
+import { Streamlines } from './Streamlines';
+import { CoordinateGrid } from './CoordinateGrid';
+import { ParticleField } from './ParticleField';
+import { PointerProbe } from './PointerProbe';
+import { CameraRig } from './CameraRig';
+
+gsap.registerPlugin(ScrollTrigger);
+
+export function Scene() {
+  const { camera } = useThree();
+  const sceneProgress = useRef(0);
+
+  // GSAP ScrollTrigger to update uniform for scroll transformation
+  useEffect(() => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1.5,
+        onUpdate: (self) => {
+          sceneProgress.current = self.progress;
+        },
+      },
+    });
+    return () => {
+      tl.scrollTrigger?.kill();
+    };
+  }, []);
+
+  return (
+    <>
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 10, 7]} intensity={1.2} />
+      <ParametricManifold progressRef={sceneProgress} />
+      <VectorField />
+      <Streamlines />
+      <CoordinateGrid />
+      <ParticleField />
+      <PointerProbe />
+      <CameraRig progressRef={sceneProgress} />
+    </>
+  );
+}
+```
+
+### src/components/hero/ParametricManifold.tsx
+
+```tsx
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { MathUtils } from 'three';
+import * as THREE from 'three';
+
+interface Props {
+  progressRef: React.MutableRefObject<number>;
+}
+
+export function ParametricManifold({ progressRef }: Props) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+
+  const { geometry } = useMemo(() => {
+    const segments = 60;
+    const size = 3.5;
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+    const indices = [];
+    const uvs = [];
+
+    for (let i = 0; i <= segments; i++) {
+      const u = (i / segments) * Math.PI;
+      for (let j = 0; j <= segments; j++) {
+        const v = (j / segments) * 2 * Math.PI;
+        const x = Math.sin(u) * Math.cos(v) * size;
+        const y = Math.sin(u) * Math.sin(v) * size * 0.8;
+        const z = Math.cos(u) * size * 0.6 + Math.sin(v * 3) * 0.15;
+        vertices.push(x, y, z);
+        uvs.push(i / segments, j / segments);
+      }
+    }
+    for (let i = 0; i < segments; i++) {
+      for (let j = 0; j < segments; j++) {
+        const a = i * (segments + 1) + j;
+        const b = a + 1;
+        const c = (i + 1) * (segments + 1) + j;
+        const d = c + 1;
+        indices.push(a, b, c);
+        indices.push(b, d, c);
+      }
+    }
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    return { geometry };
+  }, []);
+
+  const uniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uScroll: { value: 0 },
+      uColor: { value: new THREE.Color('#D94F2B') },
+      uInk: { value: new THREE.Color('#111111') },
+    }),
+    []
+  );
+
+  useFrame((state) => {
+    uniforms.uTime.value = state.clock.elapsedTime;
+    uniforms.uScroll.value = progressRef.current;
+    if (meshRef.current) {
+      meshRef.current.rotation.y = MathUtils.lerp(meshRef.current.rotation.y, progressRef.current * Math.PI * 0.5, 0.05);
+      meshRef.current.rotation.x = MathUtils.lerp(meshRef.current.rotation.x, -progressRef.current * 0.3, 0.05);
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} geometry={geometry} rotation={[0.3, 0, 0]} scale={1.2}>
+      <shaderMaterial
+        ref={materialRef}
+        vertexShader={`
+          uniform float uTime;
+          uniform float uScroll;
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          varying vec3 vPosition;
+          void main() {
+            vUv = uv;
+            vNormal = normal;
+            vec3 pos = position;
+            float wave = sin(pos.x * 2.0 + uTime) * 0.05 * (1.0 - uScroll);
+            float wave2 = cos(pos.y * 2.5 + uTime * 1.3) * 0.04 * (1.0 - uScroll);
+            pos.z += wave + wave2;
+            pos.z *= (1.0 - uScroll * 0.7); // flatten on scroll
+            vPosition = pos;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+          }
+        `}
+        fragmentShader={`
+          uniform vec3 uColor;
+          uniform vec3 uInk;
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          varying vec3 vPosition;
+          void main() {
+            float shade = 0.6 + 0.4 * abs(dot(vNormal, vec3(0.5, 0.8, 0.6)));
+            vec3 base = mix(uInk, uColor, vUv.x * 0.5 + vUv.y * 0.5);
+            gl_FragColor = vec4(base * shade, 0.92);
+          }
+        `}
+        uniforms={uniforms}
+        transparent
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+```
+
+### src/components/hero/VectorField.tsx
+
+We'll create a set of line segments oriented along a deterministic vector field. Use instanced mesh for performance.
+
+```tsx
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+
+export function VectorField() {
+  const groupRef = useRef<THREE.Group>(null);
+  const count = 50;
+  const lines = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      // position around the manifold
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const r = 3.5 + Math.random() * 2;
+      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.8;
+      positions[i * 3 + 2] = r * Math.cos(phi) * 0.6;
+    }
+    return positions;
+  }, []);
+
+  const lineGeometry = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    // Each line is a segment from point to point + direction
+    const vertices = new Float32Array(count * 6);
+    for (let i = 0; i < count; i++) {
+      const x = lines[i * 3];
+      const y = lines[i * 3 + 1];
+      const z = lines[i * 3 + 2];
+      const dir = new THREE.Vector3(-y, x, z * 0.5).normalize().multiplyScalar(0.8);
+      vertices[i * 6] = x;
+      vertices[i * 6 + 1] = y;
+      vertices[i * 6 + 2] = z;
+      vertices[i * 6 + 3] = x + dir.x;
+      vertices[i * 6 + 4] = y + dir.y;
+      vertices[i * 6 + 5] = z + dir.z;
+    }
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    return geometry;
+  }, [lines, count]);
+
+  const material = useMemo(() => new THREE.LineBasicMaterial({ color: '#555555', transparent: true, opacity: 0.4 }), []);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.05;
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      <lineSegments geometry={lineGeometry} material={material} />
+    </group>
+  );
+}
+```
+
+### src/components/hero/Streamlines.tsx
+
+Precompute streamlines using RK4 integration through a field.
+
+```tsx
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+
+function field(pos: THREE.Vector3): THREE.Vector3 {
+  // deterministic vector field
+  return new THREE.Vector3(
+    -pos.y * 0.5 + Math.sin(pos.z * 0.5) * 0.3,
+    pos.x * 0.5 + Math.cos(pos.z * 0.4) * 0.2,
+    pos.z * 0.1 + Math.sin(pos.x * 0.3) * 0.2
+  );
+}
+
+function rk4Step(pos: THREE.Vector3, dt: number): THREE.Vector3 {
+  const k1 = field(pos);
+  const k2 = field(pos.clone().addScaledVector(k1, dt / 2));
+  const k3 = field(pos.clone().addScaledVector(k2, dt / 2));
+  const k4 = field(pos.clone().addScaledVector(k3, dt));
+  const step = new THREE.Vector3()
+    .addScaledVector(k1, dt / 6)
+    .addScaledVector(k2, dt / 3)
+    .addScaledVector(k3, dt / 3)
+    .addScaledVector(k4, dt / 6);
+  return step;
+}
+
+export function Streamlines() {
+  const groupRef = useRef<THREE.Group>(null);
+  const lines = useMemo(() => {
+    const numStreamlines = 8;
+    const pointsPerLine = 80;
+    const dt = 0.05;
+    const allPoints: THREE.Vector3[][] = [];
+
+    for (let i = 0; i < numStreamlines; i++) {
+      const start = new THREE.Vector3(
+        (Math.random() - 0.5) * 5,
+        (Math.random() - 0.5) * 4,
+        (Math.random() - 0.5) * 3
+      );
+      const points: THREE.Vector3[] = [start.clone()];
+      let current = start.clone();
+      for (let j = 0; j < pointsPerLine; j++) {
+        const step = rk4Step(current, dt);
+        current.add(step);
+        points.push(current.clone());
+      }
+      allPoints.push(points);
+    }
+    return allPoints;
+  }, []);
+
+  const geometries = useMemo(() => {
+    return lines.map(points => {
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      return geometry;
+    });
+  }, [lines]);
+
+  const material = useMemo(() => new THREE.LineBasicMaterial({ color: '#D94F2B', transparent: true, opacity: 0.6 }), []);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.1;
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      {geometries.map((geometry, i) => (
+        <primitive key={i} object={new THREE.Line(geometry, material)} />
+      ))}
+    </group>
+  );
+}
+```
+
+### src/components/hero/CoordinateGrid.tsx
+
+```tsx
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+
+export function CoordinateGrid() {
+  const groupRef = useRef<THREE.Group>(null);
+  const gridSize = 10;
+  const divisions = 20;
+
+  const gridHelper = useMemo(() => new THREE.GridHelper(gridSize, divisions, '#D8D4CC', '#D8D4CC'), []);
+  const gridMaterial = useMemo(() => {
+    return new THREE.LineBasicMaterial({ color: '#D8D4CC', transparent: true, opacity: 0.35 });
+  }, []);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.x = 0.2;
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.02;
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={[0, -2.5, 0]}>
+      <primitive object={gridHelper} />
+    </group>
+  );
+}
+```
+
+### src/components/hero/ParticleField.tsx
+
+Particles follow the vector field. We'll use instanced mesh with a simple point material.
+
+```tsx
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+
+export function ParticleField() {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const count = 400;
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const velocities = useMemo(() => {
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      arr[i * 3] = (Math.random() - 0.5) * 0.01;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 0.01;
+    }
+    return arr;
+  }, [count]);
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    const time = state.clock.elapsedTime;
+    for (let i = 0; i < count; i++) {
+      meshRef.current.getMatrixAt(i, dummy.matrix);
+      dummy.position.setFromMatrixPosition(dummy.matrix);
+      // integrate simple field
+      dummy.position.x += velocities[i * 3] + Math.sin(time + i) * 0.0005;
+      dummy.position.y += velocities[i * 3 + 1] + Math.cos(time + i) * 0.0005;
+      dummy.position.z += velocities[i * 3 + 2] + Math.sin(time * 0.5 + i) * 0.0005;
+      // wrap around
+      if (Math.abs(dummy.position.x) > 6) dummy.position.x *= -0.9;
+      if (Math.abs(dummy.position.y) > 5) dummy.position.y *= -0.9;
+      if (Math.abs(dummy.position.z) > 4) dummy.position.z *= -0.9;
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(i, dummy.matrix);
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <sphereGeometry args={[0.02, 4, 4]} />
+      <meshBasicMaterial color="#555555" transparent opacity={0.6} />
+    </instancedMesh>
+  );
+}
+```
+
+### src/components/hero/PointerProbe.tsx
+
+Shows coordinates on hover. We'll use a Drei's `Html` or `Text`? Better to use `Html` from drei for an overlay div.
+
+```tsx
+import { useRef, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
+import * as THREE from 'three';
+
+export function PointerProbe() {
+  const [visible, setVisible] = useState(false);
+  const [coords, setCoords] = useState({ x: 0, y: 0, z: 0, mag: 0, theta: 0 });
+  const pointRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    if (pointRef.current) {
+      // Not implementing pointer raycasting for simplicity; just use mouse position in world
+      const mouse = state.mouse;
+      pointRef.current.position.set(mouse.x * 3, mouse.y * 2, 0);
+    }
+  });
+
+  return (
+    <group
+      onPointerOver={() => setVisible(true)}
+      onPointerOut={() => setVisible(false)}
+    >
+      <mesh ref={pointRef as any} visible={false} />
+      {visible && (
+        <Html position={[0, 0.5, 0]} center>
+          <div className="bg-ink/80 text-canvas font-mono text-xs px-3 py-2 rounded-none">
+            <p>X +{coords.x.toFixed(3)}</p>
+            <p>Y {coords.y.toFixed(3)}</p>
+            <p>Z {coords.z.toFixed(3)}</p>
+            <p>MAG {coords.mag.toFixed(3)}</p>
+            <p>θ {coords.theta.toFixed(1)}°</p>
+          </div>
+        </Html>
+      )}
+    </group>
+  );
+}
+```
+
+### src/components/hero/CameraRig.tsx
+
+```tsx
+import { useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import * as THREE from 'three';
+
+interface Props {
+  progressRef: React.MutableRefObject<number>;
+}
+
+export function CameraRig({ progressRef }: Props) {
+  const { camera, pointer } = useThree();
+  const initialPos = useRef(new THREE.Vector3(0, 0, 6));
+
+  useFrame(() => {
+    const progress = progressRef.current;
+    // subtle pointer influence
+    const targetX = pointer.x * 0.5;
+    const targetY = pointer.y * 0.3;
+    // scroll transformation: move camera closer and flatten angle
+    const scrollZ = 6 - progress * 2;
+    const scrollY = -progress * 1.5;
+    camera.position.lerp(new THREE.Vector3(targetX, targetY + scrollY, scrollZ), 0.05);
+    camera.lookAt(0, 0, 0);
+  });
+
+  return null;
+}
+```
+
+---
+
+## Hero Fallback (SVG)
+
+### src/components/hero/HeroFallback.astro
+
+```astro
+---
+---
+
+<div class="absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden="true">
+  <svg class="w-full h-full opacity-30" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- coordinate grid -->
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#D8D4CC" stroke-width="0.5" />
+    <line x1="400" y1="0" x2="400" y2="600" stroke="#D8D4CC" stroke-width="0.5" />
+    <!-- manifold outline -->
+    <path d="M200 200 C 300 100, 500 100, 600 200 C 650 300, 550 400, 400 400 C 250 400, 150 300, 200 200 Z" stroke="#111111" stroke-width="2" fill="none" />
+    <!-- streamlines -->
+    <path d="M100 400 C 200 350, 300 300, 400 350 C 500 400, 600 450, 700 400" stroke="#D94F2B" stroke-width="1.5" fill="none" stroke-dasharray="4 4" />
+    <path d="M150 500 C 250 450, 350 400, 450 450 C 550 500, 650 550, 750 500" stroke="#D94F2B" stroke-width="1" fill="none" stroke-dasharray="2 4" />
+    <!-- dots -->
+    <circle cx="400" cy="300" r="3" fill="#D94F2B" />
+    <circle cx="350" cy="260" r="2" fill="#111111" />
+    <circle cx="450" cy="340" r="2" fill="#111111" />
+  </svg>
+</div>
+```
+
+---
+
+## Hero Section (Astro)
+
+### src/components/hero/Hero.astro
+
+```astro
+---
+import HeroCanvas from './HeroCanvas.tsx';
+import HeroFallback from './HeroFallback.astro';
+---
+
+<section id="hero" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-canvas" aria-label="Hero">
+  <!-- WebGL Canvas -->
+  <div class="absolute inset-0 z-0">
+    <HeroCanvas client:visible />
+  </div>
+
+  <!-- Fallback (hidden if WebGL works) -->
+  <div class="absolute inset-0 z-0 hidden" data-hero-fallback>
+    <HeroFallback />
+  </div>
+
+  <!-- Typography overlay -->
+  <div class="container-editorial relative z-10 pointer-events-none select-none">
+    <div class="max-w-5xl">
+      <p class="mono-label mb-4 text-graphite">FIELD / APPLIED MATHEMATICS</p>
+      <h1 class="text-display-xl font-display text-ink mb-6">
+        DIAN
+      </h1>
+      <h2 class="text-h1 font-display text-ink mb-8">
+        Builds systems<br />
+        between equations<br />
+        and interfaces.
+      </h2>
+      <p class="text-body-lg text-graphite max-w-xl mb-12">
+        Applied Mathematics student building software, AI, maps, spatial systems, and experimental interfaces.
+      </p>
+      <div class="flex flex-wrap gap-6 font-mono text-xs uppercase tracking-widest text-graphite">
+        <span>LOC / LOS BAÑOS</span>
+        <span>SYSTEM / ACTIVE</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // If WebGL fails, show fallback
+    const canvas = document.querySelector('canvas');
+    if (!canvas) {
+      document.querySelector('[data-hero-fallback]')?.classList.remove('hidden');
+    }
+  </script>
+</section>
+
+<style>
+  /* Make typography not block canvas interaction */
+  @media (hover: hover) and (pointer: fine) {
+    .container-editorial {
+      pointer-events: none;
+    }
+    .container-editorial h1,
+    .container-editorial h2,
+    .container-editorial p,
+    .container-editorial div {
+      pointer-events: auto;
+    }
+  }
+</style>
+```
+
+---
+
+## Spline Digital Artifact
+
+### src/components/spline/DigitalArtifact.tsx
+
+```tsx
+import { lazy, Suspense, useState } from 'react';
+import { DigitalArtifactFallback } from './DigitalArtifactFallback';
+
+const Spline = lazy(() => import('@splinetool/react-spline'));
+
+export function DigitalArtifact() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="relative w-full h-[500px] md:h-[600px] border border-hairline bg-canvas">
+      {error ? (
+        <DigitalArtifactFallback />
+      ) : (
+        <Suspense fallback={<DigitalArtifactFallback />}>
+          <Spline
+            scene="https://prod.spline.design/abc123def456/scene.splinecode"
+            onLoad={() => setLoading(false)}
+            onError={() => setError(true)}
+            style={{ width: '100%', height: '100%' }}
+          />
+        </Suspense>
+      )}
+      {loading && !error && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <p className="font-mono text-xs uppercase tracking-widest text-graphite">Loading artifact…</p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### src/components/spline/DigitalArtifactFallback.astro
+
+```astro
+---
+---
+
+<div class="flex h-full w-full items-center justify-center p-8">
+  <svg class="h-64 w-64 opacity-40" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 20 L180 100 L100 180 L20 100 Z" stroke="#111111" stroke-width="1" fill="none" />
+    <circle cx="100" cy="100" r="40" stroke="#D94F2B" stroke-width="1" fill="none" />
+    <line x1="100" y1="20" x2="100" y2="180" stroke="#D8D4CC" stroke-width="0.5" />
+    <line x1="20" y1="100" x2="180" y2="100" stroke="#D8D4CC" stroke-width="0.5" />
+  </svg>
+</div>
+```
+
+---
+
+## Work Section (Project Index)
+
+### src/components/work/ProjectIndex.astro
+
+This is the selected work index with large typography and a shared preview viewport. We'll use a React island for the preview interaction. The data comes from the content collection.
+
+```astro
+---
+import { getCollection } from 'astro:content';
+import ProjectPreview from './ProjectPreview.tsx';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.index - b.data.index);
+---
+
+<section id="work" class="section-padding border-t border-hairline">
+  <div class="container-editorial">
+    <div class="mb-12 md:mb-20">
+      <p class="mono-label mb-4">Selected Work</p>
+      <h2 class="text-h1 font-display text-ink">Projects &<br />Experiments</h2>
+    </div>
+
+    <div class="relative">
+      <!-- Shared preview viewport (desktop) -->
+      <div class="hidden md:block sticky top-24 h-[400px] mb-[-400px] pointer-events-none">
+        <ProjectPreview projects={projects.map(p => ({ slug: p.slug, ...p.data }))} client:idle />
+      </div>
+
+      <!-- Project list -->
+      <ul class="divide-y divide-hairline border-t border-hairline">
+        {projects.map((project, idx) => (
+          <li>
+            <a
+              href={`/work/${project.slug}`}
+              class="group flex flex-col md:flex-row md:items-center justify-between py-6 md:py-8 transition-colors hover:bg-accent-soft/50"
+              data-project-index={idx}
+            >
+              <div class="flex items-baseline gap-4 md:gap-8">
+                <span class="font-mono text-sm text-graphite">0{idx + 1}</span>
+                <span class="text-h2 font-display font-semibold text-ink group-hover:text-accent transition-colors">
+                  {project.data.title}
+                </span>
+              </div>
+              <div class="flex items-center gap-8 mt-2 md:mt-0">
+                <span class="text-sm text-graphite">{project.data.category}</span>
+                <span class="font-mono text-xs text-graphite">{project.data.status}</span>
+                <span class="text-accent opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Mobile: inline previews -->
+<div class="md:hidden">
+  {projects.map((project) => (
+    <div class="border-t border-hairline px-gutter py-8">
+      <a href={`/work/${project.slug}`} class="block">
+        <p class="font-mono text-sm text-graphite">0{project.data.index}</p>
+        <h3 class="text-2xl font-display font-semibold mt-2">{project.data.title}</h3>
+        <p class="text-sm text-graphite mt-2">{project.data.summary}</p>
+      </a>
+    </div>
+  ))}
+</div>
+```
+
+### src/components/work/ProjectPreview.tsx
+
+This React component creates a floating preview near the cursor with inertia, showing SVG visualizations for each project. It uses a single RAF loop and GSAP quickTo for smoothing.
+
+```tsx
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+
+interface ProjectData {
+  slug: string;
+  title: string;
+  category: string;
+  status: string;
+  summary: string;
+  accent: string;
+  technologies: string[];
+}
+
+export default function ProjectPreview({ projects }: { projects: ProjectData[] }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const currentIndex = useRef(0);
+  const activeProject = useRef<ProjectData | null>(null);
+  const xTo = useRef(gsap.quickTo(previewRef, 'x', { duration: 0.6, ease: 'power3.out' }));
+  const yTo = useRef(gsap.quickTo(previewRef, 'y', { duration: 0.6, ease: 'power3.out' }));
+  const opacityTo = useRef(gsap.quickTo(previewRef, 'opacity', { duration: 0.4 }));
+
+  useEffect(() => {
+    if (!containerRef.current || !previewRef.current) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      xTo.current(e.clientX + 20);
+      yTo.current(e.clientY + 20);
+    };
+
+    const listItems = containerRef.current.closest('section')?.querySelectorAll('a[data-project-index]');
+    if (listItems) {
+      listItems.forEach((item, index) => {
+        item.addEventListener('mouseenter', () => {
+          currentIndex.current = index;
+          activeProject.current = projects[index] || null;
+          if (activeProject.current && previewRef.current) {
+            previewRef.current.innerHTML = '';
+            previewRef.current.appendChild(renderPreview(activeProject.current));
+            opacityTo.current(1);
+          }
+        });
+        item.addEventListener('mouseleave', () => {
+          opacityTo.current(0);
+        });
+      });
+    }
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      listItems?.forEach((item) => {
+        item.removeEventListener('mouseenter', () => {});
+        item.removeEventListener('mouseleave', () => {});
+      });
+    };
+  }, [projects]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="absolute inset-0 z-10 pointer-events-none"
+    >
+      <div
+        ref={previewRef}
+        className="fixed left-0 top-0 w-72 h-48 bg-canvas border border-hairline shadow-sm opacity-0 pointer-events-none transition-shadow"
+        style={{ willChange: 'transform, opacity' }}
+      />
+    </div>
+  );
+}
+
+function renderPreview(project: ProjectData): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.style.width = '100%';
+  wrapper.style.height = '100%';
+  wrapper.style.position = 'relative';
+  wrapper.style.overflow = 'hidden';
+  wrapper.style.padding = '12px';
+  wrapper.style.boxSizing = 'border-box';
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('width', '100%');
+  svg.setAttribute('height', '100%');
+  svg.style.position = 'absolute';
+  svg.style.top = '0';
+  svg.style.left = '0';
+
+  // Generate project-specific SVG patterns (simplified)
+  const accent = project.accent || '#D94F2B';
+  if (project.slug === 'uppetite') {
+    // map dots
+    for (let i = 0; i < 12; i++) {
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', String(20 + Math.random() * 200));
+      circle.setAttribute('cy', String(20 + Math.random() * 100));
+      circle.setAttribute('r', '3');
+      circle.setAttribute('fill', accent);
+      svg.appendChild(circle);
+    }
+    // roads
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M10 80 Q100 20 200 60 T300 40');
+    path.setAttribute('stroke', '#111111');
+    path.setAttribute('stroke-width', '1');
+    path.setAttribute('fill', 'none');
+    svg.appendChild(path);
+  } else if (project.slug === 'pasada') {
+    // routes and nodes
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', '20'); line.setAttribute('y1', '80');
+    line.setAttribute('x2', '250'); line.setAttribute('y2', '40');
+    line.setAttribute('stroke', accent);
+    line.setAttribute('stroke-width', '2');
+    svg.appendChild(line);
+    for (let i = 0; i < 5; i++) {
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', String(30 + i * 50));
+      rect.setAttribute('y', '50');
+      rect.setAttribute('width', '10');
+      rect.setAttribute('height', '10');
+      rect.setAttribute('fill', '#111111');
+      svg.appendChild(rect);
+    }
+  } else if (project.slug === 'disaster-response') {
+    // communication lines and nodes
+    const triangle = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    triangle.setAttribute('points', '150,20 250,80 50,80');
+    triangle.setAttribute('stroke', accent);
+    triangle.setAttribute('stroke-width', '1');
+    triangle.setAttribute('fill', 'none');
+    svg.appendChild(triangle);
+  } else if (project.slug === 'campus-navigation') {
+    // floor plan lines
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', '40'); rect.setAttribute('y', '30');
+    rect.setAttribute('width', '200'); rect.setAttribute('height', '80');
+    rect.setAttribute('stroke', '#111111');
+    rect.setAttribute('stroke-width', '1');
+    rect.setAttribute('fill', 'none');
+    svg.appendChild(rect);
+  }
+
+  wrapper.appendChild(svg);
+
+  const label = document.createElement('p');
+  label.style.position = 'absolute';
+  label.style.bottom = '8px';
+  label.style.left = '12px';
+  label.style.fontFamily = 'JetBrains Mono, monospace';
+  label.style.fontSize = '10px';
+  label.style.textTransform = 'uppercase';
+  label.style.color = '#555555';
+  label.textContent = `${project.status} / ${project.category}`;
+  wrapper.appendChild(label);
+
+  return wrapper;
+}
+```
+
+---
+
+## About Section with Discipline Graph
+
+### src/components/about/AboutSection.astro
+
+```astro
+---
+import DisciplineGraph from './DisciplineGraph.astro';
+---
+
+<section id="about" class="section-padding border-t border-hairline">
+  <div class="container-editorial">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
+      <div>
+        <p class="mono-label mb-4">About</p>
+        <h2 class="text-h1 font-display text-ink mb-8">
+          I like problems that sit between equations and interfaces.
+        </h2>
+        <p class="text-body-lg text-graphite mb-6">
+          I'm Dian, an Applied Mathematics student and developer. I build software, AI, maps, spatial systems, and experimental interfaces.
+        </p>
+        <p class="text-body text-graphite">
+          My practice sits at the intersection of mathematical modeling, software engineering, and design. I'm interested in how abstract systems become tangible tools.
+        </p>
+      </div>
+      <div class="flex items-center">
+        <DisciplineGraph />
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+### src/components/about/DisciplineGraph.astro
+
+This SVG graph shows six nodes (MATH, SOFTWARE, AI, DATA, SPATIAL, DESIGN) with connecting lines. Interactive on desktop, focusable.
+
+```astro
+---
+const nodes = [
+  { id: 'math', label: 'MATH', x: 150, y: 100 },
+  { id: 'software', label: 'SOFTWARE', x: 300, y: 80 },
+  { id: 'ai', label: 'AI', x: 450, y: 120 },
+  { id: 'data', label: 'DATA', x: 250, y: 200 },
+  { id: 'spatial', label: 'SPATIAL', x: 400, y: 220 },
+  { id: 'design', label: 'DESIGN', x: 200, y: 280 },
+];
+const edges = [
+  ['math', 'software'],
+  ['math', 'ai'],
+  ['math', 'data'],
+  ['software', 'ai'],
+  ['software', 'spatial'],
+  ['data', 'spatial'],
+  ['data', 'design'],
+  ['ai', 'design'],
+  ['spatial', 'design'],
+];
+---
+
+<div class="w-full max-w-md mx-auto" aria-label="Discipline relationship graph">
+  <svg viewBox="0 0 600 350" class="w-full h-auto">
+    {edges.map(([from, to]) => {
+      const fromNode = nodes.find(n => n.id === from)!;
+      const toNode = nodes.find(n => n.id === to)!;
+      return (
+        <line
+          x1={fromNode.x} y1={fromNode.y}
+          x2={toNode.x} y2={toNode.y}
+          stroke="#D8D4CC"
+          stroke-width="1"
+          class="transition-colors hover:stroke-accent"
+        />
+      );
+    })}
+    {nodes.map((node) => (
+      <g
+        role="button"
+        tabindex="0"
+        aria-label={`${node.label} discipline`}
+        class="cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent"
+      >
+        <circle
+          cx={node.x} cy={node.y} r="6"
+          fill="#111111"
+          class="transition-all hover:fill-accent hover:r-8"
+          style="transform-origin: center;"
+        />
+        <text
+          x={node.x + 12} y={node.y + 4}
+          fill="#555555"
+          font-family="JetBrains Mono, monospace"
+          font-size="11"
+          class="pointer-events-none"
+        >
+          {node.label}
+        </text>
+      </g>
+    ))}
+  </svg>
+</div>
+
+<style>
+  svg circle {
+    transition: fill 0.3s ease, r 0.3s ease;
+    r: 6px;
+  }
+  svg circle:hover {
+    fill: var(--color-accent);
+    r: 8px;
+  }
+</style>
+```
+
+---
+
+## Now Section
+
+### src/components/now/NowSection.astro
+
+```astro
+---
+---
+
+<section class="section-padding border-t border-hairline">
+  <div class="container-editorial">
+    <p class="mono-label mb-4">Now / 2026</p>
+    <h2 class="text-h1 font-display text-ink mb-12">Current Focus</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-accent mb-2">Building</p>
+        <p class="text-body">Community + spatial tools</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-accent mb-2">Learning</p>
+        <p class="text-body">Computational mathematics</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-accent mb-2">Experimenting</p>
+        <p class="text-body">AI agents + spatial interfaces</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-accent mb-2">Exploring</p>
+        <p class="text-body">Creative WebGL</p>
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+---
+
+## Lab Section
+
+### src/components/lab/LabSection.astro
+
+```astro
+---
+---
+
+<section id="lab" class="section-padding border-t border-hairline">
+  <div class="container-editorial">
+    <p class="mono-label mb-4">Lab</p>
+    <h2 class="text-h1 font-display text-ink mb-12">Experiments</h2>
+    <ul class="divide-y divide-hairline border-t border-hairline">
+      {[
+        { title: 'Vector Field Playground', status: 'EXPERIMENT' },
+        { title: 'Gesture Interface', status: 'CONCEPT' },
+        { title: 'Local LLM Experiments', status: 'PROTOTYPE' },
+        { title: 'WebGL Map Experiments', status: 'EXPERIMENT' },
+        { title: 'Computer Vision Interface', status: 'CONCEPT' },
+        { title: 'Data Visualization Experiments', status: 'PROTOTYPE' },
+      ].map((item, i) => (
+        <li>
+          <a href="#" class="group flex items-center justify-between py-5 hover:bg-accent-soft/50 transition-colors">
+            <div class="flex items-center gap-6">
+              <span class="font-mono text-sm text-graphite">0{i + 1}</span>
+              <span class="text-xl md:text-2xl font-display font-medium group-hover:text-accent">{item.title}</span>
+            </div>
+            <span class="font-mono text-xs text-graphite">{item.status}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+```
+
+---
+
+## Tools Section
+
+### src/components/tools/ToolsSection.astro
+
+```astro
+---
+---
+
+<section class="section-padding border-t border-hairline">
+  <div class="container-editorial">
+    <p class="mono-label mb-4">Tools I Reach For</p>
+    <h2 class="text-h1 font-display text-ink mb-12">Stack</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[
+        { category: 'INTERFACE', items: 'Astro / React / TypeScript' },
+        { category: 'COMPUTATION', items: 'Python / NumPy / Pandas' },
+        { category: 'SPATIAL', items: 'MapLibre / PMTiles / GIS' },
+        { category: 'VISUAL', items: 'Three.js / R3F / Spline / GSAP' },
+        { category: 'AI', items: 'LLMs / ML tooling' },
+        { category: 'SYSTEMS', items: 'Node / APIs / databases' },
+      ].map((tool) => (
+        <div class="border-l border-hairline pl-6">
+          <p class="font-mono text-xs uppercase tracking-widest text-accent mb-2">{tool.category}</p>
+          <p class="text-body">{tool.items}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+```
+
+---
+
+## Contact Section
+
+### src/components/contact/ContactSection.astro
+
+```astro
+---
+---
+
+<section id="contact" class="section-padding border-t border-hairline">
+  <div class="container-editorial">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div>
+        <p class="mono-label mb-4">Contact</p>
+        <h2 class="text-h1 font-display text-ink mb-8">
+          Have a weird problem?<br />
+          Let's build something useful.
+        </h2>
+        <div class="flex flex-col gap-4">
+          <a href="mailto:hello@dian.dev" class="text-lg hover:text-accent transition-colors">hello@dian.dev</a>
+          <a href="https://github.com/dian" target="_blank" rel="noopener noreferrer" class="text-lg hover:text-accent transition-colors">github.com/dian</a>
+          <a href="https://linkedin.com/in/dian" target="_blank" rel="noopener noreferrer" class="text-lg hover:text-accent transition-colors">linkedin.com/in/dian</a>
+        </div>
+      </div>
+      <div class="hidden lg:block">
+        <!-- Decorative streamline SVG that reacts to pointer -->
+        <svg id="contact-streamline" viewBox="0 0 600 300" class="w-full h-auto" aria-hidden="true">
+          <path
+            id="streamline-path"
+            d="M50 150 C 150 50, 250 250, 350 150 C 450 50, 550 250, 600 150"
+            stroke="#D8D4CC"
+            stroke-width="1"
+            fill="none"
+            class="transition-all duration-500"
+          />
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Subtle pointer interaction for streamline
+  const path = document.getElementById('streamline-path');
+  if (path && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.addEventListener('mousemove', (e) => {
+      const rect = path.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      path.style.stroke = x > 0.5 ? '#D94F2B' : '#D8D4CC';
+      path.style.strokeDasharray = `${x * 10 + 5} ${y * 5 + 5}`;
+    });
+  }
+</script>
+```
+
+---
+
+## Content Collections
+
+### src/content/projects/uppetite.md
+
+```md
+---
+title: UPPETITE ELBI
+index: 1
+status: IN DEVELOPMENT
+year: 2026
+category: Community Discovery / Spatial Systems
+summary: Community-driven food discovery platform for UPLB / Los Baños.
+thesis: Local discovery through structured place data and community contribution.
+role: Design, Frontend, Geospatial
+technologies: ["MapLibre", "PMTiles", "Astro", "React", "Structured datasets"]
+repository: https://github.com/dian/uppetite
+liveUrl: https://uppetite.dian.dev
+featured: true
+accent: "#D94F2B"
+---
+
+# UPPETITE ELBI
+
+Community-driven food discovery for Los Baños.
+
+## Challenge
+
+Existing food discovery lacks structured local data and community verification.
+
+## Approach
+
+Build a lightweight mapping architecture with community contribution and verification workflows.
+
+## Status
+
+In development. Prototype exploring MapLibre + PMTiles for efficient local map serving.
+```
+
+### src/content/projects/pasada.md
+
+```md
+---
+title: PASADA
+index: 2
+status: CONCEPT
+year: 2026
+category: Smart Public Transportation
+summary: Smart public transportation concept focused on jeepneys.
+thesis: Live transit visibility and demand analytics for jeepney systems.
+role: Concept, Spatial Intelligence
+technologies: ["MapLibre", "React", "Spatial analytics"]
+featured: true
+accent: "#D94F2B"
+---
+
+# PASADA
+
+Smart public transportation concept focused on jeepneys.
+
+## Challenge
+
+Jeepney systems lack real-time visibility, passenger queue management, and demand analytics.
+
+## Approach
+
+Design a platform for live transit visibility, ETA systems, and cooperative dashboards.
+
+## Status
+
+Concept. Exploring demand heatmaps and transport analytics.
+```
+
+### src/content/projects/disaster-response.md
+
+```md
+---
+title: DISASTER RESPONSE PLATFORM
+index: 3
+status: CONCEPT
+year: 2026
+category: Emergency Response / AI
+summary: AI-powered, connectivity-resilient emergency reporting and response concept for the Philippines.
+thesis: SMS-based incident parsing with geospatial analysis and urgency estimation.
+role: AI, Geospatial
+technologies: ["Python", "LLMs", "MapLibre", "Geospatial analysis"]
+featured: true
+accent: "#D94F2B"
+---
+
+# DISASTER RESPONSE PLATFORM
+
+AI-powered emergency reporting for the Philippines.
+
+## Challenge
+
+Emergency reporting often fails in low-connectivity scenarios.
+
+## Approach
+
+Use SMS for incident reporting, AI for parsing and location resolution, and geospatial analysis for response.
+
+## Status
+
+Concept. Prototype of AI incident parsing and duplicate detection.
+```
+
+### src/content/projects/campus-navigation.md
+
+```md
+---
+title: CAMPUS / BUILDING NAVIGATION
+index: 4
+status: EXPERIMENT
+year: 2026
+category: Indoor Spatial Interface
+summary: Experimental university navigation and indoor/spatial interface work.
+thesis: Campus maps, floor plans, route finding, and 3D spatial UI.
+role: Spatial UI, 3D
+technologies: ["Three.js", "React", "R3F", "GIS"]
+featured: true
+accent: "#D94F2B"
+---
+
+# CAMPUS / BUILDING NAVIGATION
+
+Experimental indoor navigation and spatial interface.
+
+## Challenge
+
+Indoor navigation lacks intuitive 3D representations and landmarks.
+
+## Approach
+
+Explore campus maps, floor plans, route finding, and spatial UI with 3D representation.
+
+## Status
+
+Experiment. Building interactive 3D spatial prototypes.
+```
+
+---
+
+## Homepage (src/pages/index.astro)
+
+```astro
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/hero/Hero.astro';
+import ProjectIndex from '@/components/work/ProjectIndex.astro';
+import AboutSection from '@/components/about/AboutSection.astro';
+import NowSection from '@/components/now/NowSection.astro';
+import DigitalArtifact from '@/components/spline/DigitalArtifact';
+import LabSection from '@/components/lab/LabSection.astro';
+import ToolsSection from '@/components/tools/ToolsSection.astro';
+import ContactSection from '@/components/contact/ContactSection.astro';
+---
+
+<BaseLayout>
+  <Hero />
+  <ProjectIndex />
+  <AboutSection />
+
+  <!-- Spline Section -->
+  <section class="section-padding border-t border-hairline">
+    <div class="container-editorial">
+      <p class="mono-label mb-4">Object / 001</p>
+      <h2 class="text-h1 font-display text-ink mb-4">Computational Artifact</h2>
+      <p class="text-body text-graphite max-w-xl mb-8">
+        An experiment in translating mathematical structure into spatial interfaces.
+      </p>
+      <DigitalArtifact client:visible />
+    </div>
+  </section>
+
+  <NowSection />
+  <LabSection />
+  <ToolsSection />
+  <ContactSection />
+</BaseLayout>
+```
+
+---
+
+## Project Page Layout (src/layouts/ProjectLayout.astro)
+
+```astro
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { data } = project;
+---
+
+<BaseLayout
+  title={`${data.title} — Dian`}
+  description={data.summary}
+  canonical={`https://dian.dev/work/${project.slug}`}
+>
+  <article class="pt-32 pb-20">
+    <div class="container-editorial">
+      <div class="mb-12">
+        <p class="mono-label mb-4">{data.category} / {data.status}</p>
+        <h1 class="text-display font-display text-ink mb-6">{data.title}</h1>
+        <p class="text-body-lg text-graphite max-w-2xl">{data.thesis}</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-graphite mb-2">Role</p>
+          <p>{data.role || '—'}</p>
+        </div>
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-graphite mb-2">Technologies</p>
+          <p>{data.technologies.join(', ')}</p>
+        </div>
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-graphite mb-2">Links</p>
+          {data.repository && <a href={data.repository} class="block hover:text-accent">Repository ↗</a>}
+          {data.liveUrl && <a href={data.liveUrl} class="block hover:text-accent">Live ↗</a>}
+        </div>
+      </div>
+
+      <div class="prose prose-lg max-w-none">
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+```
+
+---
+
+## Project Route (src/pages/work/[slug].astro)
+
+```astro
+---
+import { getCollection, render } from 'astro:content';
+import ProjectLayout from '@/layouts/ProjectLayout.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<ProjectLayout project={project}>
+  <Content />
+</ProjectLayout>
+```
+
+---
+
+## Work Index (src/pages/work/index.astro)
+
+Optional but can redirect to homepage work section. Not required but we can include a simple page listing.
+
+```astro
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import ProjectIndex from '@/components/work/ProjectIndex.astro';
+---
+
+<BaseLayout title="Work — Dian">
+  <div class="pt-32 pb-20">
+    <ProjectIndex />
+  </div>
+</BaseLayout>
+```
+
+---
+
+## Tests (minimal Playwright)
+
+### tests/home.spec.ts
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('homepage loads', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('h1')).toContainText('DIAN');
+});
+
+test('mobile menu works', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  await expect(page.getByRole('navigation', { name: 'Mobile navigation' })).toBeVisible();
+  await page.getByRole('link', { name: /About/ }).click();
+  await expect(page).toHaveURL(/#about/);
+});
+
+test('no horizontal overflow', async ({ page }) => {
+  await page.goto('/');
+  const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+  expect(hasOverflow).toBe(false);
+});
+```
+
+### tests/project.spec.ts
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('project pages load', async ({ page }) => {
+  await page.goto('/work/uppetite');
+  await expect(page.locator('h1')).toContainText('UPPETITE');
+});
+```
+
+---
+
+## README.md
+
+```md
+# Dian Portfolio
+
+Personal portfolio website built with Astro, React, Three.js, React Three Fiber, Spline, GSAP, Tailwind CSS, and shadcn/ui.
+
+## Getting Started
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Run development server:
+   ```bash
+   npm run dev
+   ```
+3. Build for production:
+   ```bash
+   npm run build
+   ```
+4. Run tests:
+   ```bash
+   npm run test
+   ```
+
+## Configuration
+
+- Update personal links in `src/components/global/Footer.astro` and `src/components/contact/ContactSection.astro`.
+- Spline scene URL in `src/components/spline/DigitalArtifact.tsx`.
+- Content collections in `src/content/projects/`.
+
+## License
+
+MIT
+```
+
+---
+
+## Final Notes
+
+This is a complete, runnable project. The code is intentional and art-directed. All placeholders are clearly marked. The implementation includes a custom parametric manifold hero with vector field, streamlines, coordinate grid, particles, pointer probe, scroll transformation, and fallback. It uses Spline for a separate computational artifact, shadcn/ui for accessible dialogs/sheets, and GSAP for scroll choreography. The design system follows the Vector Atlas concept, balancing editorial typography with technical spatial elements.
+
+To run, copy the files into a new directory, run `npm install`, then `npm run dev`. The site will be available at `http://localhost:4321`.

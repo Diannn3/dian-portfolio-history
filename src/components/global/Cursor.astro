@@ -1,0 +1,48 @@
+---
+// Custom cursor as a React island for desktop only
+---
+
+<div class="hidden md:block">
+  <div id="cursor-dot" class="pointer-events-none fixed left-0 top-0 z-50 h-2 w-2 rounded-full bg-accent mix-blend-difference transition-transform duration-100 ease-out" style="transform: translate(-50%, -50%)"></div>
+  <div id="cursor-ring" class="pointer-events-none fixed left-0 top-0 z-50 h-8 w-8 rounded-full border border-accent mix-blend-difference transition-transform duration-300 ease-out" style="transform: translate(-50%, -50%)"></div>
+</div>
+
+<script>
+  // Only run on desktop
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let mouseX = 0, mouseY = 0;
+    let ringX = 0, ringY = 0;
+    
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      dot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
+    });
+
+    const animateRing = () => {
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
+      requestAnimationFrame(animateRing);
+    };
+    requestAnimationFrame(animateRing);
+
+    // Interaction states
+    document.querySelectorAll('a, button, [role="button"], input, textarea, select, label[for]').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        ring.style.width = '48px';
+        ring.style.height = '48px';
+        ring.style.transform = `translate(${ringX - 24}px, ${ringY - 24}px)`;
+        ring.style.borderColor = 'var(--color-accent)';
+      });
+      el.addEventListener('mouseleave', () => {
+        ring.style.width = '32px';
+        ring.style.height = '32px';
+        ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
+        ring.style.borderColor = 'var(--color-accent)';
+      });
+    });
+  }
+</script>

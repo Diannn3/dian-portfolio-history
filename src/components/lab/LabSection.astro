@@ -1,0 +1,29 @@
+---
+---
+
+<section id="lab" class="section-padding border-t border-hairline">
+  <div class="container-editorial">
+    <p class="mono-label mb-4">Lab</p>
+    <h2 class="text-h1 font-display text-ink mb-12">Experiments</h2>
+    <ul class="divide-y divide-hairline border-t border-hairline">
+      {[
+        { title: 'Vector Field Playground', status: 'EXPERIMENT' },
+        { title: 'Gesture Interface', status: 'CONCEPT' },
+        { title: 'Local LLM Experiments', status: 'PROTOTYPE' },
+        { title: 'WebGL Map Experiments', status: 'EXPERIMENT' },
+        { title: 'Computer Vision Interface', status: 'CONCEPT' },
+        { title: 'Data Visualization Experiments', status: 'PROTOTYPE' },
+      ].map((item, i) => (
+        <li>
+          <a href="#" class="group flex items-center justify-between py-5 hover:bg-accent-soft/50 transition-colors">
+            <div class="flex items-center gap-6">
+              <span class="font-mono text-sm text-graphite">0{i + 1}</span>
+              <span class="text-xl md:text-2xl font-display font-medium group-hover:text-accent">{item.title}</span>
+            </div>
+            <span class="font-mono text-xs text-graphite">{item.status}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,34 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/hero/Hero.astro';
+import ProjectIndex from '@/components/work/ProjectIndex.astro';
+import AboutSection from '@/components/about/AboutSection.astro';
+import NowSection from '@/components/now/NowSection.astro';
+import DigitalArtifact from '@/components/spline/DigitalArtifact';
+import LabSection from '@/components/lab/LabSection.astro';
+import ToolsSection from '@/components/tools/ToolsSection.astro';
+import ContactSection from '@/components/contact/ContactSection.astro';
+---
+
+<BaseLayout>
+  <Hero />
+  <ProjectIndex />
+  <AboutSection />
+
+  <!-- Spline Section -->
+  <section class="section-padding border-t border-hairline">
+    <div class="container-editorial">
+      <p class="mono-label mb-4">Object / 001</p>
+      <h2 class="text-h1 font-display text-ink mb-4">Computational Artifact</h2>
+      <p class="text-body text-graphite max-w-xl mb-8">
+        An experiment in translating mathematical structure into spatial interfaces.
+      </p>
+      <DigitalArtifact client:only="react" />
+    </div>
+  </section>
+
+  <NowSection />
+  <LabSection />
+  <ToolsSection />
+  <ContactSection />
+</BaseLayout>
