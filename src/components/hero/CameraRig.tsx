@@ -1,35 +1,30 @@
-import { useRef } from "react"
-import { useFrame, useThree } from "@react-three/fiber"
-import * as THREE from "three"
-import { useHeroState } from "./hero-state"
+import * as THREE from 'three';
+import { sceneState } from '../../lib/webgl/sceneState';
+
+const target = new THREE.Vector3();
 
 /**
- * Composed camera — NOT orbit controls. Pointer nudges position slightly;
- * scroll dollies back and lifts the camera so the manifold reads as a
- * diagram by the end of the hero. All motion is eased, never abrupt.
+ * A composed camera. Pointer nudges it; scroll walks it from a low three-quarter
+ * view to a near-plan projection so the field ends up reading as a diagram.
+ * No orbit controls — the frame is art-directed.
  */
-export default function CameraRig({ mobile }: { mobile: boolean }) {
-  const { camera } = useThree()
-  const state = useHeroState()
-  const target = useRef(new THREE.Vector3(0, 0, 0))
+export function createCameraRig(camera: THREE.PerspectiveCamera, reduced: boolean, compact: boolean) {
+  const current = new THREE.Vector3(0, 1.4, compact ? 6.8 : 5.5);
+  camera.position.copy(current);
 
-  useFrame(() => {
-    const p = state.progress
-    const px = state.reducedMotion ? 0 : state.pointer.x
-    const py = state.reducedMotion ? 0 : state.pointer.y
+  return {
+    update() {
+      const p = sceneState.progress;
+      const px = reduced ? 0 : sceneState.pointerX;
+      const py = reduced ? 0 : sceneState.pointerY;
 
-    const baseZ = mobile ? 5.6 : 4.4
-    const desiredX = px * (mobile ? 0.15 : 0.5)
-    const desiredY = 0.6 + py * (mobile ? 0.1 : 0.35) + p * 1.4
-    const desiredZ = baseZ + p * 1.2
+      const y = THREE.MathUtils.lerp(compact ? 1.15 : 1.4, compact ? 3.4 : 4.1, p) + py * 0.28;
+      const z = THREE.MathUtils.lerp(compact ? 6.8 : 5.5, compact ? 5.0 : 3.7, p) + px * 0.16;
+      const x = px * (compact ? 0.1 : 0.5) + THREE.MathUtils.lerp(0, -0.5, p);
 
-    camera.position.x += (desiredX - camera.position.x) * 0.05
-    camera.position.y += (desiredY - camera.position.y) * 0.05
-    camera.position.z += (desiredZ - camera.position.z) * 0.05
-
-    target.current.set(0, p * 0.2, 0)
-    camera.lookAt(target.current)
-  })
-
-  return null
+      current.lerp(target.set(x, y, z), reduced ? 1 : 0.055);
+      camera.position.copy(current);
+      camera.lookAt(0, THREE.MathUtils.lerp(-0.1, -0.55, p), 0);
+    }
+  };
 }

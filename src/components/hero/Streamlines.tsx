@@ -1,82 +1,94 @@
-import { useEffect, useMemo, useRef } from "react"
-import { useFrame } from "@react-three/fiber"
-import * as THREE from "three"
-import { integrateStreamline, seeded, type Vec3 } from "@/lib/math/field"
-import { useHeroState } from "./hero-state"
+import * as THREE from 'three';
+import { seeded, streamline } from '../../lib/math/field';
+import { sceneState } from '../../lib/webgl/sceneState';
+import type { SceneNode } from './ParametricManifold';
 
-interface Props { count: number; steps: number }
+/**
+ * Trajectories through the field, integrated once with RK4 from a seeded set of
+ * launch points. Geometry is never rebuilt; the only motion is a set of tracers
+ * advancing along the precomputed polylines, which gives the scene direction.
+ */
+export function createStreamlines(count: number, reduced: boolean): SceneNode {
+  const group = new THREE.Group();
+  const rnd = seeded(773311);
+  const lines: THREE.Line[] = [];
+  const paths: THREE.Vector3[][] = [];
 
-type Streamline = {
-  geometry: THREE.BufferGeometry
-  positions: Float32Array
-  scratch: Float64Array
-}
+  for (let i = 0; i < count; i++) {
+    const start = new THREE.Vector3((rnd() - 0.5) * 5.4, (rnd() - 0.5) * 2.8, (rnd() - 0.5) * 4.6);
+    const pts = streamline(start, 200, 0.05, i * 1.7);
+    if (pts.length < 24) continue;
+    paths.push(pts);
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    const accent = i % 3 === 0;
+    const mat = new THREE.LineBasicMaterial({
+      color: accent ? '#d94f2b' : '#111111',
+      transparent: true,
+      opacity: accent ? 0.46 : 0.2
+    });
+    const line = new THREE.Line(geo, mat);
+    lines.push(line);
+    group.add(line);
+  }
 
-/** RK4 trajectories using caller-owned buffers on every animated rebuild. */
-export default function Streamlines({ count, steps }: Props) {
-  const groupRef = useRef<THREE.Group>(null)
-  const state = useHeroState()
-  const timeRef = useRef(0)
-  const rebuildAccum = useRef(0)
+  const tracerArray = new Float32Array(Math.max(paths.length, 1) * 3);
+  const tracerGeo = new THREE.BufferGeometry();
+  tracerGeo.setAttribute('position', new THREE.BufferAttribute(tracerArray, 3));
+  const tracerMat = new THREE.PointsMaterial({
+    color: '#d94f2b',
+    size: 0.055,
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: 0.85
+  });
+  const tracers = new THREE.Points(tracerGeo, tracerMat);
+  tracers.frustumCulled = false;
+  group.add(tracers);
 
-  const seeds = useMemo<Vec3[]>(() => {
-    const rng = seeded(20260215)
-    return Array.from({ length: count }, () => {
-      const angle = rng() * Math.PI * 2
-      const radius = 1.4 + rng() * 1.4
-      return [Math.cos(angle) * radius, (rng() - 0.5) * 2.2, Math.sin(angle) * radius] as Vec3
-    })
-  }, [count])
+  const cursor = paths.map((_, i) => i * 37 % 180);
 
-  const lines = useMemo<Streamline[]>(() => seeds.map((seed) => {
-    const positions = new Float32Array(steps * 3)
-    const scratch = new Float64Array(12)
-    integrateStreamline(seed, steps, 0.05, 0, positions, scratch)
-    const geometry = new THREE.BufferGeometry()
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3))
-    return { geometry, positions, scratch }
-  }), [seeds, steps])
+  return {
+    object: group,
+    update(delta) {
+      const p = sceneState.progress;
+      const d = reduced ? 0 : delta;
 
-  const material = useMemo(() => new THREE.LineBasicMaterial({
-    color: new THREE.Color("#17150f"), transparent: true, opacity: 0.28,
-  }), [])
-  const accentMaterial = useMemo(() => new THREE.LineBasicMaterial({
-    color: new THREE.Color("#d9482b"), transparent: true, opacity: 0.65,
-  }), [])
-  const objects = useMemo(
-    () => lines.map((line, i) => new THREE.Line(line.geometry, i % 5 === 0 ? accentMaterial : material)),
-    [lines, material, accentMaterial],
-  )
-
-  useEffect(() => () => {
-    lines.forEach((line) => line.geometry.dispose())
-    material.dispose()
-    accentMaterial.dispose()
-  }, [lines, material, accentMaterial])
-
-  useFrame((_, delta) => {
-    const dt = Math.min(delta, 0.05)
-    timeRef.current += dt
-    rebuildAccum.current += dt
-
-    if (rebuildAccum.current > 0.16 && !state.reducedMotion) {
-      rebuildAccum.current = 0
-      const t = timeRef.current * 0.5
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i]
-        integrateStreamline(seeds[i], steps, 0.05, t, line.positions, line.scratch)
-        const attr = line.geometry.getAttribute("position") as THREE.BufferAttribute
-        attr.needsUpdate = true
+      if (paths.length) {
+        for (let i = 0; i < paths.length; i++) {
+          const path = paths[i];
+          cursor[i] = (cursor[i] + d * (14 + i * 1.6)) % (path.length - 1);
+          const idx = Math.floor(cursor[i]);
+          const frac = cursor[i] - idx;
+          const a = path[idx];
+          const b = path[Math.min(idx + 1, path.length - 1)];
+          tracerArray[i * 3] = a.x + (b.x - a.x) * frac;
+          tracerArray[i * 3 + 1] = a.y + (b.y - a.y) * frac;
+          tracerArray[i * 3 + 2] = a.z + (b.z - a.z) * frac;
+        }
+        ;(tracerGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+        tracerMat.opacity = 0.85 * (1 - THREE.MathUtils.smoothstep(p, 0.6, 1));
       }
-    }
 
-    if (groupRef.current) {
-      groupRef.current.rotation.y = state.pointer.x * 0.12
-      const fade = 1 - state.progress * 0.35
-      material.opacity = 0.28 * fade
-      accentMaterial.opacity = 0.65 * fade
-    }
-  })
+      lines.forEach((line, i) => {
+        const mat = line.material as THREE.LineBasicMaterial;
+        const accent = i % 3 === 0;
+        mat.opacity =
+        (accent ? 0.46 : 0.2) * (
+        1 + THREE.MathUtils.smoothstep(p, 0.2, 0.62) * 0.5) * (
+        1 - THREE.MathUtils.smoothstep(p, 0.9, 1) * 0.6);
+      });
 
-  return <group ref={groupRef}>{objects.map((object, i) => <primitive key={i} object={object} />)}</group>
+      group.rotation.y += d * 0.012;
+      group.scale.y = 1 - p * 0.72;
+      group.position.y = p * 0.22;
+    },
+    dispose() {
+      lines.forEach((line) => {
+        line.geometry.dispose();
+        (line.material as THREE.Material).dispose();
+      });
+      tracerGeo.dispose();
+      tracerMat.dispose();
+    }
+  };
 }

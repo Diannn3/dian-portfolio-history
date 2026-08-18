@@ -1,96 +1,105 @@
-/**
- * Manifold shader. The vertex stage evaluates the same saddle+fold surface as
- * lib/math/field.ts (kept in sync intentionally) so the GPU mesh and the CPU
- * fallback describe one geometry. Fragment stage is matte with contour banding
- * derived from height — paper/technical, never chrome or neon.
- */
+/** GLSL mirror of lib/math/field.ts → manifoldHeight(). Kept in one place. */
+export const heightGLSL = /* glsl */`
+float mHeight(vec2 p, float t){
+  return 0.42 * sin(1.28 * p.x + 0.18 * t) * cos(1.12 * p.y - 0.14 * t)
+       + 0.20 * sin(0.62 * p.x * p.y + 0.24 * t)
+       - 0.055 * (p.x * p.x - p.y * p.y);
+}
+`;
 
-export const manifoldVertex = /* glsl */ `
-  uniform float uTime;
-  uniform float uProgress;   // scroll 0..1 : flatten / diagram-ify
-  uniform vec2  uPointer;    // -1..1
-  uniform float uPointerAmp;
+export const manifoldVertex = /* glsl */`
+uniform float uTime;
+uniform float uFlatten;
+uniform float uDecompose;
+uniform float uProbe;
+uniform vec2 uPointer;
 
-  varying float vHeight;
-  varying vec3  vNormal;
-  varying vec2  vUv;
-  varying vec3  vViewPos;
+varying float vH;
+varying float vSlope;
+varying vec3 vNormal;
+varying vec2 vUv;
 
-  float manifoldHeight(vec2 p, float t) {
-    float saddle = (p.x * p.x - p.y * p.y) * 0.55;
-    float fold   = sin(p.x * 2.4 + t * 0.6) * cos(p.y * 2.1 - t * 0.4) * 0.28;
-    float ripple = sin((p.x * p.x + p.y * p.y) * 2.2 - t * 0.9) * 0.06;
-    return saddle + fold + ripple;
-  }
+${heightGLSL}
 
-  void main() {
-    vUv = uv;
-    // position.xy carries the parametric (u,v) domain in [-1.4, 1.4]
-    vec2 p = position.xy;
+float amp(){ return 1.0 - 0.94 * uFlatten; }
 
-    float t = uTime;
-    float h = manifoldHeight(p, t);
+float surface(vec2 g, float t){
+  float h = mHeight(g, t);
+  float d = distance(g, uPointer * 1.9);
+  h += 0.32 * exp(-d * d * 1.5) * uProbe;
+  return h * amp();
+}
 
-    // pointer creates a localized swell — the "probe" pushing the field
-    float d = distance(p, uPointer * 1.4);
-    float swell = exp(-d * d * 2.2) * uPointerAmp * 0.5;
-    h += swell;
+void main(){
+  vUv = uv;
+  vec2 g = position.xy;
+  float t = uTime;
 
-    // scroll flattens the manifold toward a contour plane
-    h *= (1.0 - uProgress * 0.82);
+  float h = surface(g, t);
 
-    vHeight = h;
+  float e = 0.075;
+  float hx = surface(g + vec2(e, 0.0), t);
+  float hy = surface(g + vec2(0.0, e), t);
 
-    // finite-difference normal
-    float e = 0.02;
-    float hx = manifoldHeight(p + vec2(e, 0.0), t) * (1.0 - uProgress * 0.82);
-    float hy = manifoldHeight(p + vec2(0.0, e), t) * (1.0 - uProgress * 0.82);
-    vec3 tangentX = normalize(vec3(e, 0.0, hx - h));
-    vec3 tangentY = normalize(vec3(0.0, e, hy - h));
-    vNormal = normalize(cross(tangentX, tangentY));
+  vec3 tx = normalize(vec3(e, 0.0, hx - h));
+  vec3 ty = normalize(vec3(0.0, e, hy - h));
+  vec3 n = normalize(cross(tx, ty));
 
-    vec3 transformed = vec3(p.x, p.y, h);
-    vec4 mv = modelViewMatrix * vec4(transformed, 1.0);
-    vViewPos = mv.xyz;
-    gl_Position = projectionMatrix * mv;
-  }
-`
+  vSlope = clamp(length(vec2(hx - h, hy - h)) / e, 0.0, 1.6);
 
-export const manifoldFragment = /* glsl */ `
-  precision highp float;
+  // fold: the sheet is bent, not flat — a saddle carried around a soft crease
+  vec3 p = vec3(g.x + 0.12 * sin(g.y * 1.5), g.y, h);
 
-  uniform vec3  uInk;
-  uniform vec3  uPaper;
-  uniform vec3  uAccent;
-  uniform float uProgress;
+  // partial decomposition at mid-scroll: deterministic per-vertex drift
+  float rnd = fract(sin(dot(g, vec2(12.9898, 78.233))) * 43758.5453);
+  p += n * (rnd - 0.5) * 0.62 * uDecompose;
 
-  varying float vHeight;
-  varying vec3  vNormal;
-  varying vec2  vUv;
-  varying vec3  vViewPos;
+  vH = h;
+  vNormal = normalize(normalMatrix * n);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+}
+`;
 
-  void main() {
-    vec3 N = normalize(vNormal);
-    vec3 L = normalize(vec3(0.4, 0.7, 0.6));
-    float diff = clamp(dot(N, L) * 0.5 + 0.5, 0.0, 1.0);
+export const manifoldFragment = /* glsl */`
+uniform vec3 uInk;
+uniform vec3 uCanvas;
+uniform vec3 uAccent;
+uniform float uOpacity;
+uniform float uContour;
+uniform float uDensity;
 
-    // matte paper base -> ink in shadow
-    vec3 base = mix(uInk, uPaper, diff);
+varying float vH;
+varying float vSlope;
+varying vec3 vNormal;
+varying vec2 vUv;
 
-    // contour banding from height (topographic feel)
-    float bands = abs(fract(vHeight * 6.0) - 0.5);
-    float contour = smoothstep(0.46, 0.5, bands);
-    base = mix(base, uInk, (1.0 - contour) * 0.16);
+void main(){
+  vec3 n = normalize(vNormal);
+  if (!gl_FrontFacing) n = -n;
 
-    // accent kissed onto the steepest positive ridges
-    float ridge = smoothstep(0.35, 0.85, vHeight);
-    base = mix(base, uAccent, ridge * 0.14 * (1.0 - uProgress));
+  float key = clamp(dot(n, normalize(vec3(0.35, 0.86, 0.38))), 0.0, 1.0);
+  float rim = pow(1.0 - clamp(abs(n.z), 0.0, 1.0), 2.4);
+  float shade = mix(0.30, 1.0, key);
 
-    // subtle fresnel rim, kept extremely restrained
-    vec3 V = normalize(-vViewPos);
-    float fres = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 3.0);
-    base = mix(base, uInk, fres * 0.12);
+  vec3 base = mix(uInk, uCanvas, shade);
+  base = mix(base, uCanvas, 0.10);
 
-    gl_FragColor = vec4(base, 1.0);
-  }
-`
+  // topographic contours on the height function
+  float bands = vH * uDensity;
+  float d = abs(fract(bands - 0.5) - 0.5) / max(fwidth(bands), 1e-5);
+  float line = 1.0 - clamp(d, 0.0, 1.0);
+
+  vec3 lineCol = mix(uInk, uAccent, smoothstep(0.55, 1.35, vSlope));
+  vec3 col = mix(base, lineCol, line * mix(0.62, 1.0, uContour));
+  col = mix(col, uInk, rim * 0.14);
+
+  // dissolve the sheet edge into the canvas: no rectangle silhouette
+  float edge = smoothstep(0.0, 0.20, min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y)));
+
+  float surfaceAlpha = 0.94;
+  float alpha = mix(surfaceAlpha, max(line, 0.06) * 0.96, uContour) * edge * uOpacity;
+  if (alpha < 0.004) discard;
+
+  gl_FragColor = vec4(col, alpha);
+}
+`;

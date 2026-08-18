@@ -1,53 +1,65 @@
-import { useMemo, useRef } from "react"
-import { useFrame } from "@react-three/fiber"
-import * as THREE from "three"
-import { useHeroState } from "./hero-state"
+import * as THREE from 'three';
+import { manifoldHeight } from '../../lib/math/field';
+import { sceneState } from '../../lib/webgl/sceneState';
+import type { SceneNode } from './ParametricManifold';
 
 /**
- * A subtle coordinate lattice beneath the manifold. It establishes scale and,
- * as scroll progresses, tilts toward the viewer and brightens — collapsing the
- * 3D field toward the flat, diagrammatic plane that meets the first section.
+ * A coordinate lattice bent by the manifold's height function, so it establishes
+ * scale and belongs to the same system. Collapses toward a flat plan grid as the
+ * page scrolls — the 3D world becoming a diagram.
  */
-export default function CoordinateLattice() {
-  const groupRef = useRef<THREE.Group>(null)
-  const state = useHeroState()
+export function createLattice(reduced: boolean): SceneNode {
+  const n = 18;
+  const size = 7.2;
+  const pos: number[] = [];
+  const push = (x: number, z: number) => pos.push(x, manifoldHeight(x * 0.8, z * 0.8, 0) * 0.55, z);
 
-  const geometry = useMemo(() => {
-    const size = 4
-    const div = 16
-    const verts: number[] = []
-    const step = size / div
-    for (let i = 0; i <= div; i++) {
-      const p = -size / 2 + i * step
-      verts.push(-size / 2, 0, p, size / 2, 0, p)
-      verts.push(p, 0, -size / 2, p, 0, size / 2)
+  for (let i = 0; i <= n; i++) {
+    const c = -size / 2 + size * i / n;
+    const steps = 24;
+    for (let s = 0; s < steps; s++) {
+      const a = -size / 2 + size * s / steps;
+      const b = -size / 2 + size * (s + 1) / steps;
+      push(a, c);
+      push(b, c);
+      push(c, a);
+      push(c, b);
     }
-    const g = new THREE.BufferGeometry()
-    g.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3))
-    return g
-  }, [])
+  }
 
-  const material = useMemo(
-    () =>
-      new THREE.LineBasicMaterial({
-        color: new THREE.Color("#17150f"),
-        transparent: true,
-        opacity: 0.08,
-      }),
-    [],
-  )
+  const array = new Float32Array(pos);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(array, 3));
+  const bent = array.slice();
+  const flatArr = array.slice();
+  for (let i = 1; i < flatArr.length; i += 3) flatArr[i] = 0;
 
-  useFrame(() => {
-    if (!groupRef.current) return
-    const p = state.progress
-    groupRef.current.position.y = -1.15 + p * 0.4
-    groupRef.current.rotation.x = p * 0.5
-    material.opacity = 0.08 + p * 0.22
-  })
+  const material = new THREE.LineBasicMaterial({ color: '#111111', transparent: true, opacity: 0.2 });
+  const lines = new THREE.LineSegments(geometry, material);
+  lines.position.y = -1.55;
+  lines.rotation.y = 0.32;
 
-  return (
-    <group ref={groupRef}>
-      <lineSegments geometry={geometry} material={material} />
-    </group>
-  )
+  let flat = 0;
+
+  return {
+    object: lines,
+    update() {
+      const p = sceneState.progress;
+      const target = THREE.MathUtils.smoothstep(p, 0.2, 0.92);
+      flat += (target - flat) * (reduced ? 1 : 0.12);
+      const attr = geometry.getAttribute('position') as THREE.BufferAttribute;
+      const arr = attr.array as Float32Array;
+      for (let i = 1; i < arr.length; i += 3) {
+        arr[i] = bent[i] * (1 - flat) + flatArr[i] * flat;
+      }
+      attr.needsUpdate = true;
+      lines.position.y = -1.55 + p * 0.5;
+      lines.rotation.y = 0.32 + sceneState.pointerX * 0.02;
+      material.opacity = 0.2 + THREE.MathUtils.smoothstep(p, 0.1, 0.7) * 0.16;
+    },
+    dispose() {
+      geometry.dispose();
+      material.dispose();
+    }
+  };
 }

@@ -1,84 +1,69 @@
-import { useMemo, useRef } from "react"
-import { useFrame } from "@react-three/fiber"
-import * as THREE from "three"
-import { fieldInto, seeded } from "@/lib/math/field"
-import { useHeroState } from "./hero-state"
+import * as THREE from 'three';
+import { fieldAt, seeded } from '../../lib/math/field';
+import { sceneState } from '../../lib/webgl/sceneState';
+import type { SceneNode } from './ParametricManifold';
 
-interface Props { count: number }
+const v = new THREE.Vector3();
 
-/** Particles advect through the same deterministic field as the manifold. */
-export default function FieldParticles({ count }: Props) {
-  const pointsRef = useRef<THREE.Points>(null)
-  const state = useHeroState()
-  const scratch = useMemo(() => new Float64Array(3), [])
+/**
+ * Particles advected by the same field F: each point's velocity is F at its own
+ * position, so nothing floats randomly. Respawn is deterministic.
+ */
+export function createParticles(count: number, reduced: boolean): SceneNode {
+  const rnd = seeded(9182736);
+  const positions = new Float32Array(count * 3);
+  const seeds: number[] = [];
+  for (let i = 0; i < count; i++) {
+    const r = 1.2 + rnd() * 3.4;
+    const a = rnd() * Math.PI * 2;
+    positions[i * 3] = Math.cos(a) * r;
+    positions[i * 3 + 1] = (rnd() - 0.5) * 3.2;
+    positions[i * 3 + 2] = Math.sin(a) * r * 0.8;
+    seeds.push(rnd());
+  }
 
-  const { positions, seeds } = useMemo(() => {
-    const rng = seeded(770077)
-    const pos = new Float32Array(count * 3)
-    const sds = new Float32Array(count * 3)
-    for (let i = 0; i < count; i++) {
-      const a = rng() * Math.PI * 2
-      const r = 0.6 + rng() * 2.4
-      const x = Math.cos(a) * r
-      const y = (rng() - 0.5) * 2.6
-      const z = Math.sin(a) * r
-      const ix = i * 3
-      pos[ix] = sds[ix] = x
-      pos[ix + 1] = sds[ix + 1] = y
-      pos[ix + 2] = sds[ix + 2] = z
-    }
-    return { positions: pos, seeds: sds }
-  }, [count])
-
-  const geometry = useMemo(() => {
-    const g = new THREE.BufferGeometry()
-    g.setAttribute("position", new THREE.BufferAttribute(positions, 3))
-    return g
-  }, [positions])
-
-  const material = useMemo(() => new THREE.PointsMaterial({
-    color: new THREE.Color("#17150f"),
-    size: 0.018,
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const material = new THREE.PointsMaterial({
+    color: '#111111',
+    size: 0.019,
     sizeAttenuation: true,
     transparent: true,
-    opacity: 0.55,
-  }), [])
+    opacity: 0.5
+  });
+  const points = new THREE.Points(geometry, material);
+  points.frustumCulled = false;
 
-  const timeRef = useRef(0)
+  let time = 0;
 
-  useFrame((_, delta) => {
-    const dt = Math.min(delta, 0.05)
-    timeRef.current += dt
-    const t = timeRef.current * 0.5
-    const attr = geometry.getAttribute("position") as THREE.BufferAttribute
-    const arr = attr.array as Float32Array
+  return {
+    object: points,
+    update(delta) {
+      const d = reduced ? 0 : delta;
+      time += d;
+      const attr = geometry.getAttribute('position') as THREE.BufferAttribute;
+      const arr = attr.array as Float32Array;
 
-    if (!state.reducedMotion) {
       for (let i = 0; i < count; i++) {
-        const ix = i * 3
-        let x = arr[ix]
-        let y = arr[ix + 1]
-        let z = arr[ix + 2]
-        fieldInto(x, y, z, t, scratch)
-        x += scratch[0] * dt * 0.6
-        y += scratch[1] * dt * 0.6
-        z += scratch[2] * dt * 0.6
-        const r = Math.sqrt(x * x + y * y + z * z)
-        if (r > 3.2 || r < 0.3) {
-          x = seeds[ix]
-          y = seeds[ix + 1]
-          z = seeds[ix + 2]
+        const ix = i * 3;
+        fieldAt(arr[ix], arr[ix + 1], arr[ix + 2], time, v);
+        arr[ix] += v.x * d * 0.22;
+        arr[ix + 1] += v.y * d * 0.22;
+        arr[ix + 2] += v.z * d * 0.22;
+        if (Math.hypot(arr[ix], arr[ix + 1], arr[ix + 2]) > 4.9) {
+          const s = seeds[i];
+          const a = s * Math.PI * 2 + time * 0.1;
+          arr[ix] = Math.cos(a) * 1.3;
+          arr[ix + 1] = (s - 0.5) * 2.4;
+          arr[ix + 2] = Math.sin(a) * 1.1;
         }
-        arr[ix] = x
-        arr[ix + 1] = y
-        arr[ix + 2] = z
       }
-      attr.needsUpdate = true
+      attr.needsUpdate = true;
+      material.opacity = 0.5 * (1 - THREE.MathUtils.smoothstep(sceneState.progress, 0.55, 1));
+    },
+    dispose() {
+      geometry.dispose();
+      material.dispose();
     }
-
-    material.opacity = 0.55 * (1 - state.progress * 0.6)
-    if (pointsRef.current) pointsRef.current.rotation.y = state.pointer.x * 0.08
-  })
-
-  return <points ref={pointsRef} geometry={geometry} material={material} />
+  };
 }

@@ -1,133 +1,123 @@
-import { useEffect, useRef, useState } from "react"
-import ProjectPreviewVisual, { type ProjectVisualKind } from "./ProjectPreviewVisual"
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowUpRight } from 'lucide-react';
+import gsap from 'gsap';
+import { projects } from '../../data/projects';
+import { ProjectPreview } from './ProjectPreview';
+import { usePointerFine, useReducedMotion } from '../../hooks/useEnvironment';
 
-export interface WorkProject {
-  id: string
-  title: string
-  shortTitle: string
-  index: number
-  status: string
-  year?: number
-  category: string
-  summary: string
-  accent: string
-  visual: ProjectVisualKind
-}
+export function WorkIndex() {
+  const [active, setActive] = useState<number | null>(null);
+  const floater = useRef<HTMLDivElement>(null);
+  const fine = usePointerFine();
+  const reduced = useReducedMotion();
 
-export default function WorkIndex({ projects }: { projects: WorkProject[] }) {
-  const [activeId, setActiveId] = useState(projects[0]?.id ?? "")
-  const previewRef = useRef<HTMLDivElement>(null)
-  const target = useRef({ x: 0, y: 0 })
-  const current = useRef({ x: 0, y: 0 })
-
-  const active = projects.find((p) => p.id === activeId) ?? projects[0]
-
+  /* one shared interaction loop for the whole index, not one per row */
   useEffect(() => {
-    const media = window.matchMedia("(hover: hover) and (pointer: fine)")
-    if (!media.matches) return
+    if (!fine || !floater.current) return;
+    const el = floater.current;
+    const xTo = gsap.quickTo(el, 'x', { duration: reduced ? 0 : 0.55, ease: 'power3.out' });
+    const yTo = gsap.quickTo(el, 'y', { duration: reduced ? 0 : 0.7, ease: 'power3.out' });
+    const onMove = (e: PointerEvent) => {
+      xTo(e.clientX - 190);
+      yTo(e.clientY - 260);
+    };
+    window.addEventListener('pointermove', onMove);
+    return () => window.removeEventListener('pointermove', onMove);
+  }, [fine, reduced]);
 
-    let raf = 0
-    const tick = () => {
-      raf = requestAnimationFrame(tick)
-      current.current.x += (target.current.x - current.current.x) * 0.08
-      current.current.y += (target.current.y - current.current.y) * 0.08
-      if (previewRef.current) {
-        previewRef.current.style.transform = `translate3d(${current.current.x}px, ${current.current.y}px, 0)`
-      }
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
-
-  if (!active) return null
-
-  const onPointerMove = (e: React.PointerEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const nx = (e.clientX - rect.left) / rect.width - 0.5
-    const ny = (e.clientY - rect.top) / rect.height - 0.5
-    target.current.x = nx * 8
-    target.current.y = ny * 8
-  }
-
-  const resetPointer = () => {
-    target.current.x = 0
-    target.current.y = 0
-  }
+  const current = active === null ? null : projects[active];
 
   return (
-    <div className="atlas-grid gap-y-10 lg:min-h-[720px]" onPointerMove={onPointerMove} onPointerLeave={resetPointer}>
-      <ol className="col-span-4 border-t border-hairline md:col-span-8 lg:col-span-7">
-        {projects.map((project) => {
-          const selected = project.id === active.id
+    <section id="work" className="relative pt-24 md:pt-36" aria-labelledby="work-heading">
+      <div className="atlas-grid">
+        <div className="col-span-4 flex items-baseline justify-between border-t border-ink pt-4 md:col-span-8 xl:col-span-12">
+          <h2 id="work-heading" className="mono-label text-ink">
+            SELECTED WORK
+          </h2>
+          <span className="mono-label">{String(projects.length).padStart(2, '0')} ENTRIES / 2026</span>
+        </div>
+      </div>
+
+      <ul className="mt-2">
+        {projects.map((project, i) => {
+          const isActive = active === i;
           return (
-            <li key={project.id} className="group border-b border-hairline">
-              <a
-                href={`/work/${project.id}/`}
-                onMouseEnter={() => setActiveId(project.id)}
-                onFocus={() => setActiveId(project.id)}
-                className="relative grid grid-cols-4 gap-x-4 gap-y-3 py-7 md:grid-cols-8 md:py-9"
+            <li key={project.slug}>
+              <Link
+                to={`/work/${project.slug}`}
+                className="group block border-b border-hairline transition-colors duration-500 ease-atlas hover:border-ink focus-visible:border-ink"
                 data-cursor="view"
-                aria-describedby={`summary-${project.id}`}
-              >
-                <span className="mono col-span-1 text-graphite-2">{String(project.index).padStart(2, "0")}</span>
-
-                <span className="col-span-3 md:col-span-4">
-                  <span
-                    className="font-display block text-[clamp(1.75rem,3.2vw,3.8rem)] leading-[0.95] tracking-[-0.035em] transition-transform duration-500 ease-[var(--ease-atlas)] group-hover:translate-x-2 group-focus-visible:translate-x-2"
-                    style={{ color: selected ? project.accent : "var(--color-ink)" }}
-                  >
-                    {project.shortTitle}
+                onPointerEnter={() => setActive(i)}
+                onPointerLeave={() => setActive((prev) => prev === i ? null : prev)}
+                onFocus={() => setActive(i)}
+                onBlur={() => setActive((prev) => prev === i ? null : prev)}
+                aria-label={`${project.title} — ${project.category}, ${project.status}`}>
+                
+                <div className="atlas-grid items-baseline py-6 md:py-8">
+                  <span className="col-span-1 font-mono text-label text-graphite md:col-span-1">
+                    {project.index}
                   </span>
-                  <span id={`summary-${project.id}`} className="mt-3 block max-w-[48ch] text-sm leading-relaxed text-graphite md:text-base">
-                    {project.summary}
+                  <h3 className="col-span-3 font-heading text-display-2 font-medium uppercase md:col-span-4 xl:col-span-5">
+                    <span
+                      className="inline-block transition-transform duration-[600ms] ease-atlas group-hover:translate-x-2 group-focus-visible:translate-x-2"
+                      style={{ color: isActive ? project.accent : 'var(--ink)' }}>
+                      
+                      {project.title}
+                    </span>
+                  </h3>
+                  <p className="col-span-4 mt-2 text-[0.9rem] text-graphite md:col-span-2 md:mt-0 xl:col-span-3">
+                    {project.category}
+                  </p>
+                  <span className="col-span-3 mt-1 font-mono text-label uppercase text-graphite md:col-span-1 md:mt-0 xl:col-span-2">
+                    {project.status}
                   </span>
-                </span>
-
-                <span className="col-span-3 col-start-2 flex items-end justify-between gap-4 md:col-span-3 md:col-start-6 md:flex-col md:items-end md:justify-between">
-                  <span className="label text-right">{project.category}</span>
-                  <span className="mono flex items-center gap-3 text-graphite-2">
-                    <span>{project.year ?? project.status}</span>
-                    <span aria-hidden="true" className="text-ink transition-transform duration-500 group-hover:translate-x-1 group-focus-visible:translate-x-1">→</span>
+                  <span className="col-span-1 flex justify-end md:col-span-1">
+                    <ArrowUpRight
+                      className="h-4 w-4 shrink-0 -translate-y-[2px] text-graphite transition-all duration-500 ease-atlas group-hover:translate-x-1 group-hover:text-ink group-focus-visible:text-ink"
+                      strokeWidth={1.5}
+                      aria-hidden="true" />
+                    
                   </span>
-                </span>
+                </div>
 
+                {/* mobile: previews are inline, never hover-dependent */}
+                <div className="atlas-grid pb-8 md:hidden">
+                  <div className="col-span-4 aspect-[16/10] overflow-hidden border border-hairline">
+                    <ProjectPreview preview={project.preview} />
+                  </div>
+                </div>
+              </Link>
+            </li>);
 
-                <span className="col-span-4 mt-3 block md:col-span-8 lg:hidden">
-                  <span className="relative block aspect-[1.3/1] overflow-hidden border border-hairline bg-paper-2">
-                    <ProjectPreviewVisual kind={project.visual} accent={project.accent} />
-                  </span>
-                </span>
-
-                <span
-                  className="pointer-events-none absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 transition-transform duration-700 ease-[var(--ease-atlas)] group-hover:scale-x-100 group-focus-within:scale-x-100"
-                  style={{ background: project.accent }}
-                  aria-hidden="true"
-                />
-              </a>
-            </li>
-          )
         })}
-      </ol>
+      </ul>
 
-      <aside className="col-span-4 hidden lg:col-span-5 lg:block" aria-label="Project preview">
-        <div className="sticky top-28">
-          <div ref={previewRef} className="relative aspect-[1.16/1] overflow-hidden border border-hairline bg-paper-2 will-change-transform">
-            {projects.map((project) => (
-              <ProjectPreviewVisual
-                key={project.id}
-                kind={project.visual}
-                accent={project.accent}
-                active={project.id === active.id}
-              />
-            ))}
-          </div>
-          <div className="mono mt-3 flex items-center justify-between text-graphite-2">
-            <span>PREVIEW / {String(active.index).padStart(2, "0")}</span>
-            <span style={{ color: active.accent }}>{active.status}</span>
+      {fine &&
+      <div
+        ref={floater}
+        aria-hidden="true"
+        className="pointer-events-none fixed left-0 top-0 z-40 hidden w-[380px] md:block"
+        style={{ opacity: current ? 1 : 0, transition: 'opacity 380ms cubic-bezier(0.16,0.84,0.24,1)' }}>
+        
+          <div className="border border-ink bg-canvas shadow-[6px_6px_0_0_rgba(17,17,17,0.06)]">
+            <div className="aspect-[16/10] overflow-hidden">
+              {current && <ProjectPreview preview={current.preview} />}
+            </div>
+            <div className="flex items-center justify-between border-t border-ink px-3 py-2">
+              <span className="font-mono text-micro uppercase tracking-[0.16em] text-graphite">
+                {current ? current.period : ''}
+              </span>
+              <span
+              className="font-mono text-micro uppercase tracking-[0.16em]"
+              style={{ color: current?.accent }}>
+              
+                {current ? current.status : ''}
+              </span>
+            </div>
           </div>
         </div>
-      </aside>
+      }
+    </section>);
 
-    </div>
-  )
 }

@@ -1,88 +1,94 @@
-import { useMemo, useState } from "react"
+import React, { useState } from 'react';
+import { disciplineEdges, disciplines } from '../../data/site';
 
-type NodeId = "math" | "software" | "ai" | "data" | "spatial" | "design"
+const W = 520;
+const H = 420;
 
-const nodes: Array<{ id: NodeId; label: string; x: number; y: number }> = [
-  { id: "math", label: "MATH", x: 16, y: 20 },
-  { id: "software", label: "SOFTWARE", x: 67, y: 16 },
-  { id: "ai", label: "AI", x: 84, y: 48 },
-  { id: "data", label: "DATA", x: 54, y: 73 },
-  { id: "spatial", label: "SPATIAL", x: 18, y: 72 },
-  { id: "design", label: "DESIGN", x: 46, y: 42 },
-]
+export function DisciplineGraph() {
+  const [active, setActive] = useState<string | null>(null);
 
-const edges: Array<[NodeId, NodeId]> = [
-  ["math", "data"],
-  ["math", "ai"],
-  ["math", "spatial"],
-  ["software", "ai"],
-  ["software", "data"],
-  ["software", "design"],
-  ["software", "spatial"],
-  ["ai", "data"],
-  ["data", "spatial"],
-  ["spatial", "design"],
-  ["design", "math"],
-]
-
-export default function DisciplineGraph() {
-  const [active, setActive] = useState<NodeId | null>("design")
-  const byId = useMemo(() => Object.fromEntries(nodes.map((node) => [node.id, node])), []) as Record<NodeId, (typeof nodes)[number]>
+  const isLive = (id: string) =>
+  active === id ||
+  active !== null &&
+  disciplineEdges.some(([a, b]) => a === active && b === id || b === active && a === id);
 
   return (
-    <div className="relative aspect-[1.25/1] min-h-[300px] border border-hairline bg-paper-2" onMouseLeave={() => setActive(null)}>
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 80" aria-hidden="true" preserveAspectRatio="none">
-        {edges.map(([a, b]) => {
-          const from = byId[a]
-          const to = byId[b]
-          const highlighted = active === a || active === b
-          return (
-            <line
-              key={`${a}-${b}`}
-              x1={from.x}
-              y1={from.y}
-              x2={to.x}
-              y2={to.y}
-              vectorEffect="non-scaling-stroke"
-              stroke={highlighted ? "#d9482b" : "#c7c1b5"}
-              strokeWidth={highlighted ? 1.5 : 1}
-              opacity={active && !highlighted ? 0.35 : 0.95}
-              className="transition-[opacity,stroke] duration-300"
-            />
-          )
-        })}
+    <figure className="w-full">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="group" aria-label="Discipline graph: how mathematics, software, AI, data, spatial systems and design connect">
+        <g stroke="var(--hairline)" strokeWidth="1">
+          {Array.from({ length: 9 }).map((_, i) =>
+          <line key={i} x1="0" y1={H / 8 * i} x2={W} y2={H / 8 * i} />
+          )}
+        </g>
+        <g>
+          {disciplineEdges.map(([a, b]) => {
+            const na = disciplines.find((d) => d.id === a)!;
+            const nb = disciplines.find((d) => d.id === b)!;
+            const live = active !== null && (a === active || b === active);
+            return (
+              <line
+                key={`${a}-${b}`}
+                x1={na.x * W}
+                y1={na.y * H}
+                x2={nb.x * W}
+                y2={nb.y * H}
+                stroke={live ? 'var(--accent)' : 'var(--ink)'}
+                strokeOpacity={live ? 0.9 : active ? 0.12 : 0.28}
+                strokeWidth={live ? 1.4 : 1}
+                style={{ transition: 'stroke-opacity 350ms, stroke 350ms' }} />);
+
+
+          })}
+        </g>
+        <g>
+          {disciplines.map((d) => {
+            const live = isLive(d.id);
+            const dim = active !== null && !live;
+            return (
+              <g
+                key={d.id}
+                tabIndex={0}
+                role="group"
+                aria-label={`${d.label}: ${d.note}`}
+                onMouseEnter={() => setActive(d.id)}
+                onMouseLeave={() => setActive(null)}
+                onFocus={() => setActive(d.id)}
+                onBlur={() => setActive(null)}
+                style={{ cursor: 'default', opacity: dim ? 0.34 : 1, transition: 'opacity 300ms' }}>
+                
+                <circle
+                  cx={d.x * W}
+                  cy={d.y * H}
+                  r={active === d.id ? 7 : 4}
+                  fill={active === d.id ? 'var(--accent)' : 'var(--ink)'}
+                  style={{ transition: 'r 300ms cubic-bezier(0.16,0.84,0.24,1)' }} />
+                
+                <circle cx={d.x * W} cy={d.y * H} r="16" fill="transparent" />
+                <text
+                  x={d.x * W + 12}
+                  y={d.y * H + 4}
+                  fontFamily="Geist Mono, monospace"
+                  fontSize="10.5"
+                  letterSpacing="1.6"
+                  fill="var(--ink)">
+                  
+                  {d.label}
+                </text>
+              </g>);
+
+          })}
+        </g>
       </svg>
+      <figcaption className="mt-4 min-h-[3.2rem] border-t border-hairline pt-3 font-mono text-label uppercase text-graphite">
+        {active ?
+        <>
+            <span className="text-ink">{disciplines.find((d) => d.id === active)?.label}</span>{' '}
+            / {disciplines.find((d) => d.id === active)?.note}
+          </> :
 
-      {nodes.map((node) => {
-        const selected = active === node.id
-        const connected = !active || selected || edges.some(([a, b]) => (a === active && b === node.id) || (b === active && a === node.id))
-        return (
-          <button
-            key={node.id}
-            type="button"
-            onMouseEnter={() => setActive(node.id)}
-            onFocus={() => setActive(node.id)}
-            onBlur={() => setActive(null)}
-            aria-pressed={selected}
-            className="absolute -translate-x-1/2 -translate-y-1/2 border border-hairline bg-paper px-3 py-2 font-mono text-[10px] tracking-[0.14em] transition-[opacity,border-color,color,transform] duration-300 focus-visible:z-20"
-            style={{
-              left: `${node.x}%`,
-              top: `${(node.y / 80) * 100}%`,
-              color: selected ? "#d9482b" : "#17150f",
-              borderColor: selected ? "#d9482b" : "#d6d1c4",
-              opacity: connected ? 1 : 0.42,
-              transform: `translate(-50%, -50%) scale(${selected ? 1.05 : 1})`,
-            }}
-          >
-            {node.label}
-          </button>
-        )
-      })}
+        'HOVER OR TAB A NODE / SIX FIELDS, TEN RELATIONSHIPS'
+        }
+      </figcaption>
+    </figure>);
 
-      <div className="pointer-events-none absolute bottom-3 left-3 right-3 flex justify-between font-mono text-[9px] uppercase tracking-[0.12em] text-graphite-2">
-        <span>Hover / focus a discipline</span>
-        <span>Relationships, not rankings</span>
-      </div>
-    </div>
-  )
 }
