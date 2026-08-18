@@ -1,0 +1,61 @@
+---
+import HeroCanvas from './HeroCanvas.tsx';
+import HeroFallback from './HeroFallback.astro';
+---
+
+<section id="hero" class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-canvas" aria-label="Hero">
+  <!-- WebGL Canvas -->
+  <div class="absolute inset-0 z-0">
+    <HeroCanvas client:only="react" />
+  </div>
+
+  <!-- Fallback (hidden if WebGL works) -->
+  <div class="absolute inset-0 z-0 hidden" data-hero-fallback>
+    <HeroFallback />
+  </div>
+
+  <!-- Typography overlay -->
+  <div class="container-editorial relative z-10 pointer-events-none select-none">
+    <div class="max-w-5xl">
+      <p class="mono-label mb-4 text-graphite">FIELD / APPLIED MATHEMATICS</p>
+      <h1 class="text-display-xl font-display text-ink mb-6">
+        DIAN
+      </h1>
+      <h2 class="text-h1 font-display text-ink mb-8">
+        Builds systems<br />
+        between equations<br />
+        and interfaces.
+      </h2>
+      <p class="text-body-lg text-graphite max-w-xl mb-12">
+        Applied Mathematics student building software, AI, maps, spatial systems, and experimental interfaces.
+      </p>
+      <div class="flex flex-wrap gap-6 font-mono text-xs uppercase tracking-widest text-graphite">
+        <span>LOC / LOS BAÑOS</span>
+        <span>SYSTEM / ACTIVE</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // If WebGL fails, show fallback
+    const canvas = document.querySelector('canvas');
+    if (!canvas) {
+      document.querySelector('[data-hero-fallback]')?.classList.remove('hidden');
+    }
+  </script>
+</section>
+
+<style>
+  /* Make typography not block canvas interaction */
+  @media (hover: hover) and (pointer: fine) {
+    .container-editorial {
+      pointer-events: none;
+    }
+    .container-editorial h1,
+    .container-editorial h2,
+    .container-editorial p,
+    .container-editorial div {
+      pointer-events: auto;
+    }
+  }
+</style>

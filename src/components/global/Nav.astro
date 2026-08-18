@@ -1,0 +1,57 @@
+---
+import MobileNav from './MobileNav.astro';
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const links = [
+  { href: '/#work', label: 'Work' },
+  { href: '/#about', label: 'About' },
+  { href: '/#lab', label: 'Lab' },
+  { href: '/#contact', label: 'Contact' },
+];
+---
+
+<header class="fixed top-0 left-0 right-0 z-40 mix-blend-difference text-white" aria-label="Main navigation">
+  <div class="container-editorial flex items-center justify-between py-4 md:py-6">
+    <a href="/" class="font-display text-xl font-semibold tracking-tight text-white" aria-label="Dian — home">
+      DIAN
+    </a>
+    <nav class="hidden md:block">
+      <ul class="flex items-center gap-8">
+        {links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="font-mono text-xs uppercase tracking-widest text-white/70 hover:text-white transition-colors duration-200"
+              aria-current={currentPath === link.href ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+        <li class="flex items-center gap-2 ml-4">
+          <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse" aria-hidden="true"></span>
+          <span class="font-mono text-xs uppercase tracking-widest text-white/70">Building things</span>
+        </li>
+      </ul>
+    </nav>
+    <MobileNav links={links} currentPath={currentPath} />
+  </div>
+</header>
+
+<style>
+  /* Adjust mix-blend for better contrast when scrolled */
+  @media (max-width: 768px) {
+    header {
+      mix-blend-mode: normal;
+      background: rgba(244, 242, 237, 0.9);
+      backdrop-filter: blur(8px);
+    }
+    header a, header button, header span {
+      color: var(--color-ink);
+    }
+  }
+</style>

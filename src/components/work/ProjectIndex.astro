@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectPreview from './ProjectPreview.tsx';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.index - b.data.index);
+---
+
+<section id="work" class="section-padding border-t border-hairline">
+  <div class="container-editorial">
+    <div class="mb-12 md:mb-20">
+      <p class="mono-label mb-4">Selected Work</p>
+      <h2 class="text-h1 font-display text-ink">Projects &<br />Experiments</h2>
+    </div>
+
+    <div class="relative">
+      <!-- Shared preview viewport (desktop) -->
+      <div class="hidden md:block sticky top-24 h-[400px] mb-[-400px] pointer-events-none">
+        <ProjectPreview projects={projects.map(p => ({ slug: p.slug, ...p.data }))} client:idle />
+      </div>
+
+      <!-- Project list -->
+      <ul class="divide-y divide-hairline border-t border-hairline">
+        {projects.map((project, idx) => (
+          <li>
+            <a
+              href={`/work/${project.slug}`}
+              class="group flex flex-col md:flex-row md:items-center justify-between py-6 md:py-8 transition-colors hover:bg-accent-soft/50"
+              data-project-index={idx}
+            >
+              <div class="flex items-baseline gap-4 md:gap-8">
+                <span class="font-mono text-sm text-graphite">0{idx + 1}</span>
+                <span class="text-h2 font-display font-semibold text-ink group-hover:text-accent transition-colors">
+                  {project.data.title}
+                </span>
+              </div>
+              <div class="flex items-center gap-8 mt-2 md:mt-0">
+                <span class="text-sm text-graphite">{project.data.category}</span>
+                <span class="font-mono text-xs text-graphite">{project.data.status}</span>
+                <span class="text-accent opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Mobile: inline previews -->
+<div class="md:hidden">
+  {projects.map((project) => (
+    <div class="border-t border-hairline px-gutter py-8">
+      <a href={`/work/${project.slug}`} class="block">
+        <p class="font-mono text-sm text-graphite">0{project.data.index}</p>
+        <h3 class="text-2xl font-display font-semibold mt-2">{project.data.title}</h3>
+        <p class="text-sm text-graphite mt-2">{project.data.summary}</p>
+      </a>
+    </div>
+  ))}
+</div>
