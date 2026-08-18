@@ -4,28 +4,25 @@ index: 1
 status: IN DEVELOPMENT
 year: 2026
 category: Community Discovery / Spatial Systems
-summary: Community-driven food discovery platform for UPLB / Los Baños.
-thesis: Local discovery through structured place data and community contribution.
-role: Design, Frontend, Geospatial
-technologies: ["MapLibre", "PMTiles", "Astro", "React", "Structured datasets"]
-repository: https://github.com/dian/uppetite
-liveUrl: https://uppetite.dian.dev
+summary: A community-driven food discovery platform for UPLB and Los Baños.
+thesis: Local food discovery becomes easier when place data, maps, and community contributions live in one navigable system.
+role: Product / design / development
+technologies: ["MapLibre", "PMTiles", "Astro", "structured place data"]
 featured: true
 accent: "#D94F2B"
 ---
-
-# UPPETITE ELBI
-
-Community-driven food discovery for Los Baños.
-
 ## Challenge
 
-Existing food discovery lacks structured local data and community verification.
+Food discovery around a university town is fragmented across recommendations, social posts, memory, and scattered map listings. The project asks how a student-oriented interface can make local places easier to discover without pretending every listing is automatically trustworthy.
 
 ## Approach
 
-Build a lightweight mapping architecture with community contribution and verification workflows.
+UPPETITE combines a lightweight geospatial interface with structured place information and a contribution-and-verification workflow. The system is designed around local context rather than treating the map as a generic directory.
 
-## Status
+## System
 
-In development. Prototype exploring MapLibre + PMTiles for efficient local map serving.
+The working architecture centers on map tiles, place records, filters, and contribution workflows. Project-specific details should be updated from the real repository as implementation changes.
+
+## Current state
+
+**In development.** This page intentionally avoids user counts, validation claims, or deployment claims that have not been verified.

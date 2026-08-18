@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import gsap from 'gsap';
 
 interface ProjectData {
-  slug: string;
+  id: string;
   title: string;
   category: string;
   status: string;
@@ -11,148 +11,69 @@ interface ProjectData {
   technologies: string[];
 }
 
+const patterns: Record<string, ReactNode> = {
+  uppetite: <><path d="M-20 230C80 190 120 90 250 130S330 255 520 90" fill="none" stroke="#aaa49c"/><path d="M40 70C170 125 250 30 430 95" fill="none" stroke="#aaa49c"/><circle cx="105" cy="195" r="7"/><circle cx="255" cy="135" r="7"/><circle cx="390" cy="150" r="7"/></>,
+  pasada: <><path d="M30 245C140 265 195 105 310 150S410 260 530 95" fill="none" strokeWidth="4"/><rect x="100" y="200" width="14" height="14" fill="#111"/><rect x="305" y="144" width="14" height="14" fill="#111"/><rect x="455" y="175" width="14" height="14" fill="#111"/></>,
+  'disaster-response': <><circle cx="280" cy="160" r="105" fill="none" stroke="#aaa49c"/><path d="M130 250L280 60L455 250Z" fill="none" strokeWidth="3"/></>,
+  'campus-navigation': <><path d="M65 55H490V270H65Z M65 145H220V270M220 55V210H390V55" fill="none" stroke="#111"/><path d="M100 225C180 175 265 225 435 105" fill="none" strokeWidth="4" strokeDasharray="9 8"/></>,
+};
+
 export default function ProjectPreview({ projects }: { projects: ProjectData[] }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
-  const currentIndex = useRef(0);
-  const activeProject = useRef<ProjectData | null>(null);
-  const xTo = useRef(gsap.quickTo(previewRef, 'x', { duration: 0.6, ease: 'power3.out' }));
-  const yTo = useRef(gsap.quickTo(previewRef, 'y', { duration: 0.6, ease: 'power3.out' }));
-  const opacityTo = useRef(gsap.quickTo(previewRef, 'opacity', { duration: 0.4 }));
+  const root = useRef<HTMLDivElement>(null);
+  const card = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState<ProjectData | undefined>(projects[0]);
 
   useEffect(() => {
-    if (!containerRef.current || !previewRef.current) return;
+    if (!card.current || !root.current) return;
+    const cardElement = card.current;
+    const section = root.current.closest('section');
+    const xTo = gsap.quickTo(cardElement, 'x', { duration: 0.55, ease: 'power3.out' });
+    const yTo = gsap.quickTo(cardElement, 'y', { duration: 0.55, ease: 'power3.out' });
+    const handlers = new Map<Element, () => void>();
 
-    const handleMouseMove = (e: MouseEvent) => {
-      xTo.current(e.clientX + 20);
-      yTo.current(e.clientY + 20);
+    document.querySelectorAll('[data-project-id]').forEach((item) => {
+      const id = item.getAttribute('data-project-id');
+      const show = () => {
+        const project = projects.find((candidate) => candidate.id === id);
+        if (project) setActive(project);
+      };
+      item.addEventListener('pointerenter', show);
+      item.addEventListener('focus', show);
+      handlers.set(item, show);
+    });
+
+    const move = (event: PointerEvent) => {
+      const rect = section?.getBoundingClientRect();
+      if (!rect) return;
+      const nx = (event.clientX - rect.left) / rect.width - 0.5;
+      const ny = (event.clientY - rect.top) / rect.height - 0.5;
+      xTo(nx * 18);
+      yTo(ny * 14);
     };
+    const reset = () => { xTo(0); yTo(0); };
+    section?.addEventListener('pointermove', move);
+    section?.addEventListener('pointerleave', reset);
 
-    const listItems = containerRef.current.closest('section')?.querySelectorAll('a[data-project-index]');
-    if (listItems) {
-      listItems.forEach((item, index) => {
-        item.addEventListener('mouseenter', () => {
-          currentIndex.current = index;
-          activeProject.current = projects[index] || null;
-          if (activeProject.current && previewRef.current) {
-            previewRef.current.innerHTML = '';
-            previewRef.current.appendChild(renderPreview(activeProject.current));
-            opacityTo.current(1);
-          }
-        });
-        item.addEventListener('mouseleave', () => {
-          opacityTo.current(0);
-        });
-      });
-    }
-
-    window.addEventListener('mousemove', handleMouseMove);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      listItems?.forEach((item) => {
-        item.removeEventListener('mouseenter', () => {});
-        item.removeEventListener('mouseleave', () => {});
+      section?.removeEventListener('pointermove', move);
+      section?.removeEventListener('pointerleave', reset);
+      handlers.forEach((handler, item) => {
+        item.removeEventListener('pointerenter', handler);
+        item.removeEventListener('focus', handler);
       });
+      gsap.killTweensOf(cardElement);
     };
   }, [projects]);
 
+  if (!active) return null;
+
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 z-10 pointer-events-none"
-    >
-      <div
-        ref={previewRef}
-        className="fixed left-0 top-0 w-72 h-48 bg-canvas border border-hairline shadow-sm opacity-0 pointer-events-none transition-shadow"
-        style={{ willChange: 'transform, opacity' }}
-      />
+    <div ref={root} aria-hidden="true" className="relative aspect-[4/5] overflow-hidden border border-hairline bg-canvas-raised/50">
+      <div ref={card} className="absolute inset-5 flex flex-col justify-between border border-hairline bg-canvas/80 p-5 will-change-transform">
+        <div className="flex justify-between font-mono text-[9px] uppercase tracking-widest text-graphite"><span>Preview / active</span><span>{active.status}</span></div>
+        <svg viewBox="0 0 560 320" className="w-full" fill={active.accent} stroke={active.accent}>{patterns[active.id]}</svg>
+        <div><p className="font-display text-2xl font-semibold">{active.title}</p><p className="mt-2 text-sm leading-6 text-graphite">{active.summary}</p></div>
+      </div>
     </div>
   );
-}
-
-function renderPreview(project: ProjectData): HTMLElement {
-  const wrapper = document.createElement('div');
-  wrapper.style.width = '100%';
-  wrapper.style.height = '100%';
-  wrapper.style.position = 'relative';
-  wrapper.style.overflow = 'hidden';
-  wrapper.style.padding = '12px';
-  wrapper.style.boxSizing = 'border-box';
-
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width', '100%');
-  svg.setAttribute('height', '100%');
-  svg.style.position = 'absolute';
-  svg.style.top = '0';
-  svg.style.left = '0';
-
-  // Generate project-specific SVG patterns (simplified)
-  const accent = project.accent || '#D94F2B';
-  if (project.slug === 'uppetite') {
-    // map dots
-    for (let i = 0; i < 12; i++) {
-      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('cx', String(20 + Math.random() * 200));
-      circle.setAttribute('cy', String(20 + Math.random() * 100));
-      circle.setAttribute('r', '3');
-      circle.setAttribute('fill', accent);
-      svg.appendChild(circle);
-    }
-    // roads
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', 'M10 80 Q100 20 200 60 T300 40');
-    path.setAttribute('stroke', '#111111');
-    path.setAttribute('stroke-width', '1');
-    path.setAttribute('fill', 'none');
-    svg.appendChild(path);
-  } else if (project.slug === 'pasada') {
-    // routes and nodes
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', '20'); line.setAttribute('y1', '80');
-    line.setAttribute('x2', '250'); line.setAttribute('y2', '40');
-    line.setAttribute('stroke', accent);
-    line.setAttribute('stroke-width', '2');
-    svg.appendChild(line);
-    for (let i = 0; i < 5; i++) {
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', String(30 + i * 50));
-      rect.setAttribute('y', '50');
-      rect.setAttribute('width', '10');
-      rect.setAttribute('height', '10');
-      rect.setAttribute('fill', '#111111');
-      svg.appendChild(rect);
-    }
-  } else if (project.slug === 'disaster-response') {
-    // communication lines and nodes
-    const triangle = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    triangle.setAttribute('points', '150,20 250,80 50,80');
-    triangle.setAttribute('stroke', accent);
-    triangle.setAttribute('stroke-width', '1');
-    triangle.setAttribute('fill', 'none');
-    svg.appendChild(triangle);
-  } else if (project.slug === 'campus-navigation') {
-    // floor plan lines
-    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', '40'); rect.setAttribute('y', '30');
-    rect.setAttribute('width', '200'); rect.setAttribute('height', '80');
-    rect.setAttribute('stroke', '#111111');
-    rect.setAttribute('stroke-width', '1');
-    rect.setAttribute('fill', 'none');
-    svg.appendChild(rect);
-  }
-
-  wrapper.appendChild(svg);
-
-  const label = document.createElement('p');
-  label.style.position = 'absolute';
-  label.style.bottom = '8px';
-  label.style.left = '12px';
-  label.style.fontFamily = 'JetBrains Mono, monospace';
-  label.style.fontSize = '10px';
-  label.style.textTransform = 'uppercase';
-  label.style.color = '#555555';
-  label.textContent = `${project.status} / ${project.category}`;
-  wrapper.appendChild(label);
-
-  return wrapper;
 }

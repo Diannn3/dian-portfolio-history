@@ -1,14 +1,5 @@
 :root {
-  --color-canvas: #F4F2ED;
-  --color-ink: #111111;
-  --color-graphite: #555555;
-  --color-hairline: #D8D4CC;
-  --color-accent: #D94F2B;
-  --color-accent-soft: #F0E4DD;
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --gutter: clamp(1.5rem, 4vw, 4rem);
-  --section-spacing: clamp(6rem, 12vw, 12rem);
-  --content-max-width: 1440px;
+  --gutter: clamp(1.25rem, 3.7vw, 4rem);
+  --section-spacing: clamp(5.5rem, 11vw, 11rem);
+  --content-max-width: 92rem;
 }

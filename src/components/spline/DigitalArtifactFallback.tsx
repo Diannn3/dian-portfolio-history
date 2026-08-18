@@ -1,12 +1,2 @@
-export function DigitalArtifactFallback() {
-  return (
-    <div className="flex h-full w-full items-center justify-center p-8">
-      <svg className="h-64 w-64 opacity-40" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M100 20 L180 100 L100 180 L20 100 Z" stroke="#111111" strokeWidth="1" fill="none" />
-        <circle cx="100" cy="100" r="40" stroke="#D94F2B" strokeWidth="1" fill="none" />
-        <line x1="100" y1="20" x2="100" y2="180" stroke="#D8D4CC" strokeWidth="0.5" />
-        <line x1="20" y1="100" x2="180" y2="100" stroke="#D8D4CC" strokeWidth="0.5" />
-      </svg>
-    </div>
-  );
-}
+export function DigitalArtifactFallback(){return <div className="grid h-full min-h-[360px] place-items-center overflow-hidden bg-canvas-raised/40 p-8"><svg viewBox="0 0 420 320" className="h-full max-h-[360px] w-full max-w-[520px]" fill="none" aria-hidden="true"><path d="M70 210C110 88 230 55 334 116C390 150 355 244 255 264C150 286 35 272 70 210Z" stroke="#111" strokeWidth="1.5"/><path d="M102 200C144 128 224 108 320 145" stroke="#d94f2b" strokeWidth="2"/><circle cx="194" cy="168" r="66" stroke="#d8d4cc"/><line x1="30" y1="160" x2="390" y2="160" stroke="#d8d4cc"/><line x1="210" y1="35" x2="210" y2="285" stroke="#d8d4cc"/></svg></div>}
+export default DigitalArtifactFallback;

@@ -1,10 +1,6 @@
 ---
 import MobileNav from './MobileNav.astro';
-
-interface Props {
-  currentPath: string;
-}
-
+interface Props { currentPath: string; }
 const { currentPath } = Astro.props;
 const links = [
   { href: '/#work', label: 'Work' },
@@ -13,45 +9,17 @@ const links = [
   { href: '/#contact', label: 'Contact' },
 ];
 ---
-
-<header class="fixed top-0 left-0 right-0 z-40 mix-blend-difference text-white" aria-label="Main navigation">
-  <div class="container-editorial flex items-center justify-between py-4 md:py-6">
-    <a href="/" class="font-display text-xl font-semibold tracking-tight text-white" aria-label="Dian — home">
-      DIAN
-    </a>
-    <nav class="hidden md:block">
-      <ul class="flex items-center gap-8">
-        {links.map((link) => (
-          <li>
-            <a
-              href={link.href}
-              class="font-mono text-xs uppercase tracking-widest text-white/70 hover:text-white transition-colors duration-200"
-              aria-current={currentPath === link.href ? 'page' : undefined}
-            >
-              {link.label}
-            </a>
-          </li>
-        ))}
-        <li class="flex items-center gap-2 ml-4">
-          <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse" aria-hidden="true"></span>
-          <span class="font-mono text-xs uppercase tracking-widest text-white/70">Building things</span>
-        </li>
-      </ul>
+<header class="fixed inset-x-0 top-0 z-50 text-ink mix-blend-difference" aria-label="Site header">
+  <div class="container-editorial flex items-center justify-between py-5">
+    <a href="/" class="font-display text-lg font-semibold tracking-[-0.04em] text-white" aria-label="Dian — home">DIAN</a>
+    <nav class="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
+      {links.map((link) => (
+        <a href={link.href} class="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-white/65 transition-colors hover:text-white">{link.label}</a>
+      ))}
+      <span class="ml-3 flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-white/65">
+        <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span> Building things
+      </span>
     </nav>
     <MobileNav links={links} currentPath={currentPath} />
   </div>
 </header>
-
-<style>
-  /* Adjust mix-blend for better contrast when scrolled */
-  @media (max-width: 768px) {
-    header {
-      mix-blend-mode: normal;
-      background: rgba(244, 242, 237, 0.9);
-      backdrop-filter: blur(8px);
-    }
-    header a, header button, header span {
-      color: var(--color-ink);
-    }
-  }
-</style>

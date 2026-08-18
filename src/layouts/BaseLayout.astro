@@ -2,7 +2,7 @@
 import Nav from '@/components/global/Nav.astro';
 import Footer from '@/components/global/Footer.astro';
 import Cursor from '@/components/global/Cursor.astro';
-import { initLenis } from '@/lib/motion/lenis';
+import { ClientRouter } from 'astro:transitions';
 import '@/styles/global.css';
 
 interface Props {
@@ -12,23 +12,23 @@ interface Props {
   canonical?: string;
 }
 
+const site = Astro.site ?? new URL('https://example.com');
+const currentPath = Astro.url.pathname;
 const {
   title = 'Dian — Applied Mathematics × Software × Spatial Systems',
   description = 'Applied Mathematics student building software, AI, maps, spatial systems, and experimental interfaces.',
-  image = '/og-default.jpg',
-  canonical = 'https://dian.dev',
+  image = '/og-default.png',
+  canonical = new URL(currentPath, site).toString(),
 } = Astro.props;
-
-const currentPath = Astro.url.pathname;
+const socialImage = new URL(image, site).toString();
 ---
-
 <!doctype html>
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#F4F2ED" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -36,31 +36,27 @@ const currentPath = Astro.url.pathname;
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={image} />
+    <meta property="og:image" content={socialImage} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#F4F2ED" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Lenis script -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+    <ClientRouter />
     <script>
       import { initLenis } from '@/lib/motion/lenis';
-      document.addEventListener('astro:page-load', () => {
-        initLenis();
-      });
+      let controller: ReturnType<typeof initLenis> = null;
+      const boot = () => {
+        controller?.destroy?.();
+        controller = initLenis();
+      };
+      document.addEventListener('astro:page-load', boot);
+      document.addEventListener('astro:before-swap', () => controller?.destroy?.());
     </script>
   </head>
-  <body class="min-h-screen bg-canvas text-ink antialiased">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-canvas focus:px-4 focus:py-2 focus:text-ink">
-      Skip to content
-    </a>
+  <body>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-canvas focus:px-4 focus:py-2">Skip to content</a>
     <Nav currentPath={currentPath} />
-    <main id="main-content">
-      <slot />
-    </main>
+    <main id="main-content"><slot /></main>
     <Footer />
     <Cursor />
   </body>

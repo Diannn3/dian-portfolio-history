@@ -1,24 +1,4 @@
 ---
+const rows=[['INTERFACE','Astro / React / TypeScript'],['COMPUTATION','Python / NumPy / Pandas'],['SPATIAL','MapLibre / PMTiles / GIS'],['VISUAL','Three.js / R3F / Spline / GSAP'],['AI','LLMs / ML tooling'],['SYSTEMS','Node / APIs / databases']];
 ---
-
-<section class="section-padding border-t border-hairline">
-  <div class="container-editorial">
-    <p class="mono-label mb-4">Tools I Reach For</p>
-    <h2 class="text-h1 font-display text-ink mb-12">Stack</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      {[
-        { category: 'INTERFACE', items: 'Astro / React / TypeScript' },
-        { category: 'COMPUTATION', items: 'Python / NumPy / Pandas' },
-        { category: 'SPATIAL', items: 'MapLibre / PMTiles / GIS' },
-        { category: 'VISUAL', items: 'Three.js / R3F / Spline / GSAP' },
-        { category: 'AI', items: 'LLMs / ML tooling' },
-        { category: 'SYSTEMS', items: 'Node / APIs / databases' },
-      ].map((tool) => (
-        <div class="border-l border-hairline pl-6">
-          <p class="font-mono text-xs uppercase tracking-widest text-accent mb-2">{tool.category}</p>
-          <p class="text-body">{tool.items}</p>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
+<section class="section-padding border-t border-hairline"><div class="container-editorial"><p class="mono-label mb-4">Tools / working set</p><h2 class="heading-lg mb-12">Tools I reach for.</h2><dl class="border-t border-hairline">{rows.map(([category,items])=><div class="grid gap-2 border-b border-hairline py-5 md:grid-cols-12"><dt class="font-mono text-[0.68rem] uppercase tracking-widest text-graphite md:col-span-3">{category}</dt><dd class="font-display text-xl md:col-span-8 md:text-2xl">{items}</dd></div>)}</dl></div></section>

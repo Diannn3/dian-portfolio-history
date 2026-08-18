@@ -1,55 +1,40 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { mulberry32, vectorField } from './field';
+import type { Quality } from './Scene';
 
-export function VectorField() {
-  const groupRef = useRef<THREE.Group>(null);
-  const count = 50;
-  const lines = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      // position around the manifold
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 3.5 + Math.random() * 2;
-      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.8;
-      positions[i * 3 + 2] = r * Math.cos(phi) * 0.6;
-    }
-    return positions;
-  }, []);
-
-  const lineGeometry = useMemo(() => {
-    const geometry = new THREE.BufferGeometry();
-    // Each line is a segment from point to point + direction
+export function VectorField({ quality, progressRef }: { quality: Quality; progressRef: React.MutableRefObject<number> }) {
+  const group = useRef<THREE.Group>(null!);
+  const count = quality === 'low' ? 28 : quality === 'high' ? 72 : 48;
+  const { geometry, material } = useMemo(() => {
+    const random = mulberry32(5219);
     const vertices = new Float32Array(count * 6);
+    const point = new THREE.Vector3();
+    const direction = new THREE.Vector3();
+
     for (let i = 0; i < count; i++) {
-      const x = lines[i * 3];
-      const y = lines[i * 3 + 1];
-      const z = lines[i * 3 + 2];
-      const dir = new THREE.Vector3(-y, x, z * 0.5).normalize().multiplyScalar(0.8);
-      vertices[i * 6] = x;
-      vertices[i * 6 + 1] = y;
-      vertices[i * 6 + 2] = z;
-      vertices[i * 6 + 3] = x + dir.x;
-      vertices[i * 6 + 4] = y + dir.y;
-      vertices[i * 6 + 5] = z + dir.z;
+      point.set((random() - 0.5) * 8.4, (random() - 0.5) * 5.4, (random() - 0.5) * 3.2);
+      vectorField(point, direction).normalize().multiplyScalar(0.42 + random() * 0.34);
+      const offset = i * 6;
+      vertices.set([
+        point.x, point.y, point.z,
+        point.x + direction.x, point.y + direction.y, point.z + direction.z,
+      ], offset);
     }
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    return geometry;
-  }, [lines, count]);
 
-  const material = useMemo(() => new THREE.LineBasicMaterial({ color: '#555555', transparent: true, opacity: 0.4 }), []);
+    const nextGeometry = new THREE.BufferGeometry();
+    nextGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    const nextMaterial = new THREE.LineBasicMaterial({ color: '#6f6a63', transparent: true, opacity: 0.27 });
+    return { geometry: nextGeometry, material: nextMaterial };
+  }, [count]);
 
-  useFrame((state) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.05;
-    }
+  useFrame((_, delta) => {
+    if (!group.current) return;
+    const progress = progressRef.current;
+    group.current.scale.z = THREE.MathUtils.damp(group.current.scale.z, 1 - progress * 0.72, 4, delta);
+    group.current.position.z = THREE.MathUtils.damp(group.current.position.z, -progress * 0.35, 4, delta);
   });
 
-  return (
-    <group ref={groupRef}>
-      <lineSegments geometry={lineGeometry} material={material} />
-    </group>
-  );
+  return <group ref={group}><lineSegments geometry={geometry} material={material} /></group>;
 }
