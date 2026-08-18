@@ -1,0 +1,17 @@
+---
+import { skillCategories } from '../data/skills';
+---
+
+<section class="px-[var(--spacing-gutter)] py-24 md:py-36 bg-white border-t border-line">
+  <div class="max-w-7xl mx-auto">
+    <h2 class="text-[var(--text-section)] font-bold mb-16" data-reveal>TOOLS I REACH FOR</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
+      {skillCategories.map((skill) => (
+        <div class="border-b border-line pb-6" data-reveal>
+          <span class="mono-label text-ink-faint">{skill.category}</span>
+          <p class="mt-2 text-lg font-medium">{skill.items}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

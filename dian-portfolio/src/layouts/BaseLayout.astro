@@ -1,0 +1,51 @@
+---
+import SEOHead from '../components/global/SEOHead.astro';
+import Navigation from '../components/global/Navigation.astro';
+import Cursor from '../components/global/Cursor.tsx';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalURL?: URL;
+  ogImage?: string;
+}
+const {
+  title = "Dian — Systems & Interfaces",
+  description = "Applied mathematics student, developer, and technical creative.",
+  canonicalURL,
+  ogImage = "/og-default.png",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SEOHead
+      title={title}
+      description={description}
+      canonicalURL={canonicalURL}
+      ogImage={ogImage}
+    />
+  </head>
+  <body class="bg-paper text-ink font-sans">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:bg-paper focus:p-4">
+      Skip to content
+    </a>
+    <Cursor client:load />
+    <Navigation />
+    <main id="main-content">
+      <slot />
+    </main>
+    <script>
+      import { initLenis } from '../scripts/lenis';
+      import { initMotion } from '../scripts/motion';
+      
+      const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!isReduced) {
+        const lenis = initLenis();
+        initMotion();
+      }
+    </script>
+  </body>
+</html>

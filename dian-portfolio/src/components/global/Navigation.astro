@@ -1,0 +1,76 @@
+---
+import { Menu, X } from 'lucide-react';
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 mix-blend-difference text-white">
+  <nav class="flex items-center justify-between px-[var(--spacing-gutter)] py-4 md:py-5" aria-label="Primary">
+    <a href="/" class="text-xl font-bold tracking-tight link-underline" data-cursor="home">
+      DIAN
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="/#work" class="text-sm font-medium link-underline" data-cursor="view">Work</a>
+      <a href="/#about" class="text-sm font-medium link-underline" data-cursor="view">About</a>
+      <a href="/#now" class="text-sm font-medium link-underline" data-cursor="view">Now</a>
+      <a href="/#lab" class="text-sm font-medium link-underline" data-cursor="view">Lab</a>
+      <a href="/#contact" class="text-sm font-medium link-underline" data-cursor="view">Contact</a>
+      <span class="mono-label !text-white/70">
+        ● AVAILABLE / BUILDING THINGS
+      </span>
+    </div>
+    <button
+      class="md:hidden p-2"
+      aria-label="Open menu"
+      aria-expanded="false"
+      data-mobile-menu-trigger
+    >
+      <Menu class="w-6 h-6" />
+    </button>
+  </nav>
+
+  <dialog
+    class="fixed inset-0 z-50 m-0 h-full w-full max-w-none bg-ink text-paper md:hidden"
+    data-mobile-menu
+    aria-label="Mobile navigation"
+  >
+    <div class="flex h-full flex-col justify-between p-6 py-8">
+      <div class="flex justify-between items-center">
+        <span class="text-xl font-bold">DIAN</span>
+        <button aria-label="Close menu" data-mobile-menu-close>
+          <X class="w-6 h-6" />
+        </button>
+      </div>
+      <nav class="space-y-6 text-3xl font-semibold">
+        <a href="/#work" class="block link-underline" data-cursor="view">Work</a>
+        <a href="/#about" class="block link-underline" data-cursor="view">About</a>
+        <a href="/#now" class="block link-underline" data-cursor="view">Now</a>
+        <a href="/#lab" class="block link-underline" data-cursor="view">Lab</a>
+        <a href="/#contact" class="block link-underline" data-cursor="view">Contact</a>
+      </nav>
+      <span class="mono-label text-paper/60">● AVAILABLE / BUILDING THINGS</span>
+    </div>
+  </dialog>
+</header>
+
+<script>
+  const trigger = document.querySelector('[data-mobile-menu-trigger]');
+  const closeBtn = document.querySelector('[data-mobile-menu-close]');
+  const dialog = document.querySelector('[data-mobile-menu]');
+
+  trigger?.addEventListener('click', () => {
+    dialog?.showModal();
+    trigger.setAttribute('aria-expanded', 'true');
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    dialog?.close();
+    trigger.setAttribute('aria-expanded', 'false');
+  });
+
+  dialog?.addEventListener('close', () => {
+    trigger.setAttribute('aria-expanded', 'false');
+  });
+
+  dialog?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => dialog.close());
+  });
+</script>
