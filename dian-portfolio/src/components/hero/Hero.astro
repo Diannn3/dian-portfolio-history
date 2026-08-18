@@ -1,0 +1,47 @@
+---
+import HeroCanvas from './HeroCanvas.tsx';
+import HeroFallback from './HeroFallback.astro';
+---
+
+<section
+  id="hero"
+  class="relative h-[100svh] min-h-[600px] w-full overflow-hidden bg-paper"
+  data-hero
+>
+  <div class="absolute inset-0 z-0">
+    <HeroCanvas client:load />
+    <HeroFallback />
+  </div>
+
+  <div class="relative z-10 flex h-full flex-col justify-between p-[var(--spacing-gutter)] pointer-events-none">
+    <div class="flex items-start justify-between text-xs mono-label text-ink-faint">
+      <span>SYSTEM / ACTIVE</span>
+      <span>LOC / 14.165° N, 121.243° E</span>
+    </div>
+    <div class="mb-8 md:mb-12">
+      <h1 class="text-[var(--text-display)] font-bold leading-[0.9] tracking-tight text-ink">
+        DIAN<br />
+        <span class="text-ink-muted">BUILDS</span> SYSTEMS<br />
+        FOR THE PHYSICAL<br />
+        AND DIGITAL WORLD.
+      </h1>
+      <p class="mt-4 max-w-xl text-base md:text-lg text-ink-muted pointer-events-auto">
+        Applied mathematics student, developer, and technical creative — working across software, AI, maps, and interfaces.
+      </p>
+      <a
+        href="#work"
+        class="mt-8 inline-flex items-center gap-2 border-b border-ink pb-1 text-sm font-medium uppercase tracking-widest pointer-events-auto"
+        data-cursor="explore"
+      >
+        Explore selected work
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 5v14M19 12l-7 7-7-7" stroke-width="2"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="absolute bottom-6 right-6 z-10 text-xs mono-label text-ink-faint hidden md:block">
+    SCROLL TO TRANSFORM
+  </div>
+</section>
