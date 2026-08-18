@@ -1,0 +1,28 @@
+---
+interface Props {
+  title: string
+  description: string
+  image?: string
+}
+const { title, description, image = "/og.png" } = Astro.props
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href
+const socialImage = new URL(image, Astro.site ?? Astro.url.origin).href
+const fullTitle = title === "Dian" ? "Dian — Vector Atlas" : `${title} · Dian`
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta name="theme-color" content="#f2efe7" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={socialImage} />
+<meta property="og:site_name" content="Dian" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={socialImage} />

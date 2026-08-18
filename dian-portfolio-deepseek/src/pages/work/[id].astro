@@ -1,8 +1,0 @@
----
-import { getCollection, render } from 'astro:content';
-import ProjectLayout from '../../layouts/ProjectLayout.astro';
-export async function getStaticPaths(){ const projects=(await getCollection('projects')).sort((a,b)=>a.data.index.localeCompare(b.data.index)); return projects.map((project,i)=>({params:{id:project.id},props:{project,nextProject:projects[(i+1)%projects.length]}})); }
-const { project, nextProject } = Astro.props;
-const { Content } = await render(project);
----
-<ProjectLayout project={project} nextProject={nextProject}><Content /></ProjectLayout>

@@ -1,0 +1,37 @@
+---
+const groups = [
+  { label: "INTERFACE", tools: "Astro / React / TypeScript" },
+  { label: "COMPUTATION", tools: "Python / NumPy / Pandas" },
+  { label: "SPATIAL", tools: "MapLibre / PMTiles / GIS" },
+  { label: "VISUAL", tools: "Three.js / R3F / Spline / GSAP" },
+  { label: "AI", tools: "LLMs / ML tooling / agents" },
+  { label: "SYSTEMS", tools: "Node / APIs / databases" },
+]
+---
+
+<section id="tools" class="border-t border-hairline py-20 md:py-28" aria-labelledby="tools-heading">
+  <div class="atlas-container atlas-grid gap-y-10">
+    <div class="col-span-4 md:col-span-4">
+      <p class="label mb-4" data-reveal="rise">§06 · Tools</p>
+      <h2 id="tools-heading" class="font-display max-w-[11ch] text-h3" data-reveal="rise">Tools I reach for.</h2>
+      <p class="mt-5 max-w-[34ch] text-graphite" data-reveal="rise">
+        A working vocabulary, not a logo wall. The tool changes when the problem changes.
+      </p>
+    </div>
+
+    <div class="col-span-4 md:col-span-8">
+      <dl class="border-t border-hairline">
+        {groups.map((group, index) => (
+          <div class="grid grid-cols-[2.5rem_1fr] gap-4 border-b border-hairline py-4 sm:grid-cols-[3rem_9rem_1fr]" data-reveal="rise">
+            <span class="mono text-graphite-2">{String(index + 1).padStart(2, "0")}</span>
+            <dt class="label hidden sm:block">{group.label}</dt>
+            <dd>
+              <span class="label mb-1 block sm:hidden">{group.label}</span>
+              <span class="font-display text-[clamp(1.15rem,1.8vw,1.65rem)] text-ink">{group.tools}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </div>
+</section>

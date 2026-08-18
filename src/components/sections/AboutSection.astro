@@ -1,0 +1,59 @@
+---
+import DisciplineGraph from "@/components/about/DisciplineGraph"
+
+const facts = [
+  { k: "Field", v: "Applied Mathematics" },
+  { k: "Base", v: "Los Baños, PH" },
+  { k: "Mode", v: "Student · builder · designer" },
+  { k: "Interest", v: "AI · spatial systems · data" },
+]
+---
+
+<section id="about" class="relative border-t border-hairline py-24 md:py-36" aria-labelledby="about-heading">
+  <div class="atlas-container atlas-grid gap-y-12">
+    <div class="col-span-4 md:col-span-4">
+      <p class="label mb-6" data-reveal="rise">§02 · About</p>
+      <div class="sticky top-28 hidden md:block">
+        <dl class="border-t border-hairline">
+          {facts.map((fact) => (
+            <div class="flex items-baseline justify-between gap-6 border-b border-hairline py-3" data-reveal="rise">
+              <dt class="mono text-graphite-2">{fact.k}</dt>
+              <dd class="text-right text-sm text-ink">{fact.v}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+
+    <div class="col-span-4 md:col-span-7 md:col-start-6">
+      <h2 id="about-heading" class="font-display max-w-[18ch] text-h3 leading-snug text-balance" data-reveal="rise">
+        I like problems that sit between equations and interfaces.
+      </h2>
+      <div class="mt-8 max-w-[64ch] space-y-6 text-body-lg text-graphite">
+        <p data-reveal="rise">
+          I&apos;m Dian, an Applied Mathematics student who builds software, AI experiments, maps, data tools, and visual interfaces. I&apos;m most interested in systems where the mathematical structure changes how the interface should behave.
+        </p>
+        <p data-reveal="rise">
+          That can mean a route becoming a spatial decision, a dataset becoming an instrument, or an AI workflow becoming something a person can actually inspect and use. The common thread is turning abstract systems into legible ones.
+        </p>
+      </div>
+
+      <div class="mt-12" data-reveal="rise">
+        <div class="mb-4 flex items-end justify-between gap-4">
+          <p class="label">Discipline graph / live relationships</p>
+          <p class="mono hidden text-graphite-2 sm:block">EQUATIONS ↔ SYSTEMS ↔ INTERFACES ↔ SPACE</p>
+        </div>
+        <DisciplineGraph client:visible />
+      </div>
+
+      <dl class="mt-10 border-t border-hairline md:hidden">
+        {facts.map((fact) => (
+          <div class="flex items-baseline justify-between gap-6 border-b border-hairline py-3">
+            <dt class="mono text-graphite-2">{fact.k}</dt>
+            <dd class="text-right text-sm text-ink">{fact.v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </div>
+</section>

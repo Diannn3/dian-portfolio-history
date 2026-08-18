@@ -1,0 +1,35 @@
+---
+import DigitalArtifact from "@/components/spline/DigitalArtifact"
+
+const sceneUrl = import.meta.env.PUBLIC_SPLINE_SCENE_URL
+---
+
+<section id="artifact" class="border-t border-hairline py-24 md:py-36" aria-labelledby="artifact-heading">
+  <div class="atlas-container atlas-grid gap-y-10">
+    <div class="col-span-4 md:col-span-4">
+      <p class="label mb-4" data-reveal="rise">§04 · Object / 001</p>
+      <h2 id="artifact-heading" class="font-display max-w-[13ch] text-h2 text-balance" data-reveal="rise">
+        Computational artifact.
+      </h2>
+      <p class="mt-6 max-w-[38ch] text-graphite" data-reveal="rise">
+        An experiment in translating mathematical structure into a spatial interface: coordinate planes, contour logic, and a physical-feeling object that still behaves like data.
+      </p>
+      <div class="mt-8 border-t border-hairline pt-4" data-reveal="rise">
+        <p class="mono text-graphite-2">
+          SPLINE / {sceneUrl ? "LAZY INTERACTIVE SCENE" : "STATIC FALLBACK ACTIVE"}
+        </p>
+        {!sceneUrl && (
+          <p class="mt-2 text-sm text-graphite">
+            Add <code class="mono text-ink">PUBLIC_SPLINE_SCENE_URL</code> when a published Spline scene is ready; the section is intentionally complete without one.
+          </p>
+        )}
+      </div>
+    </div>
+
+    <div class="col-span-4 md:col-span-7 md:col-start-6" data-reveal="clip">
+      <div class="overflow-hidden border border-hairline">
+        <DigitalArtifact sceneUrl={sceneUrl} client:visible />
+      </div>
+    </div>
+  </div>
+</section>
