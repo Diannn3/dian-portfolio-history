@@ -1,109 +1,375 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "lenis/dist/lenis.css";
-@import "./tokens.css";
 
-@theme inline {
-  --color-canvas: #f4f2ed;
-  --color-canvas-raised: #ebe7df;
-  --color-ink: #111111;
-  --color-ink-soft: #2c2b29;
-  --color-graphite: #64615c;
-  --color-muted: #8e8981;
-  --color-hairline: #d8d4cc;
-  --color-accent: #d94f2b;
-  --color-accent-soft: #ead9d0;
-  --color-inverse: #f7f5f0;
-  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+
+/* ============================================================
+   VECTOR ATLAS — design tokens
+   A mathematical atlas / spatial OS / research notebook.
+   Warm paper canvas, ink, graphite, hairline, single warm accent.
+   ============================================================ */
+
+@theme {
+  /* palette */
+  --color-paper: #f2efe7;
+  --color-paper-2: #eae6db;
+  --color-ink: #17150f;
+  --color-graphite: #5a5750;
+  --color-graphite-2: #8a867c;
+  --color-hairline: #d6d1c4;
+  --color-hairline-strong: #c3bdae;
+  --color-accent: #d9482b;
+  --color-accent-ink: #b23a20;
+  --color-field: #3f6f63; /* muted spatial teal, secondary */
+
+  /* fonts */
+  --font-display: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", monospace;
+
+  /* fluid type scale */
+  --text-micro: 0.6875rem;
+  --text-mono: 0.75rem;
+  --text-body: 1.0625rem;
+  --text-body-lg: clamp(1.125rem, 0.9rem + 0.9vw, 1.5rem);
+  --text-h3: clamp(1.25rem, 1rem + 1.1vw, 1.75rem);
+  --text-h2: clamp(1.75rem, 1.2rem + 2.6vw, 3.25rem);
+  --text-h1: clamp(2.5rem, 1.4rem + 5.2vw, 6rem);
+  --text-display: clamp(3.25rem, 1rem + 11vw, 12rem);
+
+  /* radii — kept minimal, technical */
+  --radius: 2px;
+
+  /* motion */
+  --ease-atlas: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-quick: cubic-bezier(0.4, 0, 0.1, 1);
 }
 
-@layer base {
-  :root { color-scheme: light; }
-  * { box-sizing: border-box; }
-  html {
-    background: var(--color-canvas);
-    color: var(--color-ink);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    scrollbar-gutter: stable;
-  }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    overflow-x: clip;
-    background: var(--color-canvas);
-    color: var(--color-ink);
-    font-family: var(--font-sans);
-    font-feature-settings: "ss01", "cv01", "cv02";
-  }
-  ::selection { background: var(--color-accent); color: var(--color-inverse); }
-  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
-  h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); text-wrap: balance; }
-  p { text-wrap: pretty; }
-  a { color: inherit; text-decoration: none; }
-  button { font: inherit; }
+/* ------------------------------------------------------------ base */
+:root {
+  color-scheme: light;
+  --grid-unit: clamp(16px, 4vw, 40px);
 }
 
-@layer components {
-  .container-editorial {
-    width: min(calc(100% - (var(--gutter) * 2)), var(--content-max-width));
-    margin-inline: auto;
+* {
+  border-color: var(--color-hairline);
+}
+
+html {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  font-feature-settings: "cv05" 1, "ss01" 1;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-paper);
+}
+
+/* ------------------------------------------------------------ typographic helpers */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  letter-spacing: 0.02em;
+  font-feature-settings: "zero" 1;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-graphite);
+}
+
+.display-xl {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 600;
+  line-height: 0.86;
+  letter-spacing: -0.04em;
+}
+
+/* ------------------------------------------------------------ layout system */
+.atlas-container {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 5rem);
+}
+
+.atlas-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: clamp(1rem, 2vw, 2rem);
+}
+@media (min-width: 768px) {
+  .atlas-grid {
+    grid-template-columns: repeat(8, 1fr);
   }
-  .section-padding { padding-block: var(--section-spacing); }
-  .mono-label {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    line-height: 1.4;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-graphite);
+}
+@media (min-width: 1100px) {
+  .atlas-grid {
+    grid-template-columns: repeat(12, 1fr);
   }
-  .display-xl {
-    font-size: clamp(4.25rem, 11vw, 10.5rem);
-    line-height: 0.82;
-    letter-spacing: -0.065em;
-    font-weight: 600;
-  }
-  .display-lg {
-    font-size: clamp(2.8rem, 6.7vw, 6.5rem);
-    line-height: 0.92;
-    letter-spacing: -0.045em;
-    font-weight: 560;
-  }
-  .heading-lg {
-    font-size: clamp(2rem, 4.5vw, 4.5rem);
-    line-height: 0.98;
-    letter-spacing: -0.035em;
-    font-weight: 560;
-  }
-  .body-lg { font-size: clamp(1rem, 1.4vw, 1.22rem); line-height: 1.62; }
-  .hairline { border-color: var(--color-hairline); }
-  .prose-portfolio h2 { margin-top: 4rem; margin-bottom: 1rem; font-size: clamp(1.6rem, 3vw, 2.6rem); line-height: 1; }
-  .prose-portfolio p { max-width: 48rem; color: var(--color-graphite); font-size: 1.05rem; line-height: 1.75; }
-  .prose-portfolio strong { color: var(--color-ink); }
+}
+
+/* subtle paper coordinate texture used behind sections */
+.coord-paper {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--color-hairline) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-hairline) 55%, transparent) 1px, transparent 1px);
+  background-size: var(--grid-unit) var(--grid-unit);
+  background-position: center;
+}
+
+.hairline {
+  border: 0;
+  border-top: 1px solid var(--color-hairline);
+  height: 0;
+}
+
+/* ------------------------------------------------------------ link + interaction primitives */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s var(--ease-atlas);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* focus */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 200;
+  transform: translateY(-150%);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding: 0.6rem 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  transition: transform 0.25s var(--ease-quick);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* ------------------------------------------------------------ reveal primitives (GSAP-driven, JS-off safe) */
+[data-reveal] {
+  opacity: 1;
+}
+html.js [data-reveal] {
+  opacity: 0;
+}
+.reveal-line {
+  display: block;
+  overflow: hidden;
 }
 
 
-.custom-cursor { display: none; }
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .custom-cursor { display: grid; }
-}
+/* Progressive enhancement: a native <details> nav remains usable without JS. */
+html.js .nojs-mobile-nav { display: none; }
+html.no-js .js-mobile-nav { display: none; }
 
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto !important; }
-  *, *::before, *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+/* ------------------------------------------------------------ custom cursor */
+.atlas-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 300;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+@media (hover: none), (pointer: coarse) {
+  .atlas-cursor {
+    display: none;
   }
 }
 
+/* hide native cursor only on fine-pointer devices when custom cursor active */
 @media (hover: hover) and (pointer: fine) {
-  ::-webkit-scrollbar { width: 10px; }
-  ::-webkit-scrollbar-track { background: var(--color-canvas); }
-  ::-webkit-scrollbar-thumb { background: var(--color-hairline); border: 2px solid var(--color-canvas); border-radius: 999px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--color-graphite); }
+  html.cursor-ready,
+  html.cursor-ready a,
+  html.cursor-ready button {
+    cursor: none;
+  }
+}
+
+/* ------------------------------------------------------------ reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html.js [data-reveal] {
+    opacity: 1;
+  }
+  .atlas-cursor {
+    display: none !important;
+  }
+  html.cursor-ready,
+  html.cursor-ready a,
+  html.cursor-ready button {
+    cursor: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------ utility + editorial prose */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.project-prose {
+  font-size: var(--text-body-lg);
+  line-height: 1.62;
+  color: var(--color-graphite);
+}
+
+.project-prose > * + * {
+  margin-top: 1.4rem;
+}
+
+.project-prose h2 {
+  margin-top: 4rem;
+  margin-bottom: 1.1rem;
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--color-ink);
+}
+
+.project-prose h2:first-child {
+  margin-top: 0;
+}
+
+.project-prose p,
+.project-prose li {
+  max-width: 64ch;
+}
+
+.project-prose ul,
+.project-prose ol {
+  max-width: 64ch;
+  border-top: 1px solid var(--color-hairline);
+  margin-top: 1.75rem;
+}
+
+.project-prose li {
+  position: relative;
+  border-bottom: 1px solid var(--color-hairline);
+  padding: 0.8rem 0 0.8rem 1.6rem;
+}
+
+.project-prose li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--project-accent, var(--color-accent));
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.project-prose strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.project-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--color-ink);
+}
+
+/* Hide only recognized reveal modes before GSAP initializes. Unknown/plain
+   data-reveal attributes remain visible instead of becoming accidental ghosts. */
+html.js [data-reveal="rise"],
+html.js [data-reveal="lines"],
+html.js [data-reveal="draw"],
+html.js [data-reveal="clip"] {
+  opacity: 0;
+}
+
+/* Override the earlier broad selector from the original v0 scaffold. */
+html.js [data-reveal]:not([data-reveal="rise"]):not([data-reveal="lines"]):not([data-reveal="draw"]):not([data-reveal="clip"]) {
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  #hero {
+    height: 165vh;
+  }
+
+  #hero .display-xl {
+    font-size: clamp(3rem, 15vw, 5rem);
+    line-height: 0.88;
+  }
+
+  .project-prose h2 {
+    margin-top: 3rem;
+  }
 }

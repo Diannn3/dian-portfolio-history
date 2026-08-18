@@ -1,20 +1,127 @@
 ---
-import BaseLayout from './BaseLayout.astro';
-import ProjectVisual from '@/components/work/ProjectVisual.astro';
-import type { CollectionEntry } from 'astro:content';
-interface Props { project: CollectionEntry<'projects'>; }
-const { project } = Astro.props; const { data }=project;
+import BaseLayout from "./BaseLayout.astro"
+import ProjectPreviewVisual from "@/components/work/ProjectPreviewVisual"
+import ProjectSystemDiagram from "@/components/project/ProjectSystemDiagram.astro"
+
+interface ProjectData {
+  title: string
+  shortTitle: string
+  index: number
+  status: "CONCEPT" | "PROTOTYPE" | "IN DEVELOPMENT" | "EXPERIMENT"
+  year?: number
+  category: string
+  summary: string
+  thesis: string
+  role?: string
+  technologies: string[]
+  themes: string[]
+  accent: string
+  visual: "uppetite" | "pasada" | "disaster" | "campus"
+}
+
+interface Props {
+  slug: string
+  project: ProjectData
+  nextProject?: { slug: string; title: string; index: number }
+}
+
+const { slug, project, nextProject } = Astro.props
 ---
-<BaseLayout title={`${data.title} — Dian`} description={data.summary}>
-  <article class="pb-24 pt-32">
-    <header class="container-editorial">
-      <a href="/#work" class="mono-label inline-block border-b border-hairline pb-1">← Selected work</a>
-      <div class="mt-12 grid gap-10 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-8"><p class="mono-label mb-4">0{data.index} / {data.category} / {data.status}</p><h1 transition:name={`project-title-${project.id}`} class="display-lg">{data.title}</h1><p class="body-lg mt-6 max-w-2xl text-graphite">{data.thesis}</p></div>
-        <dl class="grid gap-5 text-sm lg:col-span-3 lg:col-start-10"><div><dt class="mono-label">Role</dt><dd class="mt-1">{data.role ?? 'To verify'}</dd></div><div><dt class="mono-label">Stack</dt><dd class="mt-1 leading-6">{data.technologies.join(' / ')}</dd></div><div><dt class="mono-label">Year</dt><dd class="mt-1">{data.year ?? 'To verify'}</dd></div></dl>
+
+<BaseLayout title={project.shortTitle} description={project.summary}>
+  <article style={`--project-accent:${project.accent}`}>
+    <header class="border-b border-hairline pb-16 pt-32 md:pb-24 md:pt-40">
+      <div class="atlas-container">
+        <div class="atlas-grid gap-y-10">
+          <div class="col-span-4 md:col-span-8 lg:col-span-9">
+            <p class="label mb-5" style="color:var(--project-accent)">
+              WORK / {String(project.index).padStart(2, "0")} · {project.status}
+            </p>
+            <h1 class="display-xl max-w-[12ch] text-balance" transition:name={`project-title-${slug}`}>
+              {project.shortTitle}
+            </h1>
+          </div>
+          <div class="col-span-4 md:col-span-4 lg:col-span-3 lg:pt-16">
+            <p class="font-display text-[clamp(1.3rem,2.2vw,2rem)] leading-snug text-graphite">{project.thesis}</p>
+          </div>
+        </div>
+
+        <div class="mt-12 grid grid-cols-2 gap-px border border-hairline bg-hairline sm:grid-cols-4">
+          <div class="bg-paper p-4"><p class="label mb-2">STATUS</p><p class="mono text-ink">{project.status}</p></div>
+          <div class="bg-paper p-4"><p class="label mb-2">CATEGORY</p><p class="mono text-ink">{project.category}</p></div>
+          <div class="bg-paper p-4"><p class="label mb-2">ROLE</p><p class="mono text-ink">{project.role || "TO VERIFY"}</p></div>
+          <div class="bg-paper p-4"><p class="label mb-2">YEAR</p><p class="mono text-ink">{project.year || "TO VERIFY"}</p></div>
+        </div>
+
+        <div class="relative mt-8 aspect-[16/9] overflow-hidden border border-hairline bg-paper-2 md:mt-12" transition:name={`project-media-${slug}`}>
+          <ProjectPreviewVisual kind={project.visual} accent={project.accent} />
+        </div>
       </div>
-      <div class="mt-14"><ProjectVisual id={project.id} accent={data.accent}/></div>
     </header>
-    <div class="container-editorial mt-16 grid gap-12 lg:grid-cols-12"><div class="lg:col-span-3"><p class="mono-label sticky top-28">Case study / current state</p></div><div class="prose-portfolio lg:col-span-8"><slot /></div></div>
+
+    <section class="py-20 md:py-28" aria-labelledby="project-thesis">
+      <div class="atlas-container atlas-grid gap-y-10">
+        <div class="col-span-4 md:col-span-3">
+          <p class="label">01 / THESIS</p>
+        </div>
+        <div class="project-prose col-span-4 md:col-span-7 md:col-start-5">
+          <h2 id="project-thesis" class="sr-only">Project details</h2>
+          <slot />
+        </div>
+      </div>
+    </section>
+
+    <section class="border-t border-hairline py-20 md:py-28" aria-labelledby="system-heading">
+      <div class="atlas-container">
+        <div class="atlas-grid mb-10 gap-y-5">
+          <div class="col-span-4 md:col-span-3"><p class="label">02 / SYSTEM</p></div>
+          <div class="col-span-4 md:col-span-7 md:col-start-5">
+            <h2 id="system-heading" class="font-display text-h3">A diagram, not a dashboard.</h2>
+            <p class="mt-3 max-w-[52ch] text-graphite">The system view compresses the project into the relationships that matter most. It is intentionally project-specific rather than a generic box-and-arrow template.</p>
+          </div>
+        </div>
+        <ProjectSystemDiagram visual={project.visual} accent={project.accent} />
+      </div>
+    </section>
+
+    <section class="coord-paper border-t border-hairline py-20 md:py-28" aria-labelledby="project-meta">
+      <div class="atlas-container atlas-grid gap-y-10">
+        <div class="col-span-4 md:col-span-3"><p class="label">03 / FIELD NOTES</p></div>
+        <div class="col-span-4 md:col-span-7 md:col-start-5">
+          <h2 id="project-meta" class="font-display text-h3">Themes &amp; working tools.</h2>
+          <div class="mt-8 grid gap-10 sm:grid-cols-2">
+            <div>
+              <p class="label mb-4">THEMES</p>
+              <ul class="border-t border-hairline">
+                {project.themes.map((theme) => <li class="border-b border-hairline py-3 text-ink">{theme}</li>)}
+              </ul>
+            </div>
+            <div>
+              <p class="label mb-4">TOOLING / EXPLORED OR PLANNED</p>
+              {project.technologies.length ? (
+                <ul class="border-t border-hairline">
+                  {project.technologies.map((technology) => <li class="border-b border-hairline py-3 text-ink">{technology}</li>)}
+                </ul>
+              ) : (
+                <p class="border-y border-hairline py-4 text-graphite">Not claimed here until the project data is verified.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {nextProject && (
+      <nav class="border-t border-hairline" aria-label="Next project">
+        <a href={`/work/${nextProject.slug}/`} class="group block py-16 md:py-24" data-cursor="view">
+          <div class="atlas-container atlas-grid items-end gap-y-5">
+            <div class="col-span-4 md:col-span-3"><p class="label">NEXT / {String(nextProject.index).padStart(2, "0")}</p></div>
+            <div class="col-span-4 md:col-span-8 md:col-start-5">
+              <p class="font-display text-h2 leading-none tracking-tight transition-transform duration-500 ease-[var(--ease-atlas)] group-hover:translate-x-2">{nextProject.title} →</p>
+            </div>
+          </div>
+        </a>
+      </nav>
+    )}
   </article>
 </BaseLayout>

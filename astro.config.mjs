@@ -1,16 +1,19 @@
-import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
-import mdx from '@astrojs/mdx';
-import sitemap from '@astrojs/sitemap';
-import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from "astro/config"
+import react from "@astrojs/react"
+import mdx from "@astrojs/mdx"
+import sitemap from "@astrojs/sitemap"
+import tailwindcss from "@tailwindcss/vite"
 
-const site = process.env.SITE_URL || 'https://example.com';
+const site = process.env.SITE_URL
 
 export default defineConfig({
   site,
-  output: 'static',
-  integrations: [react(), mdx(), sitemap()],
+  integrations: [react(), mdx(), ...(site ? [sitemap()] : [])],
   vite: {
     plugins: [tailwindcss()],
   },
-});
+  server: {
+    host: true,
+    port: 3000,
+  },
+})

@@ -1,9 +1,46 @@
-<footer class="border-t border-hairline py-10">
-  <div class="container-editorial grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
-    <div>
-      <p class="font-display text-2xl font-semibold tracking-tight">DIAN</p>
-      <p class="mt-1 max-w-xl text-sm text-graphite">Applied Mathematics × software × spatial systems. Contact links intentionally remain unset until verified.</p>
+---
+const year = new Date().getFullYear()
+const email = import.meta.env.PUBLIC_CONTACT_EMAIL
+const github = import.meta.env.PUBLIC_GITHUB_URL
+const linkedin = import.meta.env.PUBLIC_LINKEDIN_URL
+const links = [
+  { label: "Email", href: email ? `mailto:${email}` : undefined, note: email || "TO ADD" },
+  { label: "GitHub", href: github, note: github ? "PROFILE ↗" : "TO ADD" },
+  { label: "LinkedIn", href: linkedin, note: linkedin ? "PROFILE ↗" : "TO ADD" },
+]
+---
+
+<footer class="border-t border-hairline">
+  <div class="atlas-container grid grid-cols-4 gap-y-8 py-10 md:grid-cols-12">
+    <div class="col-span-4 md:col-span-4">
+      <span class="font-display text-lg text-ink">Dian</span>
+      <p class="mono mt-2 max-w-[28ch] text-graphite-2">Systems between equations and interfaces.</p>
     </div>
-    <p class="font-mono text-[0.68rem] uppercase tracking-widest text-graphite">© 2026 / Vector Atlas</p>
+
+    <nav class="col-span-4 flex flex-col gap-2 md:col-span-5" aria-label="Elsewhere">
+      {links.map((link) => (
+        link.href ? (
+          <a
+            href={link.href}
+            target={link.href.startsWith("http") ? "_blank" : undefined}
+            rel={link.href.startsWith("http") ? "noreferrer noopener" : undefined}
+            class="group flex items-baseline justify-between border-b border-hairline py-2"
+            data-cursor={link.href.startsWith("http") ? "external" : "default"}
+          >
+            <span class="link-underline text-ink">{link.label}</span>
+            <span class="mono text-graphite-2">{link.note}</span>
+          </a>
+        ) : (
+          <div class="flex items-baseline justify-between border-b border-hairline py-2 text-graphite-2">
+            <span>{link.label}</span><span class="mono">{link.note}</span>
+          </div>
+        )
+      ))}
+    </nav>
+
+    <div class="col-span-4 flex flex-col justify-between gap-4 md:col-span-3 md:items-end md:text-right">
+      <span class="label">© {year} · DIAN</span>
+      <span class="mono text-graphite-2">Astro · R3F · GSAP</span>
+    </div>
   </div>
 </footer>

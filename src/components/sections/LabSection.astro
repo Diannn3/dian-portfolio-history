@@ -1,0 +1,44 @@
+---
+const experiments = [
+  { name: "Vector Field Playground", status: "EXPERIMENT", axis: "MATH / WEBGL", mark: "∿" },
+  { name: "Gesture Interface", status: "CONCEPT", axis: "VISION / INPUT", mark: "↝" },
+  { name: "Local LLM Experiments", status: "EXPERIMENT", axis: "AI / SYSTEMS", mark: "λ" },
+  { name: "WebGL Map Experiments", status: "EXPERIMENT", axis: "SPATIAL / GPU", mark: "⌖" },
+  { name: "Computer Vision Interface", status: "CONCEPT", axis: "VISION / UI", mark: "◉" },
+  { name: "Data Visualization Experiments", status: "EXPERIMENT", axis: "DATA / FORM", mark: "⌁" },
+]
+---
+
+<section id="lab" class="coord-paper border-t border-hairline py-24 md:py-36" aria-labelledby="lab-heading">
+  <div class="atlas-container">
+    <header class="atlas-grid mb-12 md:mb-16">
+      <div class="col-span-4 md:col-span-7">
+        <p class="label mb-4" data-reveal="rise">§05 · Lab</p>
+        <h2 id="lab-heading" class="font-display max-w-[14ch] text-h2 text-balance" data-reveal="rise">
+          Small experiments, unfinished on purpose.
+        </h2>
+      </div>
+      <div class="col-span-4 mt-5 md:col-span-4 md:col-start-9 md:mt-0">
+        <p class="text-graphite" data-reveal="rise">
+          These are directions rather than claimed finished projects. The lab is where interaction ideas can be tested before they deserve a case study.
+        </p>
+      </div>
+    </header>
+
+    <ol class="grid grid-cols-1 border-l border-t border-hairline sm:grid-cols-2 lg:grid-cols-3">
+      {experiments.map((item, index) => (
+        <li class="group relative min-h-[230px] border-b border-r border-hairline bg-paper/80 p-6 md:p-7" data-reveal="rise">
+          <div class="flex items-start justify-between">
+            <span class="mono text-graphite-2">{String(index + 1).padStart(2, "0")}</span>
+            <span class="font-display text-4xl leading-none text-hairline-strong transition-colors duration-300 group-hover:text-accent" aria-hidden="true">{item.mark}</span>
+          </div>
+          <div class="absolute inset-x-6 bottom-6 md:inset-x-7 md:bottom-7">
+            <p class="label mb-3">{item.axis}</p>
+            <h3 class="font-display text-[clamp(1.35rem,2vw,2rem)] leading-tight">{item.name}</h3>
+            <p class="mono mt-4 text-accent-ink">{item.status}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

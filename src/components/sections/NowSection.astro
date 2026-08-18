@@ -1,0 +1,32 @@
+---
+const now = [
+  { label: "BUILDING", value: "community + spatial tools", code: "01" },
+  { label: "LEARNING", value: "computational mathematics", code: "02" },
+  { label: "EXPERIMENTING", value: "AI agents + spatial interfaces", code: "03" },
+  { label: "EXPLORING", value: "creative WebGL", code: "04" },
+]
+---
+
+<section id="now" class="border-t border-hairline py-20 md:py-28" aria-labelledby="now-heading">
+  <div class="atlas-container atlas-grid gap-y-10">
+    <div class="col-span-4 md:col-span-3">
+      <p class="label mb-3" data-reveal="rise">§03 · Now / 2026</p>
+      <h2 id="now-heading" class="font-display text-h3" data-reveal="rise">Current vectors.</h2>
+    </div>
+
+    <div class="col-span-4 md:col-span-9">
+      <dl class="border-t border-hairline">
+        {now.map((item) => (
+          <div class="grid grid-cols-[3rem_1fr] gap-4 border-b border-hairline py-5 sm:grid-cols-[4rem_9rem_1fr]" data-reveal="rise">
+            <span class="mono text-graphite-2">{item.code}</span>
+            <dt class="label hidden sm:block">{item.label}</dt>
+            <dd>
+              <span class="label mb-1 block sm:hidden">{item.label}</span>
+              <span class="font-display text-[clamp(1.3rem,2vw,2.15rem)] leading-tight text-ink">{item.value}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </div>
+</section>

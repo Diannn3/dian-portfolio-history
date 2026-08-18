@@ -1,6 +1,0 @@
----
-import MobileNavMenu from './MobileNavMenu';
-interface Props { links: Array<{ href: string; label: string }>; currentPath: string; }
-const { links, currentPath } = Astro.props;
----
-<div class="md:hidden"><MobileNavMenu links={links} currentPath={currentPath} client:load /></div>

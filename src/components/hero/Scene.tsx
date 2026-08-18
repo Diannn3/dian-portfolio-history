@@ -1,51 +1,48 @@
-import { useEffect, useRef } from 'react';
-import { useThree } from '@react-three/fiber';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ParametricManifold } from './ParametricManifold';
-import { VectorField } from './VectorField';
-import { Streamlines } from './Streamlines';
-import { CoordinateGrid } from './CoordinateGrid';
-import { ParticleField } from './ParticleField';
-import { PointerProbe } from './PointerProbe';
-import { CameraRig } from './CameraRig';
+import { useFrame } from "@react-three/fiber"
+import ParametricManifold from "./ParametricManifold"
+import Streamlines from "./Streamlines"
+import FieldParticles from "./FieldParticles"
+import CoordinateLattice from "./CoordinateLattice"
+import CameraRig from "./CameraRig"
+import { useHeroState } from "./hero-state"
+import type { QualityConfig } from "@/lib/webgl/quality"
 
-gsap.registerPlugin(ScrollTrigger);
-export type Quality = 'low' | 'medium' | 'high';
+interface Props {
+  config: QualityConfig
+  mobile: boolean
+}
 
-export function Scene({ quality, reducedMotion }: { quality: Quality; reducedMotion: boolean }) {
-  const progress = useRef(0);
-  const invalidate = useThree((state) => state.invalidate);
+/**
+ * Composes the coordinated systems. A single frame loop here smooths the
+ * pointer once per frame; child systems only read the smoothed value.
+ */
+export default function Scene({ config, mobile }: Props) {
+  const state = useHeroState()
 
-  useEffect(() => {
-    if (reducedMotion) {
-      progress.current = 0.18;
-      invalidate();
-      return;
-    }
-
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: '#hero',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 0.8,
-        onUpdate: (self) => { progress.current = self.progress; },
-      });
-    });
-    requestAnimationFrame(() => ScrollTrigger.refresh());
-    return () => ctx.revert();
-  }, [invalidate, reducedMotion]);
+  useFrame(() => {
+    // smooth pointer with inertia in one place
+    state.pointer.x += (state.pointerTarget.x - state.pointer.x) * 0.06
+    state.pointer.y += (state.pointerTarget.y - state.pointer.y) * 0.06
+  })
 
   return (
     <>
-      <CoordinateGrid progressRef={progress} />
-      <VectorField quality={quality} progressRef={progress} />
-      <Streamlines quality={quality} progressRef={progress} reducedMotion={reducedMotion} />
-      <ParticleField quality={quality} progressRef={progress} reducedMotion={reducedMotion} />
-      <ParametricManifold progressRef={progress} reducedMotion={reducedMotion} />
-      {!reducedMotion && <PointerProbe />}
-      <CameraRig progressRef={progress} reducedMotion={reducedMotion} />
+      <CameraRig mobile={mobile} />
+
+      <ambientLight intensity={0.75} />
+      <directionalLight position={[3, 5, 4]} intensity={0.9} />
+      <directionalLight position={[-4, 2, -3]} intensity={0.25} />
+
+      <ParametricManifold segments={config.manifoldSegments} />
+      <CoordinateLattice />
+      {!mobile && <Streamlines count={config.streamlines} steps={config.streamlineSteps} />}
+      {mobile && (
+        <Streamlines
+          count={Math.max(3, Math.round(config.streamlines * 0.5))}
+          steps={Math.round(config.streamlineSteps * 0.7)}
+        />
+      )}
+      <FieldParticles count={mobile ? Math.round(config.particles * 0.5) : config.particles} />
     </>
-  );
+  )
 }

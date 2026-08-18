@@ -1,53 +1,82 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-import { mulberry32, vectorField } from './field';
-import type { Quality } from './Scene';
+import { useEffect, useMemo, useRef } from "react"
+import { useFrame } from "@react-three/fiber"
+import * as THREE from "three"
+import { integrateStreamline, seeded, type Vec3 } from "@/lib/math/field"
+import { useHeroState } from "./hero-state"
 
-function integrate(start: THREE.Vector3, steps: number, dt: number) {
-  const points = [start.clone()];
-  const point = start.clone();
-  const k1 = new THREE.Vector3();
-  const k2 = new THREE.Vector3();
-  const midpoint = new THREE.Vector3();
+interface Props { count: number; steps: number }
 
-  for (let i = 0; i < steps; i++) {
-    vectorField(point, k1);
-    midpoint.copy(point).addScaledVector(k1, dt * 0.5);
-    vectorField(midpoint, k2);
-    point.addScaledVector(k2, dt);
-    points.push(point.clone());
-  }
-  return points;
+type Streamline = {
+  geometry: THREE.BufferGeometry
+  positions: Float32Array
+  scratch: Float64Array
 }
 
-export function Streamlines({ quality, progressRef, reducedMotion }: { quality: Quality; progressRef: React.MutableRefObject<number>; reducedMotion: boolean }) {
-  const group = useRef<THREE.Group>(null!);
-  const count = quality === 'low' ? 5 : quality === 'high' ? 11 : 8;
-  const { lines, material } = useMemo(() => {
-    const random = mulberry32(90210);
-    const sharedMaterial = new THREE.LineBasicMaterial({ color: '#d94f2b', transparent: true, opacity: 0.62 });
-    const generatedLines = Array.from({ length: count }, () => {
-      const start = new THREE.Vector3((random() - 0.5) * 5.4, (random() - 0.5) * 3.4, (random() - 0.5) * 1.8);
-      const geometry = new THREE.BufferGeometry().setFromPoints(integrate(start, quality === 'low' ? 48 : 74, 0.052));
-      return new THREE.Line(geometry, sharedMaterial);
-    });
-    return { lines: generatedLines, material: sharedMaterial };
-  }, [count, quality]);
+/** RK4 trajectories using caller-owned buffers on every animated rebuild. */
+export default function Streamlines({ count, steps }: Props) {
+  const groupRef = useRef<THREE.Group>(null)
+  const state = useHeroState()
+  const timeRef = useRef(0)
+  const rebuildAccum = useRef(0)
+
+  const seeds = useMemo<Vec3[]>(() => {
+    const rng = seeded(20260215)
+    return Array.from({ length: count }, () => {
+      const angle = rng() * Math.PI * 2
+      const radius = 1.4 + rng() * 1.4
+      return [Math.cos(angle) * radius, (rng() - 0.5) * 2.2, Math.sin(angle) * radius] as Vec3
+    })
+  }, [count])
+
+  const lines = useMemo<Streamline[]>(() => seeds.map((seed) => {
+    const positions = new Float32Array(steps * 3)
+    const scratch = new Float64Array(12)
+    integrateStreamline(seed, steps, 0.05, 0, positions, scratch)
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3))
+    return { geometry, positions, scratch }
+  }), [seeds, steps])
+
+  const material = useMemo(() => new THREE.LineBasicMaterial({
+    color: new THREE.Color("#17150f"), transparent: true, opacity: 0.28,
+  }), [])
+  const accentMaterial = useMemo(() => new THREE.LineBasicMaterial({
+    color: new THREE.Color("#d9482b"), transparent: true, opacity: 0.65,
+  }), [])
+  const objects = useMemo(
+    () => lines.map((line, i) => new THREE.Line(line.geometry, i % 5 === 0 ? accentMaterial : material)),
+    [lines, material, accentMaterial],
+  )
 
   useEffect(() => () => {
-    lines.forEach((line) => line.geometry.dispose());
-    material.dispose();
-  }, [lines, material]);
+    lines.forEach((line) => line.geometry.dispose())
+    material.dispose()
+    accentMaterial.dispose()
+  }, [lines, material, accentMaterial])
 
-  useFrame((state, delta) => {
-    if (!group.current) return;
-    const progress = progressRef.current;
-    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, progress * 0.22, 4, delta);
-    group.current.position.z = THREE.MathUtils.damp(group.current.position.z, -progress * 0.8, 4, delta);
-    group.current.scale.z = THREE.MathUtils.damp(group.current.scale.z, 1 - progress * 0.7, 4, delta);
-    if (!reducedMotion) group.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.12) * 0.018;
-  });
+  useFrame((_, delta) => {
+    const dt = Math.min(delta, 0.05)
+    timeRef.current += dt
+    rebuildAccum.current += dt
 
-  return <group ref={group}>{lines.map((line, index) => <primitive key={index} object={line} dispose={null} />)}</group>;
+    if (rebuildAccum.current > 0.16 && !state.reducedMotion) {
+      rebuildAccum.current = 0
+      const t = timeRef.current * 0.5
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]
+        integrateStreamline(seeds[i], steps, 0.05, t, line.positions, line.scratch)
+        const attr = line.geometry.getAttribute("position") as THREE.BufferAttribute
+        attr.needsUpdate = true
+      }
+    }
+
+    if (groupRef.current) {
+      groupRef.current.rotation.y = state.pointer.x * 0.12
+      const fade = 1 - state.progress * 0.35
+      material.opacity = 0.28 * fade
+      accentMaterial.opacity = 0.65 * fade
+    }
+  })
+
+  return <group ref={groupRef}>{objects.map((object, i) => <primitive key={i} object={object} />)}</group>
 }

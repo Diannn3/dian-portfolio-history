@@ -1,0 +1,73 @@
+---
+import MobileNav from "./MobileNav.tsx"
+
+const onHome = Astro.url.pathname === "/"
+const links = [
+  { label: "Work", hash: "#work" },
+  { label: "About", hash: "#about" },
+  { label: "Lab", hash: "#lab" },
+  { label: "Contact", hash: "#contact" },
+].map((link) => ({ ...link, href: onHome ? link.hash : `/${link.hash}` }))
+---
+
+<header class="fixed inset-x-0 top-0 z-[120] transition-colors duration-300" data-header>
+  <div class="atlas-container flex items-center justify-between py-4 md:py-5">
+    <a href="/" class="group flex items-baseline gap-2" aria-label="Dian — home">
+      <span class="font-display text-lg tracking-tight text-ink">Dian</span>
+      <span class="mono hidden text-graphite-2 sm:inline" aria-hidden="true">⟶ vector atlas</span>
+    </a>
+
+    <nav aria-label="Primary" class="hidden items-center gap-8 md:flex">
+      {links.map((link) => (
+        <a href={link.href} class="link-underline mono !text-mono text-ink" data-nav-link>{link.label}</a>
+      ))}
+      <span class="mono flex items-center gap-2 text-accent-ink" aria-label="Current status: building things">
+        <span class="relative inline-flex h-1.5 w-1.5" aria-hidden="true">
+          <span class="absolute inline-flex h-full w-full rounded-full bg-accent opacity-30"></span>
+          <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent"></span>
+        </span>
+        Building things
+      </span>
+    </nav>
+
+    <div class="js-mobile-nav md:hidden">
+      <MobileNav onHome={onHome} client:idle />
+    </div>
+
+    <details class="nojs-mobile-nav relative md:hidden">
+      <summary class="label cursor-pointer list-none !text-ink">Menu</summary>
+      <nav class="absolute right-0 top-8 min-w-48 border border-hairline bg-paper p-4" aria-label="Primary fallback">
+        <ul class="space-y-3">
+          {links.map((link) => <li><a href={link.href} class="mono text-ink">{link.label}</a></li>)}
+        </ul>
+      </nav>
+    </details>
+  </div>
+  <div class="atlas-container" aria-hidden="true"><div class="h-px w-full origin-left bg-hairline" data-header-rule></div></div>
+</header>
+
+<script>
+  let cleanupHeader = () => {}
+
+  function setupHeader() {
+    cleanupHeader()
+    const header = document.querySelector<HTMLElement>("[data-header]")
+    const rule = document.querySelector<HTMLElement>("[data-header-rule]")
+    if (!header || !rule) return
+
+    const onScroll = () => {
+      const past = window.scrollY > window.innerHeight * 0.6
+      rule.style.transform = past ? "scaleX(1)" : "scaleX(0)"
+      header.classList.toggle("bg-paper/90", past)
+      header.classList.toggle("backdrop-blur-sm", past)
+    }
+
+    rule.style.transform = "scaleX(0)"
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    cleanupHeader = () => window.removeEventListener("scroll", onScroll)
+  }
+
+  document.addEventListener("astro:page-load", setupHeader)
+  document.addEventListener("astro:before-swap", () => cleanupHeader())
+</script>
