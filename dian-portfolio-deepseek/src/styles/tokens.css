@@ -1,0 +1,26 @@
+@theme {
+  --color-paper: #f3f0e9;
+  --color-paper-2: #ebe6dc;
+  --color-ink: #11110f;
+  --color-muted: #66645f;
+  --color-faint: #9a968d;
+  --color-line: #d4cec2;
+  --color-accent: #d94f2b;
+  --font-sans: "Inter Tight", "Arial Narrow", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+:root {
+  --paper: #f3f0e9;
+  --paper-2: #ebe6dc;
+  --ink: #11110f;
+  --muted: #66645f;
+  --faint: #9a968d;
+  --line: #d4cec2;
+  --accent: #d94f2b;
+  --gutter: clamp(1rem, 3vw, 3rem);
+  --section: clamp(5.5rem, 10vw, 10rem);
+  --display: clamp(3.3rem, 9.4vw, 9.4rem);
+  --h2: clamp(2.4rem, 5.5vw, 5.6rem);
+  --radius: 2px;
+}

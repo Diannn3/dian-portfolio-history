@@ -1,0 +1,16 @@
+<div class="custom-cursor" aria-hidden="true" data-cursor-ui><span data-cursor-label></span></div>
+<script>
+  function initCursor() {
+    if (!matchMedia('(pointer:fine)').matches || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    const cursor = document.querySelector('[data-cursor-ui]');
+    const label = cursor?.querySelector('[data-cursor-label]');
+    if (!(cursor instanceof HTMLElement) || !(label instanceof HTMLElement)) return;
+    let tx=0, ty=0, x=0, y=0, raf=0;
+    const move=(e)=>{ tx=e.clientX; ty=e.clientY; cursor.style.opacity='1'; };
+    const over=(e)=>{ const el=e.target instanceof Element ? e.target.closest('[data-cursor],a,button') : null; label.textContent=el?.getAttribute('data-cursor')?.toUpperCase() || (el ? 'OPEN' : ''); cursor.style.width=el?'3.2rem':'2.2rem'; cursor.style.height=el?'3.2rem':'2.2rem'; };
+    const loop=()=>{ x+=(tx-x)*.16; y+=(ty-y)*.16; cursor.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)`; raf=requestAnimationFrame(loop); };
+    addEventListener('mousemove',move); addEventListener('mouseover',over); loop();
+    document.addEventListener('astro:before-swap',()=>{ removeEventListener('mousemove',move); removeEventListener('mouseover',over); cancelAnimationFrame(raf); },{once:true});
+  }
+  document.addEventListener('astro:page-load',initCursor);
+</script>

@@ -1,0 +1,13 @@
+<section id="about" class="section shell">
+  <div class="about-grid">
+    <div><span class="eyebrow">ABOUT / PROFILE</span><div data-reveal="clip"><h2 class="section-title" style="margin:1rem 0 0">I like problems that sit between equations and interfaces.</h2></div></div>
+    <div class="about-copy" data-reveal="meta"><p>I’m Dian—an applied mathematics student building software, AI systems, maps, and experimental interfaces.</p><p>Most of the work I’m drawn to has a spatial or systems layer: people moving through a campus, transport moving through a route network, reports moving through an emergency workflow, or local knowledge moving through a community map.</p></div>
+  </div>
+  <div class="discipline">
+    <span class="eyebrow">DISCIPLINE GRAPH / HOVER OR TAB</span>
+    <svg viewBox="0 0 1100 430" role="img" aria-label="Connections between mathematics, software, data, artificial intelligence, spatial systems, and design">
+      <g stroke="#c6bfb3" stroke-width="1.2"><path d="M135 220L360 95 545 210 760 105 955 220"/><path d="M135 220L360 340 545 210 760 330 955 220"/><path d="M360 95L360 340M760 105L760 330"/></g>
+      {[[135,220,'MATH'],[360,95,'SOFTWARE'],[360,340,'DESIGN'],[545,210,'DATA'],[760,105,'AI'],[760,330,'SPATIAL'],[955,220,'SYSTEMS']].map(([x,y,label])=><g class="node" tabindex="0"><circle cx={x} cy={y} r="8" fill={label==='MATH'?'#d94f2b':'#11110f'}/><text x={x} y={Number(y)+30} text-anchor="middle" font-family="monospace" font-size="13" fill="#66645f">{label}</text></g>)}
+    </svg>
+  </div>
+</section>

@@ -1,0 +1,7 @@
+---
+import { experiments } from '../data/site';
+---
+<section id="lab" class="section shell">
+  <div style="display:flex;justify-content:space-between;align-items:end;margin-bottom:3rem"><div><span class="eyebrow">LAB / 006</span><div data-reveal="clip"><h2 class="section-title" style="margin:.6rem 0 0">Small systems, weird tests.</h2></div></div><span class="eyebrow">NOT EVERYTHING NEEDS A CASE STUDY</span></div>
+  <div>{experiments.map(x=><div class="lab-row"><span class="eyebrow">{x.index}</span><div class="lab-title">{x.title}</div><span class="lab-type muted">{x.type}</span><span class="eyebrow">{x.status}</span></div>)}</div>
+</section>

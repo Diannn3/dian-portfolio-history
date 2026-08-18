@@ -1,5 +1,0 @@
-:root {
-  --gutter: clamp(1.25rem, 3.7vw, 4rem);
-  --section-spacing: clamp(5.5rem, 11vw, 11rem);
-  --content-max-width: 92rem;
-}

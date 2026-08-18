@@ -1,0 +1,3 @@
+import { test, expect } from '@playwright/test';
+test('homepage exposes core sections', async ({page})=>{ await page.goto('/'); await expect(page.getByRole('heading',{level:1})).toContainText('DIAN BUILDS'); await expect(page.locator('#work')).toBeVisible(); await expect(page.locator('#about')).toBeVisible(); await expect(page.locator('#contact')).toBeVisible(); });
+test('project route renders verified status', async ({page})=>{ await page.goto('/work/uppetite'); await expect(page.getByRole('heading',{level:1})).toContainText('UPPETITE'); await expect(page.getByText('In development',{exact:true}).first()).toBeVisible(); });
