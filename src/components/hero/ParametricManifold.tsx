@@ -1,108 +1,59 @@
 import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { MathUtils } from 'three';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { manifoldPoint } from './field';
 
-interface Props {
-  progressRef: React.MutableRefObject<number>;
-}
-
-export function ParametricManifold({ progressRef }: Props) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const materialRef = useRef<THREE.ShaderMaterial>(null);
-
-  const { geometry } = useMemo(() => {
-    const segments = 60;
-    const size = 3.5;
-    const geometry = new THREE.BufferGeometry();
-    const vertices = [];
-    const indices = [];
-    const uvs = [];
-
-    for (let i = 0; i <= segments; i++) {
-      const u = (i / segments) * Math.PI;
-      for (let j = 0; j <= segments; j++) {
-        const v = (j / segments) * 2 * Math.PI;
-        const x = Math.sin(u) * Math.cos(v) * size;
-        const y = Math.sin(u) * Math.sin(v) * size * 0.8;
-        const z = Math.cos(u) * size * 0.6 + Math.sin(v * 3) * 0.15;
-        vertices.push(x, y, z);
-        uvs.push(i / segments, j / segments);
+export function ParametricManifold({ progressRef, reducedMotion }: { progressRef: React.MutableRefObject<number>; reducedMotion: boolean }) {
+  const mesh = useRef<THREE.Mesh>(null!);
+  const material = useRef<THREE.ShaderMaterial>(null!);
+  const viewport = useThree((s) => s.viewport);
+  const geometry = useMemo(() => {
+    const segmentsX = 64, segmentsY = 46;
+    const vertices: number[] = [], uvs: number[] = [], indices: number[] = [];
+    const p = new THREE.Vector3();
+    for (let y = 0; y <= segmentsY; y++) {
+      const v = y / segmentsY * 2 - 1;
+      for (let x = 0; x <= segmentsX; x++) {
+        const u = x / segmentsX * 2 - 1;
+        manifoldPoint(u, v, p); vertices.push(p.x, p.y, p.z); uvs.push(x / segmentsX, y / segmentsY);
       }
     }
-    for (let i = 0; i < segments; i++) {
-      for (let j = 0; j < segments; j++) {
-        const a = i * (segments + 1) + j;
-        const b = a + 1;
-        const c = (i + 1) * (segments + 1) + j;
-        const d = c + 1;
-        indices.push(a, b, c);
-        indices.push(b, d, c);
-      }
+    for (let y = 0; y < segmentsY; y++) for (let x = 0; x < segmentsX; x++) {
+      const a = y * (segmentsX + 1) + x, b = a + 1, c = a + segmentsX + 1, d = c + 1;
+      indices.push(a, b, c, b, d, c);
     }
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-    geometry.setIndex(indices);
-    geometry.computeVertexNormals();
-    return { geometry };
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    g.setIndex(indices); g.computeVertexNormals();
+    return g;
   }, []);
+  const uniforms = useMemo(() => ({
+    uTime: { value: 0 }, uScroll: { value: 0 },
+    uAccent: { value: new THREE.Color('#d94f2b') }, uInk: { value: new THREE.Color('#111111') },
+  }), []);
 
-  const uniforms = useMemo(
-    () => ({
-      uTime: { value: 0 },
-      uScroll: { value: 0 },
-      uColor: { value: new THREE.Color('#D94F2B') },
-      uInk: { value: new THREE.Color('#111111') },
-    }),
-    []
-  );
-
-  useFrame((state) => {
-    uniforms.uTime.value = state.clock.elapsedTime;
+  useFrame((state, delta) => {
+    uniforms.uTime.value = reducedMotion ? 0.5 : state.clock.elapsedTime;
     uniforms.uScroll.value = progressRef.current;
-    if (meshRef.current) {
-      meshRef.current.rotation.y = MathUtils.lerp(meshRef.current.rotation.y, progressRef.current * Math.PI * 0.5, 0.05);
-      meshRef.current.rotation.x = MathUtils.lerp(meshRef.current.rotation.x, -progressRef.current * 0.3, 0.05);
-    }
+    if (!mesh.current) return;
+    const p = progressRef.current;
+    mesh.current.rotation.y = THREE.MathUtils.damp(mesh.current.rotation.y, -0.26 + p * 0.72, 4, delta);
+    mesh.current.rotation.x = THREE.MathUtils.damp(mesh.current.rotation.x, 0.12 - p * 0.18, 4, delta);
   });
 
+  const compact = viewport.width < 7.2;
   return (
-    <mesh ref={meshRef} geometry={geometry} rotation={[0.3, 0, 0]} scale={1.2}>
-      <shaderMaterial
-        ref={materialRef}
+    <mesh ref={mesh} geometry={geometry} position={[compact ? 0.65 : 1.55, compact ? 0.4 : 0.15, compact ? -0.8 : -0.25]} scale={compact ? 0.64 : 0.88}>
+      <shaderMaterial ref={material} transparent depthWrite={false} side={THREE.DoubleSide} uniforms={uniforms}
         vertexShader={`
-          uniform float uTime;
-          uniform float uScroll;
-          varying vec2 vUv;
-          varying vec3 vNormal;
-          varying vec3 vPosition;
-          void main() {
-            vUv = uv;
-            vNormal = normal;
-            vec3 pos = position;
-            float wave = sin(pos.x * 2.0 + uTime) * 0.05 * (1.0 - uScroll);
-            float wave2 = cos(pos.y * 2.5 + uTime * 1.3) * 0.04 * (1.0 - uScroll);
-            pos.z += wave + wave2;
-            pos.z *= (1.0 - uScroll * 0.7); // flatten on scroll
-            vPosition = pos;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-          }
+          uniform float uTime; uniform float uScroll; varying vec2 vUv; varying vec3 vNormal;
+          void main(){ vUv=uv; vec3 pos=position; float breathe=sin((uv.x*2.4+uv.y)*6.283+uTime*.75)*.055*(1.-uScroll); pos.z += breathe; pos.z *= 1.-uScroll*.74; pos.x += (uv.y-.5)*uScroll*.35; vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(pos,1.); }
         `}
         fragmentShader={`
-          uniform vec3 uColor;
-          uniform vec3 uInk;
-          varying vec2 vUv;
-          varying vec3 vNormal;
-          varying vec3 vPosition;
-          void main() {
-            float shade = 0.6 + 0.4 * abs(dot(vNormal, vec3(0.5, 0.8, 0.6)));
-            vec3 base = mix(uInk, uColor, vUv.x * 0.5 + vUv.y * 0.5);
-            gl_FragColor = vec4(base * shade, 0.92);
-          }
+          uniform vec3 uAccent; uniform vec3 uInk; uniform float uScroll; varying vec2 vUv; varying vec3 vNormal;
+          void main(){ float light=.58+.42*abs(vNormal.z); float bands=1.0-smoothstep(0.0,.035,abs(fract(vUv.y*14.)-.5)); vec3 base=mix(uInk,uAccent,.68+vUv.x*.2); vec3 color=mix(base,uInk,bands*.35); float alpha=mix(.30,.16,uScroll)+(bands*.18); gl_FragColor=vec4(color*light,alpha); }
         `}
-        uniforms={uniforms}
-        transparent
-        side={THREE.DoubleSide}
       />
     </mesh>
   );

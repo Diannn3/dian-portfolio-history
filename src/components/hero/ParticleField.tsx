@@ -1,45 +1,14 @@
-import { useMemo, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { mulberry32, vectorField } from './field';
+import type { Quality } from './Scene';
 
-export function ParticleField() {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const count = 400;
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const velocities = useMemo(() => {
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 0.01;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 0.01;
-    }
-    return arr;
-  }, [count]);
-
-  useFrame((state) => {
-    if (!meshRef.current) return;
-    const time = state.clock.elapsedTime;
-    for (let i = 0; i < count; i++) {
-      meshRef.current.getMatrixAt(i, dummy.matrix);
-      dummy.position.setFromMatrixPosition(dummy.matrix);
-      // integrate simple field
-      dummy.position.x += velocities[i * 3] + Math.sin(time + i) * 0.0005;
-      dummy.position.y += velocities[i * 3 + 1] + Math.cos(time + i) * 0.0005;
-      dummy.position.z += velocities[i * 3 + 2] + Math.sin(time * 0.5 + i) * 0.0005;
-      // wrap around
-      if (Math.abs(dummy.position.x) > 6) dummy.position.x *= -0.9;
-      if (Math.abs(dummy.position.y) > 5) dummy.position.y *= -0.9;
-      if (Math.abs(dummy.position.z) > 4) dummy.position.z *= -0.9;
-      dummy.updateMatrix();
-      meshRef.current.setMatrixAt(i, dummy.matrix);
-    }
-    meshRef.current.instanceMatrix.needsUpdate = true;
-  });
-
-  return (
-    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
-      <sphereGeometry args={[0.02, 4, 4]} />
-      <meshBasicMaterial color="#555555" transparent opacity={0.6} />
-    </instancedMesh>
-  );
+export function ParticleField({ quality, progressRef, reducedMotion }: { quality: Quality; progressRef: React.MutableRefObject<number>; reducedMotion: boolean }) {
+  const count=quality==='low'?110:quality==='high'?360:220; const mesh=useRef<THREE.InstancedMesh>(null!);
+  const dummy=useMemo(()=>new THREE.Object3D(),[]), velocity=useMemo(()=>new THREE.Vector3(),[]);
+  const positions=useMemo(()=>{ const r=mulberry32(20260819), a=new Float32Array(count*3); for(let i=0;i<count;i++){a[i*3]=(r()-.5)*8;a[i*3+1]=(r()-.5)*5;a[i*3+2]=(r()-.5)*3;} return a;},[count]);
+  useLayoutEffect(()=>{ if(!mesh.current)return; for(let i=0;i<count;i++){dummy.position.set(positions[i*3],positions[i*3+1],positions[i*3+2]);dummy.scale.setScalar(.7+(i%5)*.07);dummy.updateMatrix();mesh.current.setMatrixAt(i,dummy.matrix);} mesh.current.instanceMatrix.needsUpdate=true;},[count,dummy,positions]);
+  useFrame((_,delta)=>{ if(reducedMotion||!mesh.current)return; const speed=delta*(.12+progressRef.current*.06); for(let i=0;i<count;i++){const o=i*3;dummy.position.set(positions[o],positions[o+1],positions[o+2]);vectorField(dummy.position,velocity).normalize();dummy.position.addScaledVector(velocity,speed);if(Math.abs(dummy.position.x)>4.5||Math.abs(dummy.position.y)>3.2||Math.abs(dummy.position.z)>2.2) dummy.position.multiplyScalar(-.72);positions[o]=dummy.position.x;positions[o+1]=dummy.position.y;positions[o+2]=dummy.position.z;dummy.updateMatrix();mesh.current.setMatrixAt(i,dummy.matrix);}mesh.current.instanceMatrix.needsUpdate=true;});
+  return <instancedMesh ref={mesh} args={[undefined,undefined,count]}><sphereGeometry args={[.018,4,4]}/><meshBasicMaterial color="#4f4b46" transparent opacity={.48}/></instancedMesh>;
 }

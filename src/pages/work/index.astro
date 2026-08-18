@@ -1,11 +1,5 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
 import ProjectIndex from '@/components/work/ProjectIndex.astro';
 ---
-
-<BaseLayout title="Work — Dian">
-  <div class="pt-32 pb-20">
-    <ProjectIndex />
-  </div>
-</BaseLayout>
+<BaseLayout title="Work — Dian" description="Selected spatial, software, AI, and interface projects."><div class="pt-24"><ProjectIndex /></div></BaseLayout>

@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useRef } from 'react';
+import { useThree } from '@react-three/fiber';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ParametricManifold } from './ParametricManifold';
@@ -11,40 +11,41 @@ import { PointerProbe } from './PointerProbe';
 import { CameraRig } from './CameraRig';
 
 gsap.registerPlugin(ScrollTrigger);
+export type Quality = 'low' | 'medium' | 'high';
 
-export function Scene() {
-  const { camera } = useThree();
-  const sceneProgress = useRef(0);
+export function Scene({ quality, reducedMotion }: { quality: Quality; reducedMotion: boolean }) {
+  const progress = useRef(0);
+  const invalidate = useThree((state) => state.invalidate);
 
-  // GSAP ScrollTrigger to update uniform for scroll transformation
   useEffect(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
+    if (reducedMotion) {
+      progress.current = 0.18;
+      invalidate();
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
         trigger: '#hero',
         start: 'top top',
         end: 'bottom top',
-        scrub: 1.5,
-        onUpdate: (self) => {
-          sceneProgress.current = self.progress;
-        },
-      },
+        scrub: 0.8,
+        onUpdate: (self) => { progress.current = self.progress; },
+      });
     });
-    return () => {
-      tl.scrollTrigger?.kill();
-    };
-  }, []);
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => ctx.revert();
+  }, [invalidate, reducedMotion]);
 
   return (
     <>
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 10, 7]} intensity={1.2} />
-      <ParametricManifold progressRef={sceneProgress} />
-      <VectorField />
-      <Streamlines />
-      <CoordinateGrid />
-      <ParticleField />
-      <PointerProbe />
-      <CameraRig progressRef={sceneProgress} />
+      <CoordinateGrid progressRef={progress} />
+      <VectorField quality={quality} progressRef={progress} />
+      <Streamlines quality={quality} progressRef={progress} reducedMotion={reducedMotion} />
+      <ParticleField quality={quality} progressRef={progress} reducedMotion={reducedMotion} />
+      <ParametricManifold progressRef={progress} reducedMotion={reducedMotion} />
+      {!reducedMotion && <PointerProbe />}
+      <CameraRig progressRef={progress} reducedMotion={reducedMotion} />
     </>
   );
 }

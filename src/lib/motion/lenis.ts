@@ -4,26 +4,33 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function initLenis() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+export interface LenisController {
+  lenis: Lenis;
+  destroy: () => void;
+}
+
+export function initLenis(): LenisController | null {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+  if (reduced || coarsePointer) return null;
 
   const lenis = new Lenis({
-    duration: 1.2,
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    orientation: 'vertical',
-    gestureOrientation: 'vertical',
+    duration: 1.05,
     smoothWheel: true,
-    wheelMultiplier: 1,
-    touchMultiplier: 1.5,
+    anchors: true,
+    stopInertiaOnNavigate: true,
   });
 
+  const update = (time: number) => lenis.raf(time * 1000);
   lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(update);
+  gsap.ticker.lagSmoothing(0);
 
-  const raf = (time: number) => {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
+  return {
+    lenis,
+    destroy() {
+      gsap.ticker.remove(update);
+      lenis.destroy();
+    },
   };
-  requestAnimationFrame(raf);
-
-  return lenis;
 }

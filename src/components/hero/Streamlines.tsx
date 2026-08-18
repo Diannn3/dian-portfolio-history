@@ -1,75 +1,53 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { mulberry32, vectorField } from './field';
+import type { Quality } from './Scene';
 
-function field(pos: THREE.Vector3): THREE.Vector3 {
-  // deterministic vector field
-  return new THREE.Vector3(
-    -pos.y * 0.5 + Math.sin(pos.z * 0.5) * 0.3,
-    pos.x * 0.5 + Math.cos(pos.z * 0.4) * 0.2,
-    pos.z * 0.1 + Math.sin(pos.x * 0.3) * 0.2
-  );
+function integrate(start: THREE.Vector3, steps: number, dt: number) {
+  const points = [start.clone()];
+  const point = start.clone();
+  const k1 = new THREE.Vector3();
+  const k2 = new THREE.Vector3();
+  const midpoint = new THREE.Vector3();
+
+  for (let i = 0; i < steps; i++) {
+    vectorField(point, k1);
+    midpoint.copy(point).addScaledVector(k1, dt * 0.5);
+    vectorField(midpoint, k2);
+    point.addScaledVector(k2, dt);
+    points.push(point.clone());
+  }
+  return points;
 }
 
-function rk4Step(pos: THREE.Vector3, dt: number): THREE.Vector3 {
-  const k1 = field(pos);
-  const k2 = field(pos.clone().addScaledVector(k1, dt / 2));
-  const k3 = field(pos.clone().addScaledVector(k2, dt / 2));
-  const k4 = field(pos.clone().addScaledVector(k3, dt));
-  const step = new THREE.Vector3()
-    .addScaledVector(k1, dt / 6)
-    .addScaledVector(k2, dt / 3)
-    .addScaledVector(k3, dt / 3)
-    .addScaledVector(k4, dt / 6);
-  return step;
-}
-
-export function Streamlines() {
-  const groupRef = useRef<THREE.Group>(null);
-  const lines = useMemo(() => {
-    const numStreamlines = 8;
-    const pointsPerLine = 80;
-    const dt = 0.05;
-    const allPoints: THREE.Vector3[][] = [];
-
-    for (let i = 0; i < numStreamlines; i++) {
-      const start = new THREE.Vector3(
-        (Math.random() - 0.5) * 5,
-        (Math.random() - 0.5) * 4,
-        (Math.random() - 0.5) * 3
-      );
-      const points: THREE.Vector3[] = [start.clone()];
-      let current = start.clone();
-      for (let j = 0; j < pointsPerLine; j++) {
-        const step = rk4Step(current, dt);
-        current.add(step);
-        points.push(current.clone());
-      }
-      allPoints.push(points);
-    }
-    return allPoints;
-  }, []);
-
-  const geometries = useMemo(() => {
-    return lines.map(points => {
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      return geometry;
+export function Streamlines({ quality, progressRef, reducedMotion }: { quality: Quality; progressRef: React.MutableRefObject<number>; reducedMotion: boolean }) {
+  const group = useRef<THREE.Group>(null!);
+  const count = quality === 'low' ? 5 : quality === 'high' ? 11 : 8;
+  const { lines, material } = useMemo(() => {
+    const random = mulberry32(90210);
+    const sharedMaterial = new THREE.LineBasicMaterial({ color: '#d94f2b', transparent: true, opacity: 0.62 });
+    const generatedLines = Array.from({ length: count }, () => {
+      const start = new THREE.Vector3((random() - 0.5) * 5.4, (random() - 0.5) * 3.4, (random() - 0.5) * 1.8);
+      const geometry = new THREE.BufferGeometry().setFromPoints(integrate(start, quality === 'low' ? 48 : 74, 0.052));
+      return new THREE.Line(geometry, sharedMaterial);
     });
-  }, [lines]);
+    return { lines: generatedLines, material: sharedMaterial };
+  }, [count, quality]);
 
-  const material = useMemo(() => new THREE.LineBasicMaterial({ color: '#D94F2B', transparent: true, opacity: 0.6 }), []);
+  useEffect(() => () => {
+    lines.forEach((line) => line.geometry.dispose());
+    material.dispose();
+  }, [lines, material]);
 
-  useFrame((state) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.1;
-    }
+  useFrame((state, delta) => {
+    if (!group.current) return;
+    const progress = progressRef.current;
+    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, progress * 0.22, 4, delta);
+    group.current.position.z = THREE.MathUtils.damp(group.current.position.z, -progress * 0.8, 4, delta);
+    group.current.scale.z = THREE.MathUtils.damp(group.current.scale.z, 1 - progress * 0.7, 4, delta);
+    if (!reducedMotion) group.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.12) * 0.018;
   });
 
-  return (
-    <group ref={groupRef}>
-      {geometries.map((geometry, i) => (
-        <primitive key={i} object={new THREE.Line(geometry, material)} />
-      ))}
-    </group>
-  );
+  return <group ref={group}>{lines.map((line, index) => <primitive key={index} object={line} dispose={null} />)}</group>;
 }

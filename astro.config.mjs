@@ -1,23 +1,16 @@
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
 import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import tailwindcss from '@tailwindcss/vite';
+
+const site = process.env.SITE_URL || 'https://example.com';
 
 export default defineConfig({
-  site: 'https://dian.dev',
-  integrations: [
-    tailwind({
-      applyBaseStyles: false,
-    }),
-    react(),
-    mdx(),
-    sitemap(),
-  ],
+  site,
   output: 'static',
+  integrations: [react(), mdx(), sitemap()],
   vite: {
-    ssr: {
-      noExternal: ['three', '@react-three/fiber', '@react-three/drei', '@splinetool/react-spline'],
-    },
+    plugins: [tailwindcss()],
   },
 });

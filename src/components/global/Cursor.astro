@@ -1,48 +1,40 @@
----
-// Custom cursor as a React island for desktop only
----
-
-<div class="hidden md:block">
-  <div id="cursor-dot" class="pointer-events-none fixed left-0 top-0 z-50 h-2 w-2 rounded-full bg-accent mix-blend-difference transition-transform duration-100 ease-out" style="transform: translate(-50%, -50%)"></div>
-  <div id="cursor-ring" class="pointer-events-none fixed left-0 top-0 z-50 h-8 w-8 rounded-full border border-accent mix-blend-difference transition-transform duration-300 ease-out" style="transform: translate(-50%, -50%)"></div>
-</div>
-
+<div id="cursor-dot" class="custom-cursor pointer-events-none fixed left-0 top-0 z-[90] size-1.5 place-items-center rounded-full bg-accent" aria-hidden="true"></div>
+<div id="cursor-ring" class="custom-cursor pointer-events-none fixed left-0 top-0 z-[89] size-8 place-items-center rounded-full border border-ink/45" aria-hidden="true"><span id="cursor-label" class="font-mono text-[8px] uppercase tracking-widest"></span></div>
 <script>
-  // Only run on desktop
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const dot = document.getElementById('cursor-dot');
-    const ring = document.getElementById('cursor-ring');
-    let mouseX = 0, mouseY = 0;
-    let ringX = 0, ringY = 0;
-    
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      dot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
-    });
+  const cursorWindow = window as Window & { __dianCursorBooted?: boolean };
+  if (!cursorWindow.__dianCursorBooted) {
+    cursorWindow.__dianCursorBooted = true;
+    let x = innerWidth / 2;
+    let y = innerHeight / 2;
+    let ringX = x;
+    let ringY = y;
 
-    const animateRing = () => {
-      ringX += (mouseX - ringX) * 0.15;
-      ringY += (mouseY - ringY) * 0.15;
-      ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
-      requestAnimationFrame(animateRing);
+    const frame = () => {
+      const enabled = matchMedia('(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference)').matches;
+      if (enabled) {
+        const dot = document.getElementById('cursor-dot');
+        const ring = document.getElementById('cursor-ring');
+        if (dot && ring) {
+          ringX += (x - ringX) * 0.16;
+          ringY += (y - ringY) * 0.16;
+          dot.style.transform = `translate3d(${x - 3}px,${y - 3}px,0)`;
+          ring.style.transform = `translate3d(${ringX - ring.offsetWidth / 2}px,${ringY - ring.offsetHeight / 2}px,0)`;
+        }
+      }
+      requestAnimationFrame(frame);
     };
-    requestAnimationFrame(animateRing);
 
-    // Interaction states
-    document.querySelectorAll('a, button, [role="button"], input, textarea, select, label[for]').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        ring.style.width = '48px';
-        ring.style.height = '48px';
-        ring.style.transform = `translate(${ringX - 24}px, ${ringY - 24}px)`;
-        ring.style.borderColor = 'var(--color-accent)';
-      });
-      el.addEventListener('mouseleave', () => {
-        ring.style.width = '32px';
-        ring.style.height = '32px';
-        ring.style.transform = `translate(${ringX - 16}px, ${ringY - 16}px)`;
-        ring.style.borderColor = 'var(--color-accent)';
-      });
+    addEventListener('pointermove', (event) => { x = event.clientX; y = event.clientY; }, { passive: true });
+    addEventListener('pointerover', (event) => {
+      const target = event.target instanceof Element ? event.target.closest('a,button,[data-cursor]') : null;
+      const ring = document.getElementById('cursor-ring');
+      const label = document.getElementById('cursor-label');
+      if (!ring || !label) return;
+      const mode = target?.getAttribute('data-cursor') || (target ? 'view' : '');
+      label.textContent = mode.toUpperCase();
+      ring.style.width = target ? '48px' : '32px';
+      ring.style.height = target ? '48px' : '32px';
     });
+    requestAnimationFrame(frame);
   }
 </script>

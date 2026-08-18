@@ -1,0 +1,11 @@
+---
+interface Props { id: string; accent?: string; compact?: boolean; }
+const { id, accent = '#D94F2B', compact = false } = Astro.props;
+---
+<div class:list={["project-visual relative overflow-hidden bg-canvas-raised/55", compact ? "aspect-[16/9]" : "aspect-[16/10]"]} data-project-visual={id}>
+  {id === 'uppetite' && <svg viewBox="0 0 640 400" class="h-full w-full"><g fill="none" stroke="#c8c2b9"><path d="M-30 330C120 270 130 135 290 160S440 320 690 105"/><path d="M20 80C180 145 250 20 420 88S530 220 680 210"/></g><g fill={accent}>{[[110,246],[205,183],[320,224],[405,132],[525,197]].map(([x,y])=><circle cx={x} cy={y} r="7"/>)}</g><path d="M110 246Q220 110 320 224T525 197" stroke="#111" stroke-width="2" fill="none" stroke-dasharray="7 8"/></svg>}
+  {id === 'pasada' && <svg viewBox="0 0 640 400" class="h-full w-full"><path d="M40 290C180 300 195 140 330 170S450 310 610 105" stroke={accent} stroke-width="5" fill="none"/><g fill="#111">{[[90,282],[224,178],[360,197],[488,239],[584,138]].map(([x,y])=><rect x={x-7} y={y-7} width="14" height="14"/>)}</g><g stroke="#c8c2b9"><line x1="0" y1="335" x2="640" y2="335"/><line x1="0" y1="80" x2="640" y2="80"/></g></svg>}
+  {id === 'disaster-response' && <svg viewBox="0 0 640 400" class="h-full w-full"><g stroke="#c8c2b9" fill="none"><circle cx="320" cy="200" r="125"/><circle cx="320" cy="200" r="78"/><line x1="320" y1="30" x2="320" y2="370"/><line x1="80" y1="200" x2="560" y2="200"/></g><path d="M160 290L320 90L500 285Z" stroke={accent} stroke-width="3" fill="none"/><g fill="#111"><circle cx="160" cy="290" r="8"/><circle cx="320" cy="90" r="8"/><circle cx="500" cy="285" r="8"/></g></svg>}
+  {id === 'campus-navigation' && <svg viewBox="0 0 640 400" class="h-full w-full"><g stroke="#111" fill="none"><path d="M95 80H520V315H95Z"/><path d="M95 170H260V315M260 80V245H420V80M420 170H520"/></g><path d="M130 270C190 235 205 205 295 215S420 250 480 130" stroke={accent} stroke-width="4" fill="none" stroke-dasharray="10 8"/><circle cx="130" cy="270" r="7" fill={accent}/><circle cx="480" cy="130" r="7" fill={accent}/></svg>}
+  <div class="absolute left-4 top-4 font-mono text-[9px] uppercase tracking-[0.15em] text-graphite">System / {id}</div>
+</div>

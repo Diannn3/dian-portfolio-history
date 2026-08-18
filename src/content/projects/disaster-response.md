@@ -4,26 +4,25 @@ index: 3
 status: CONCEPT
 year: 2026
 category: Emergency Response / AI
-summary: AI-powered, connectivity-resilient emergency reporting and response concept for the Philippines.
-thesis: SMS-based incident parsing with geospatial analysis and urgency estimation.
-role: AI, Geospatial
-technologies: ["Python", "LLMs", "MapLibre", "Geospatial analysis"]
+summary: A connectivity-resilient emergency reporting and response concept designed for the Philippines.
+thesis: Emergency reports should still become structured, locatable incidents when connectivity is unreliable and information arrives through different channels.
+role: AI / geospatial concept
+technologies: ["Python", "LLMs", "geospatial analysis", "SMS-oriented workflows"]
 featured: true
 accent: "#D94F2B"
 ---
-
-# DISASTER RESPONSE PLATFORM
-
-AI-powered emergency reporting for the Philippines.
-
 ## Challenge
 
-Emergency reporting often fails in low-connectivity scenarios.
+Emergency information can arrive in fragmented natural-language reports while internet connectivity is unreliable. Responders need structured location, hazard, urgency, and duplicate information without forcing reporters through a complex interface.
 
 ## Approach
 
-Use SMS for incident reporting, AI for parsing and location resolution, and geospatial analysis for response.
+The concept accepts reports from resilient communication channels, parses incident details, resolves approximate location, requests only critical missing information, checks related reports, and prepares structured data for response prioritization.
 
-## Status
+## System
 
-Concept. Prototype of AI incident parsing and duplicate detection.
+The intended workflow connects communication intake, incident extraction, geospatial and hazard context, duplicate detection, prioritization, and case-state updates. It is a concept architecture—not a claim that the complete system is deployed.
+
+## Current state
+
+**Concept.** Individual parsing or mapping experiments may exist separately; this page does not claim a production emergency platform.
