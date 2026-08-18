@@ -1,0 +1,23 @@
+---
+import HeroFallback from './HeroFallback.astro';
+import VectorAtlasCanvas from './VectorAtlasCanvas';
+---
+<section class="hero" data-hero>
+  <div class="hero-sticky">
+    <HeroFallback />
+    <div class="hero-canvas"><VectorAtlasCanvas client:load /></div>
+    <div class="hero-kicker eyebrow"><span>VECTOR ATLAS / FIELD 01</span><span>LOS BAÑOS / PH</span></div>
+    <div class="hero-copy shell">
+      <h1 class="display hero-title" data-reveal="clip"><span>DIAN BUILDS <span class="soft">SYSTEMS</span> BETWEEN EQUATIONS & INTERFACES.</span></h1>
+      <div class="hero-bottom">
+        <p class="hero-summary">Applied mathematics student and builder working across software, AI, data, maps, and spatial interfaces.</p>
+        <a class="hero-cta" href="#work" data-cursor="explore">Explore selected work ↓</a>
+        <div class="hero-probe" aria-hidden="true"><span data-probe-x>X +0.000</span><span data-probe-y>Y +0.000</span><span data-probe-m>MAG 0.000</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  function initProbe(){ const x=document.querySelector('[data-probe-x]'),y=document.querySelector('[data-probe-y]'),m=document.querySelector('[data-probe-m]'); const hero=document.querySelector('[data-hero]'); if(!hero||!x||!y||!m)return; const move=(e)=>{const r=hero.getBoundingClientRect(); const px=((e.clientX-r.left)/r.width-.5)*5; const py=-((e.clientY-r.top)/Math.max(innerHeight,r.height)-.5)*3.2; const r2=px*px+py*py+.35; const vx=-py*(.68/r2)+.34*px+Math.sin(py*1.7)*.12; const vy=px*(.68/r2)-.30*py+Math.cos(px*1.4)*.10; x.textContent=`X ${px>=0?'+':''}${px.toFixed(3)}`;y.textContent=`Y ${py>=0?'+':''}${py.toFixed(3)}`;m.textContent=`MAG ${Math.hypot(vx,vy).toFixed(3)}`;}; hero.addEventListener('pointermove',move); document.addEventListener('astro:before-swap',()=>hero.removeEventListener('pointermove',move),{once:true}); }
+  document.addEventListener('astro:page-load',initProbe);
+</script>

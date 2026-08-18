@@ -1,0 +1,28 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import SEOHead from '../components/global/SEOHead.astro';
+import Navigation from '../components/global/Navigation.astro';
+import Cursor from '../components/global/Cursor.astro';
+import '../styles/global.css';
+import { site } from '../data/site';
+interface Props { title?: string; description?: string; }
+const { title = site.title, description = site.description } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <SEOHead title={title} description={description} />
+    <ClientRouter fallback="animate" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <Navigation />
+    <main id="main-content"><slot /></main>
+    <Cursor />
+    <script>
+      import { initSiteMotion, destroySiteMotion } from '../scripts/motion';
+      document.addEventListener('astro:page-load', initSiteMotion);
+      document.addEventListener('astro:before-swap', destroySiteMotion);
+    </script>
+  </body>
+</html>

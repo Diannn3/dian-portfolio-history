@@ -1,0 +1,43 @@
+<header class="nav" data-nav>
+  <a class="nav-brand" href="/" aria-label="Dian home">DIAN</a>
+  <nav class="nav-links" aria-label="Primary navigation">
+    <a href="/#work" data-cursor="view">Work</a>
+    <a href="/#about" data-cursor="view">About</a>
+    <a href="/#lab" data-cursor="view">Lab</a>
+    <a href="/#contact" data-cursor="contact">Contact</a>
+  </nav>
+  <span class="nav-status">● BUILDING / LEARNING / SHIPPING</span>
+  <button class="nav-menu-button" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-menu" data-menu-open>MENU</button>
+</header>
+
+<dialog id="mobile-menu" class="mobile-dialog" data-mobile-dialog>
+  <div class="mobile-dialog-inner">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>DIAN</strong>
+      <button type="button" data-menu-close style="background:transparent;border:0;color:inherit">CLOSE</button>
+    </div>
+    <nav aria-label="Mobile navigation">
+      <a href="/#work">Work</a>
+      <a href="/#about">About</a>
+      <a href="/#lab">Lab</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+    <span class="eyebrow" style="color:#aaa">VECTOR ATLAS / 2026</span>
+  </div>
+</dialog>
+
+<script>
+  function initMenu() {
+    const dialog = document.querySelector('[data-mobile-dialog]');
+    const open = document.querySelector('[data-menu-open]');
+    const close = document.querySelector('[data-menu-close]');
+    if (!(dialog instanceof HTMLDialogElement) || !(open instanceof HTMLButtonElement)) return;
+    const show = () => { dialog.showModal(); open.setAttribute('aria-expanded','true'); };
+    const hide = () => { dialog.close(); open.setAttribute('aria-expanded','false'); open.focus(); };
+    open.onclick = show;
+    if (close instanceof HTMLButtonElement) close.onclick = hide;
+    dialog.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => dialog.close(), { once: true }));
+    dialog.addEventListener('close', () => open.setAttribute('aria-expanded','false'), { once: true });
+  }
+  document.addEventListener('astro:page-load', initMenu);
+</script>

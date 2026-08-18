@@ -1,0 +1,31 @@
+---
+interface Props { type: 'uppetite'|'pasada'|'tugon'|'campus'; accent?: string; }
+const { type, accent = '#d94f2b' } = Astro.props;
+---
+<svg class="project-visual" viewBox="0 0 900 650" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <rect width="900" height="650" fill="#ebe6dc"/>
+  {type === 'uppetite' && <>
+    <g stroke="#c8c0b3" stroke-width="1"><path d="M0 95H900M0 180H900M0 265H900M0 350H900M0 435H900M0 520H900"/><path d="M120 0V650M250 0V650M380 0V650M510 0V650M640 0V650M770 0V650"/></g>
+    <path d="M95 545C210 470 215 340 340 330S470 420 560 330 670 180 820 145" fill="none" stroke={accent} stroke-width="7" stroke-linecap="round"/>
+    {[['170','470'],['345','330'],['556','333'],['745','205']].map(([cx,cy])=><g><circle cx={cx} cy={cy} r="18" fill="#11110f"/><circle cx={cx} cy={cy} r="5" fill="#f3f0e9"/></g>)}
+    <text x="55" y="70" font-family="monospace" font-size="17" fill="#66645f">PLACE NETWORK / ELBI</text>
+  </>}
+  {type === 'pasada' && <>
+    <g fill="none" stroke="#aaa297" stroke-width="2"><path d="M70 490C230 360 310 530 450 365S700 210 840 285"/><path d="M50 400C180 280 310 410 420 255S650 135 820 185"/></g>
+    <g fill={accent}>{[[120,455],[270,405],[445,365],[610,250],[780,278]].map(([cx,cy],i)=><circle cx={cx} cy={cy} r={i===2?20:10}/>)}</g>
+    <g stroke="#11110f" stroke-width="1" opacity=".5">{[120,220,320,420,520,620,720].map(x=><line x1={x} y1="550" x2={x} y2={550-(x%240)} />)}</g>
+    <text x="55" y="70" font-family="monospace" font-size="17" fill="#66645f">ROUTE / DEMAND FIELD</text>
+  </>}
+  {type === 'tugon' && <>
+    <g stroke="#b8b0a4" fill="none">{[[450,325,160,115],[450,325,200,520],[450,325,700,150],[450,325,730,495],[450,325,130,320]].map(([x1,y1,x2,y2])=><line x1={x1} y1={y1} x2={x2} y2={y2}/>)}</g>
+    <circle cx="450" cy="325" r="95" fill="none" stroke={accent} stroke-width="5"/><circle cx="450" cy="325" r="20" fill="#11110f"/>
+    {[[160,115],[200,520],[700,150],[730,495],[130,320]].map(([cx,cy])=><g><rect x={cx-42} y={cy-22} width="84" height="44" fill="#f3f0e9" stroke="#77736b"/><circle cx={cx} cy={cy} r="5" fill={accent}/></g>)}
+    <text x="55" y="70" font-family="monospace" font-size="17" fill="#66645f">INCIDENT / SIGNAL GRAPH</text>
+  </>}
+  {type === 'campus' && <>
+    <g fill="none" stroke="#9e978b" stroke-width="2"><path d="M120 130H405V250H515V145H790V500H610V555H320V505H120Z"/><path d="M320 130V505M515 145V500M120 345H790"/><path d="M405 130V250H320M610 345V555"/></g>
+    <path d="M175 450L245 385 365 385 365 300 565 300 565 220 720 220" fill="none" stroke={accent} stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="175" cy="450" r="15" fill="#11110f"/><circle cx="720" cy="220" r="15" fill={accent}/>
+    <text x="55" y="70" font-family="monospace" font-size="17" fill="#66645f">FLOOR / ROUTE MODEL</text>
+  </>}
+</svg>
