@@ -11,16 +11,9 @@ export function registerGsap() {
 }
 
 /**
- * Registered at import time as well: child effects run before parent effects in
- * React, so a section's useGSAP callback can reach ScrollTrigger before the
- * provider's own effect has run.
- */
-registerGsap();
-
-/**
- * The site's motion vocabulary. Masked line reveal for typography, draw for
- * rules, a short clipped rise for media, a plain fade for annotation.
- * Everything else stays still on purpose.
+ * The site's motion vocabulary. Three verbs only — masked line reveal for
+ * typography, draw for rules, and a short clipped rise for media. Everything
+ * else stays still on purpose.
  */
 export function buildReveals(root: HTMLElement, reduced: boolean) {
   registerGsap();
@@ -32,9 +25,6 @@ export function buildReveals(root: HTMLElement, reduced: boolean) {
     root.querySelectorAll<HTMLElement>('[data-draw]').forEach((el) => gsap.set(el, { scaleX: 1 }));
     root.querySelectorAll<HTMLElement>('[data-clip]').forEach((el) =>
     gsap.set(el, { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1 })
-    );
-    root.querySelectorAll<HTMLElement>('[data-fade]').forEach((el) =>
-    gsap.set(el, { opacity: 1, y: 0 })
     );
     return;
   }
