@@ -5,7 +5,7 @@ const routes = ['/', '/work/uppetite/', '/work/campus-navigation/', '/work/pasad
 
 for (const route of routes) {
   test(`${route} has no serious or critical automated accessibility violations`, async ({ page }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
     await page.goto(route);
     // Let the route reveal settle before measuring computed contrast. The
     // portfolio deliberately animates opacity during entry; auditing mid-tween

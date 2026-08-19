@@ -132,6 +132,25 @@ test('post-hero orientation and Selected Work hierarchy are evidence-led', async
   await expect(work.locator('[data-study-entry]').first()).toContainText('CONCEPT STUDY');
 });
 
+for (const product of catalog.slice(0, 2)) {
+  test(`${product.slug} opening exposes proof state, role and media provenance`, async ({ page }) => {
+    await page.goto(`/work/${product.slug}/`);
+    const main = page.locator('#main');
+    const lead = main.locator('[data-case-lead-evidence]');
+    await expect(lead).toHaveCount(1);
+    await expect(lead.locator('img')).toBeVisible();
+    await expect(lead.getByText('PROVES', { exact: true })).toBeVisible();
+    await expect(lead.getByText('DATA STATE', { exact: true })).toBeVisible();
+    await expect(lead.getByText('SOURCE', { exact: true })).toBeVisible();
+    await expect(lead).toContainText(/audit derivative/i);
+    await expect(main).toHaveAttribute(
+      'data-project-evidence',
+      product.slug === 'uppetite' ? 'IMPLEMENTATION' : 'PROTOTYPE',
+    );
+    await expect(main.getByText('ROLE', { exact: true })).toBeVisible();
+  });
+}
+
 test('case index uses real hash navigation and updates project reading context', async ({ page }) => {
   await page.goto('/work/uppetite/');
   const caseIndex = page.getByRole('navigation', { name: 'Case study sections' });

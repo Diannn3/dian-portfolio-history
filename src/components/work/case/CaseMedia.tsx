@@ -1,9 +1,9 @@
 import React from 'react';
 import type { ProjectMedia } from '../../../types/project';
 
-export function CaseMedia({ media }: { media: ProjectMedia[] }) {
+export function CaseMedia({ media, lead = false }: { media: ProjectMedia[]; lead?: boolean }) {
   return (
-    <div className="atlas-grid mt-10 gap-y-10 md:mt-12">
+    <div className={`atlas-grid gap-y-10 ${lead ? 'mt-12 md:mt-16' : 'mt-10 md:mt-12'}`}>
       {media.map((item, index) => {
         const aspectRatio = item.aspectRatio ??
           (item.width && item.height ? `${item.width} / ${item.height}` : '16 / 10');
@@ -12,6 +12,7 @@ export function CaseMedia({ media }: { media: ProjectMedia[] }) {
         return (
           <figure
             key={`${item.src}-${index}`}
+            data-case-lead-evidence={lead ? true : undefined}
             className="col-span-4 md:col-span-8 xl:col-span-10 xl:col-start-2"
           >
             <div
@@ -41,13 +42,43 @@ export function CaseMedia({ media }: { media: ProjectMedia[] }) {
                 </video>
               )}
             </div>
-            <figcaption className="mt-3 flex gap-4 border-t border-hairline pt-3">
-              <span className="font-mono text-micro tracking-[0.16em] text-graphite">
-                FIG / {String(index + 1).padStart(2, '0')}
-              </span>
-              <span className="max-w-[62ch] text-read-sm text-graphite">
-                {item.caption}
-              </span>
+            <figcaption className="mt-3 border-t border-hairline pt-3">
+              <div className="flex gap-4">
+                <span className="font-mono text-micro tracking-[0.16em] text-graphite">
+                  FIG / {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="max-w-[62ch] text-read-sm text-graphite">
+                  {item.caption}
+                </span>
+              </div>
+              {(item.proves || item.dataState || item.capturedAt || item.source) ? (
+                <dl className="mt-4 grid gap-x-6 gap-y-3 border-t border-hairline pt-3 sm:grid-cols-2">
+                  {item.proves ? (
+                    <div>
+                      <dt className="mono-label text-ink">PROVES</dt>
+                      <dd className="mt-1 text-read-sm text-graphite">{item.proves}</dd>
+                    </div>
+                  ) : null}
+                  {item.dataState ? (
+                    <div>
+                      <dt className="mono-label text-ink">DATA STATE</dt>
+                      <dd className="mt-1 text-read-sm text-graphite">{item.dataState}</dd>
+                    </div>
+                  ) : null}
+                  {item.capturedAt ? (
+                    <div>
+                      <dt className="mono-label text-ink">CAPTURED</dt>
+                      <dd className="mt-1 text-read-sm text-graphite">{item.capturedAt}</dd>
+                    </div>
+                  ) : null}
+                  {item.source ? (
+                    <div>
+                      <dt className="mono-label text-ink">SOURCE</dt>
+                      <dd className="mt-1 break-words text-read-sm text-graphite">{item.source}</dd>
+                    </div>
+                  ) : null}
+                </dl>
+              ) : null}
             </figcaption>
           </figure>
         );
