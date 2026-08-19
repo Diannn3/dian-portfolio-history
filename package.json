@@ -13,6 +13,7 @@
     "postbuild": "node scripts/generate-route-entrypoints.mjs",
     "guard:frozen": "node scripts/check-frozen-surfaces.mjs",
     "test:e2e": "playwright test",
+    "test:visual": "playwright test tests/e2e/visual-contract.spec.ts",
     "test:a11y": "playwright test tests/e2e/accessibility.spec.ts",
     "verify:dist": "node scripts/verify-dist.mjs"
   },
