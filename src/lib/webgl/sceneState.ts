@@ -1,6 +1,6 @@
 /**
  * One mutable module-level record shared between GSAP/ScrollTrigger, the pointer
- * listener and the render loop. Frame-rate work never touches React state.
+ * listener and the R3F render loop. Frame-rate work never touches React state.
  */
 export const sceneState = {
   /** hero scroll progress 0 → 1 */

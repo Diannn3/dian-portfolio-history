@@ -1,4 +1,4 @@
-/** Editable site-level content. Claims here must stay evidence-bounded. */
+/** Editable site-level content. */
 
 export const identity = {
   name: 'Dian',
@@ -54,53 +54,24 @@ export const now = {
 
 };
 
-export interface LabEntry {
-  id: string;
-  title: string;
-  status: string;
-  note: string;
-  tag: string;
-  href: string;
-}
-
-export const lab: LabEntry[] = [
-{
-  id: 'L01',
-  title: 'Vector Field Playground',
-  status: 'EXPERIMENT',
-  note:
-  'The same analytic field the hero is built from, exposed directly: seed points integrated with RK4 so the parameters behind the site become adjustable rather than decorative.',
-  tag: 'FIELD MATH',
-  href: ''
-},
-{
-  id: 'L02',
-  title: 'AedriAIn / Spatial Student Desktop',
-  status: 'PROTOTYPE',
-  note:
-  'Webcam hand tracking, pinch manipulation, holographic windows, local state and an Electron shell scaffold. The visualisation here is a diagram of that prototype — this page does not run hand tracking.',
-  tag: 'INTERACTION',
-  href: 'https://github.com/Diannn3/AedriAIn'
-},
-{
-  id: 'L03',
-  title: 'Spline Spatial Study',
-  status: 'EXPERIMENT',
-  note:
-  'Lazy-loading infrastructure for a published Spline scene, kept deliberately empty until a real scene of mine exists. No borrowed or example asset stands in for it.',
-  tag: 'SPATIAL',
-  href: ''
-},
-{
-  id: 'L04',
-  title: 'Motion Studies',
-  status: 'EXPERIMENT',
-  note:
-  'The seven motion verbs this site is built from, demonstrated in isolation so the vocabulary is inspectable instead of implicit.',
-  tag: 'MOTION',
-  href: ''
-}];
-
+export const lab = [
+  {
+    id: 'L01',
+    title: 'Vector Field Playground',
+    status: 'EXPERIMENT',
+    note: 'The portfolio hero itself: analytic fields, trajectories, particles and a custom GLSL manifold treated as one interactive system.',
+    tag: 'WEBGL',
+    href: '',
+  },
+  {
+    id: 'L02',
+    title: 'AedriAIn / Spatial Student Desktop',
+    status: 'PROTOTYPE',
+    note: 'Webcam hand tracking, pinch manipulation, holographic windows, local state and an Electron shell scaffold.',
+    tag: 'INTERACTION',
+    href: 'https://github.com/Diannn3/AedriAIn',
+  },
+];
 
 export const tools = [
 { group: 'INTERFACE', items: 'Astro / SvelteKit / React / TypeScript' },
@@ -108,8 +79,8 @@ export const tools = [
 { group: 'SPATIAL', items: 'MapLibre / graph routing / GIS' },
 { group: 'VISUAL', items: 'Three.js / R3F / GSAP / GLSL' },
 { group: 'DATA', items: 'Postgres / Supabase / structured pipelines' },
-{ group: 'AI', items: 'LLMs / computer vision / local model experiments' }];
-
+{ group: 'AI', items: 'LLMs / computer vision / local model experiments' }]
+;
 
 export const contactLinks = [
 { label: 'GITHUB', value: 'github.com/Diannn3', href: 'https://github.com/Diannn3' }];
@@ -117,7 +88,7 @@ export const contactLinks = [
 
 /**
  * Spline scene URL. Left empty on purpose — no invented asset URLs.
- * Drop a published Spline scene URL here and Lab / L03 will load it lazily,
- * inside the viewport only, with an honest fallback until then.
+ * Drop a published Spline scene URL here and the artifact section will load it
+ * lazily, with the procedural artifact used as the fallback until then.
  */
 export const SPLINE_SCENE_URL = '';

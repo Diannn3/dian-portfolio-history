@@ -25,18 +25,6 @@ export function usePointerFine() {
   return fine;
 }
 
-export function useCompact() {
-  const [compact, setCompact] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 767px)');
-    setCompact(mq.matches);
-    const onChange = () => setCompact(mq.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
-  return compact;
-}
-
 function detectWebGL(): boolean {
   try {
     const canvas = document.createElement('canvas');

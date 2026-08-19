@@ -1,79 +1,75 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { subscribeTick } from '../../lib/motion/ticker';
+import React, { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 import { usePointerFine, useReducedMotion } from '../../hooks/useEnvironment';
 
-type CursorState = 'default' | 'probe' | 'link' | 'row';
-
-const LABEL: Record<CursorState, string> = {
-  default: '',
+const labels: Record<string, string> = {
+  view: 'VIEW',
   probe: 'PROBE',
-  link: 'OPEN',
-  row: 'VIEW'
+  external: '↗',
+  rotate: 'ROTATE',
+  drag: 'DRAG'
 };
 
 /**
- * A single instrument cursor. State comes from [data-cursor] on hovered
- * elements; position is written directly to the node on the shared ticker.
- * Never shown on coarse pointers or under reduced motion.
+ * The native cursor stays. This adds a small analytical marker that follows it
+ * with inertia and names the current affordance. Desktop only, off for reduced
+ * motion.
  */
 export function Cursor() {
   const dot = useRef<HTMLDivElement>(null);
-  const [state, setState] = useState<CursorState>('default');
+  const label = useRef<HTMLSpanElement>(null);
   const fine = usePointerFine();
   const reduced = useReducedMotion();
-  const enabled = fine && !reduced;
 
   useEffect(() => {
-    if (!enabled) return;
-    const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const current = { ...target };
+    if (!fine || reduced || !dot.current) return;
+    const el = dot.current;
+    gsap.set(el, { xPercent: -50, yPercent: -50, opacity: 0 });
+    const xTo = gsap.quickTo(el, 'x', { duration: 0.28, ease: 'power3.out' });
+    const yTo = gsap.quickTo(el, 'y', { duration: 0.28, ease: 'power3.out' });
 
+    let shown = false;
     const onMove = (e: PointerEvent) => {
-      target.x = e.clientX;
-      target.y = e.clientY;
-      const el = (e.target as HTMLElement | null)?.closest?.('[data-cursor]');
-      const next = el?.getAttribute('data-cursor') as CursorState | null ?? 'default';
-      setState((prev) => prev === next ? prev : next);
+      xTo(e.clientX);
+      yTo(e.clientY);
+      if (!shown) {
+        shown = true;
+        gsap.to(el, { opacity: 1, duration: 0.3 });
+      }
+      const target = (e.target as HTMLElement | null)?.closest('[data-cursor]') as HTMLElement | null;
+      const key = target?.dataset.cursor ?? '';
+      const text = labels[key] ?? '';
+      if (label.current && label.current.textContent !== text) {
+        label.current.textContent = text;
+        gsap.to(el, { scale: text ? 1 : 0.6, duration: 0.4, ease: 'power3.out' });
+      }
     };
-
-    window.addEventListener('pointermove', onMove, { passive: true });
-    const unsub = subscribeTick(() => {
-      current.x += (target.x - current.x) * 0.18;
-      current.y += (target.y - current.y) * 0.18;
-      if (dot.current)
-      dot.current.style.transform = `translate3d(${current.x}px, ${current.y}px, 0)`;
-    });
-
+    const onLeave = () => {
+      shown = false;
+      gsap.to(el, { opacity: 0, duration: 0.25 });
+    };
+    window.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerleave', onLeave);
     return () => {
       window.removeEventListener('pointermove', onMove);
-      unsub();
+      document.removeEventListener('pointerleave', onLeave);
+      gsap.killTweensOf(el);
     };
-  }, [enabled]);
+  }, [fine, reduced]);
 
-  if (!enabled) return null;
-
-  const active = state !== 'default';
+  if (!fine || reduced) return null;
 
   return (
     <div
       ref={dot}
       aria-hidden="true"
-      className="pointer-events-none fixed left-0 top-0 z-[65] hidden md:block">
-
-      <div className="relative -translate-x-1/2 -translate-y-1/2">
-        <span
-          className={`block h-[9px] w-[9px] border transition-all duration-300 ease-atlas ${
-          active ? 'scale-[1.9] border-accent bg-transparent' : 'border-ink bg-ink'}`
-          } />
-
-        <span
-          className={`absolute left-4 top-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-micro uppercase tracking-[0.16em] text-graphite transition-opacity duration-300 ${
-          active ? 'opacity-100' : 'opacity-0'}`
-          }>
-
-          {LABEL[state]}
-        </span>
-      </div>
+      className="pointer-events-none fixed left-0 top-0 z-[90] flex scale-[0.6] items-center gap-2 opacity-0">
+      
+      <span className="block h-[6px] w-[6px] translate-y-[0.5px] bg-accent" />
+      <span
+        ref={label}
+        className="font-mono text-micro uppercase tracking-[0.18em] text-ink" />
+      
     </div>);
 
 }
