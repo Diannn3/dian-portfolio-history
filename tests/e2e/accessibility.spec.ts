@@ -53,3 +53,16 @@ test('reduced-motion preference preserves content and disables the route mask', 
   await expect(page.locator('[data-route-mask]')).toHaveCount(0);
   await expect(page.locator('[data-work-stage-shell]')).toHaveCount(0);
 });
+
+
+test('contact finale remains usable with reduced motion and keyboard focus', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const contact = page.locator('#contact');
+  await contact.scrollIntoViewIfNeeded();
+  const primary = contact.getByRole('link', { name: /VIEW GITHUB/i });
+  await expect(primary).toBeVisible();
+  await primary.focus();
+  await expect(primary).toBeFocused();
+  await expect(contact.getByRole('heading', { name: /Have a weird problem.*Let's build something useful\./i })).toBeVisible();
+});

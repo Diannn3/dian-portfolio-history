@@ -31,7 +31,7 @@
     "src/components/lab/VectorFieldPlayground.tsx": "b56237e7c02d8e566114b15be3e5408951377221bfa7f6e53c3a89c0fdd31081",
     "src/components/motion/MotionProvider.tsx": "37ba33821c197ff662d8aad04c2360361d2f0bd72657525960be1963c74c9a30",
     "src/components/motion/RouteMask.tsx": "f4765261cc3602cc6b18162837be19e1256138ac458a8302e39bcab8fa825f4e",
-    "src/components/sections/Contact.tsx": "ac217f2d2b76deed4bc9f2f17e1af8028f337fb882f0ae3779adee935ecae751",
+    "src/components/sections/Contact.tsx": "10391618035bca9919bb5c4b90404cf7bfdaa544db8302332b3c605b9e939667",
     "src/components/sections/Now.tsx": "ec569016ce2cba32134e860994fb5806bea9fd315d98897ea73dd08342703793",
     "src/components/sections/Tools.tsx": "48f90146b4e41ee01f3ea9d336baf8e3a17fd230f842ea512128ea2b128ad1ac",
     "src/components/ui/SectionFrame.tsx": "8b96d43df9eaf1e15ec50d0497847f036326069bd5e8c86196e862141124cb20",

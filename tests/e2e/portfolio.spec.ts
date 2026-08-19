@@ -25,6 +25,19 @@ test('Atlas index traps focus, closes with Escape, and restores focus', async ({
   await expect(trigger).toBeFocused();
 });
 
+test('contact finale restores the full-width streamline composition and verified CTA', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const contact = page.locator('#contact');
+  await contact.scrollIntoViewIfNeeded();
+  await expect(page.getByRole('heading', { name: /Have a weird problem.*Let's build something useful\./i })).toBeVisible();
+  await expect(contact.locator('[data-contact-field]')).toHaveCount(1);
+  const primary = contact.getByRole('link', { name: /VIEW GITHUB/i });
+  await expect(primary).toHaveAttribute('href', 'https://github.com/Diannn3');
+  await expect(contact.getByText('PROJECTS / CODE / EXPERIMENTS')).toBeVisible();
+  await expect(contact.getByText('FIG / BEARING')).toHaveCount(0);
+});
+
 test('desktop section anchor navigation reaches Work with Lenis-compatible hashes', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
