@@ -1,128 +1,135 @@
-# Vector Atlas — content upgrade implementation report
+# Vector Atlas — upgrade pass implementation report
 
-## Baseline
+## Remote baseline
 
-The content pass was applied to the previously hardened `dian-vector-atlas-safe-pass` copy. The original safe-pass remains separate.
+This pass was based on the GitHub branch `content-upgrade` in `Diannn3/dian-portfolio-history`.
 
-## Runtime/visual surfaces intentionally frozen
+Remote baseline identifiers captured before edits:
 
-No edits were made to:
+- commit: `c6ce1b1e03bf8345c58b1e32684f1f40d34d0c97`
+- tree: `75586e205c3dd744527d81ca5b380b514c860d84`
 
-- hero shaders or mathematical field code
-- Three.js scene/camera/particles/streamlines/vector glyphs
+Direct `git clone` was blocked by cloud DNS. The working tree was therefore reconstructed and verified against the complete, non-truncated GitHub tree; the local baseline Git tree matched the remote tree SHA exactly before implementation began.
+
+GitHub write operations currently return `403 Resource not accessible by integration`, so this pass is being developed/validated locally rather than silently modifying `content-upgrade`.
+
+## Protected visual/runtime surfaces
+
+A frozen-surface hash gate protects 32 approved files covering the creative/runtime core, including:
+
+- hero / GLSL / camera / particles / streamlines / vector field
+- math and motion libraries
+- WebGL scene state
 - project preview artwork
-- GSAP / Lenis motion implementation
-- global navigation, cursor, SEO implementation or footer
-- Digital Artifact / Spline/procedural geometry
-- global CSS / Tailwind tokens
-- routing architecture
+- global visual tokens
+- navigation/cursor
+- artifact geometry
 
-A file-level allowlist comparison against the safe-pass reports no changes outside the content/schema files documented below.
+Current result:
 
-## Implemented
+```text
+FROZEN OK: 32 protected visual/runtime files match the approved baseline.
+```
 
-### Case-study schema
+## Implemented in this pass
 
-Added optional, backward-compatible content primitives:
+### Case-study UX
 
-- project source/document/demo/video links
-- evidence level (`IMPLEMENTATION`, `PROTOTYPE`, `CONCEPT`)
-- real media records (`image` / `video`)
-- structured engineering decisions
-- validation states (`VERIFIED`, `DEFINED`, `LIMITATION`, `NOT CLAIMED`)
-- reflection modules
+- compact `CURRENT STATE` summaries for UPPETITE and IMS
+- jumpable Case Index derived from the case-study modules
+- stable section anchors
+- complex system diagrams now include a keyboard-accessible text equivalent
+- mobile diagram `SCROLL / DRAG →` affordance
+- Lab pruned to inspectable work instead of filling slots
+- procedural Digital Artifact is presented as a deliberate Three.js construct rather than an empty Spline slot
 
-### Reusable components
+### Initial-bundle isolation
 
-- `ProjectLinks.tsx`
-- `CaseMedia.tsx`
-- `DecisionBlock.tsx`
-- `ValidationBlock.tsx`
-- extended `CaseModules.tsx`
+- homepage uses `projectCatalog.json` rather than long-form case-study data
+- detailed `ProjectPage` is lazy-loaded
+- each case study lives in its own lazy project module
+- pointer/focus intent preloads the selected project page + selected project content
+- sanity gate fails if Three.js or long-form project content becomes synchronously reachable from `src/index.tsx`
 
-No new npm package was introduced.
+### Routing / SEO hardening
 
-### UPPETITE
+- wildcard route no longer silently renders Home
+- portfolio-native 404 has `noindex`
+- postbuild emits static HTML entrypoints for every known project route
+- route-specific title/description/robots/Open Graph metadata are present before React executes
+- `robots.txt` always generated
+- sitemap + canonical URLs generated only when `SITE_URL` is intentionally configured
+- homepage and project entrypoints receive initial HTML metadata before React executes
+- client-side 404 navigation removes stale canonical / `og:url` tags
+- social metadata no longer claims `summary_large_image` unless a real social image is configured
+- `verify:dist` validates generated route/crawler metadata after build
 
-- promoted to implementation-backed flagship #01
-- public source/docs links
-- actual Astro/Svelte/MapLibre/Supabase architecture represented
-- current product surfaces documented
-- local-first personal-state decision documented
-- fail-closed route-coverage decision documented
-- project-evolution flow added
-- validation/non-claim block added
-- reflection added
+### Media contract
 
-### IMS Academic Hub
+`ProjectMedia` now supports:
 
-- visible project renamed from Campus Navigation while preserving `/work/campus-navigation`
-- moved to flagship #02
-- public source/docs links
-- real SvelteKit/SVG/A*/Supabase/IndexedDB architecture represented
-- current product surfaces documented
-- SvelteKit framework decision documented
-- local grade-data decision documented
-- import → stage → apply → verify → publish governance flow added
-- site-unverified floorplan limitation made explicit
-- reflection added
+- exact `width` / `height`
+- optional aspect-ratio override
+- `contain` / `cover` fit
+- one-image priority hint (`eager` + `fetchpriority=high`)
+- lazy decoding/loading for non-priority images
+- user-initiated video with `preload=none`
 
-### Pasada
+No fake screenshot was added. Full-tree repository inspection did discover real UPPETITE Playwright visual baselines; their exact source paths and privacy/crop rules are recorded in `MEDIA_CAPTURE_PLAN.md` for later localization/selection.
 
-- moved to #03
-- remains explicitly `CONCEPT`
-- assumptions, failure modes and required validation replace implied results
-- no live fleet, partnership or measured ETA claim
+### Accessibility / regression infrastructure
 
-### Disaster Response Platform
+- Playwright portfolio journey tests
+- axe serious/critical accessibility checks
+- keyboard case-index + diagram-text-equivalent checks
+- reduced-motion readability check
+- frozen-surface hash guard
+- GitHub Actions workflow for install → static guards → build → dist verification → Chromium → browser tests
 
-- moved to #04
-- downgraded from `PROTOTYPE` to `CONCEPT` because no public implementation evidence was found during the audit
-- human authority decision made explicit
-- deployment/responder/accuracy non-claims added
-- required validation work listed
+### Font loading
 
-### Homepage supporting content
+- font CSS `@import` remains removed
+- Google Fonts requests now ask only for Geist / Geist Mono weights 400 and 500, matching the actual source usage
+- self-hosting remains deferred until the font binaries can be acquired and browser-regressed normally
 
-- hero visual/copy structure retained
-- support sentence made more specific
-- `NOW / AUG 2026` uses current named projects
-- Tools updated to reflect implemented work
-- About copy made more systems-oriented
-- Lab reduced to stronger entries and now links AedriAIn to its real public repository
+### Repository hygiene / reproducibility
 
-### Media infrastructure
+- generated `.vercel` linkage removed and ignored
+- remaining `latest` package entries removed
+- dependencies/devDependencies exact-pinned in `package.json`
+- Node engine contract added
+- no fake lockfile generated while the registry is unreachable
 
-Real screenshot/video rendering is implemented but no fake product media was added.
+## Dependency-free validation completed here
 
-`MEDIA_CAPTURE_PLAN.md` specifies deterministic, privacy-safe captures for UPPETITE and IMS. `npm run sanity` will reject a `/work/...` media path if the referenced file does not exist.
+Current green checks include:
 
-## Evidence policy
+```text
+SANITY OK
+FROZEN OK — 32 protected files
+TS/TSX transpile parser — PASS
+relative source imports — PASS
+mock postbuild route generation without SITE_URL — PASS
+mock verify:dist without SITE_URL — PASS
+mock postbuild route generation with SITE_URL — PASS
+mock verify:dist with SITE_URL — PASS
+git diff --check — PASS
+```
 
-`CONTENT_EVIDENCE.md` records the claim boundary for each project. It distinguishes repository-backed facts from defined test infrastructure and explicit non-claims.
+The initial synchronous dependency graph remains free of both Three.js and long-form case-study modules.
 
-## Validation completed in this environment
+## Validation still blocked by environment
 
-- `npm run sanity` / `node scripts/sanity.mjs` — **PASS**
-- all TS/TSX files through TypeScript `transpileModule` — **56/56 PASS**
-- changed-file semantic TypeScript check with temporary external-library stubs — **PASS**
-- frozen-surface file comparison against safe-pass — **PASS**
-- Three.js remains outside the initial static import graph — **PASS**
-- external content links are HTTPS-bounded — **PASS**
-- referenced `/work/...` media assets are existence-checked — **PASS**
+This cloud does not have the project `node_modules`, and outbound npm/GitHub DNS is unavailable. An offline install also cannot complete because the new browser/a11y packages are not present in the npm cache.
 
-## Validation blocked by environment
-
-`npm run build` cannot run because the working container has no installed dependencies (`vite: not found`). A clean npm install probe times out because outbound npm access is unavailable in this environment.
-
-This is not reported as a successful production build. On a normal networked machine, run:
+Therefore this report does **not** claim that these have run successfully here:
 
 ```bash
 npm install
-npm run sanity
-npm run typecheck
-npm run build
-npm run dev
+npm run typecheck        # full dependency-aware TypeScript check
+npm run build            # real Vite production build
+npm run test:e2e         # real Chromium browser run
+npm run test:a11y        # real axe browser run
 ```
 
-Then perform browser/visual regression at the target desktop/mobile widths before merging or deploying.
+On the first normal networked machine/CI run, execute the full quality command set from `README.md` before merging or deploying. Do not begin React/Vite/Tailwind/WebGL modernization until that baseline is green and visual screenshots exist.

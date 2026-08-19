@@ -12,6 +12,7 @@ const pkg = JSON.parse(read('package.json'));
 if (pkg.dependencies?.['gsap/ScrollTrigger']) fail('gsap/ScrollTrigger must not be listed as a package dependency.');
 if (fs.existsSync(path.join(root, 'src/package.json'))) fail('duplicate src/package.json exists.');
 if (!fs.existsSync(path.join(root, 'public/favicon.svg'))) fail('public/favicon.svg is missing.');
+if (fs.existsSync(path.join(root, '.vercel'))) fail('.vercel is local deployment linkage and must not be tracked.');
 
 const sourceFiles = [];
 function walk(dir) {
@@ -38,8 +39,21 @@ for (const marker of [
   if (combined.includes(marker)) fail(`stale generated marker remains: ${marker}`);
 }
 
-const projects = read('src/data/projects.ts');
+const projectDir = path.join(root, 'src/content/projects');
+const projects = fs.readdirSync(projectDir)
+  .filter((name) => name.endsWith('.ts'))
+  .map((name) => fs.readFileSync(path.join(projectDir, name), 'utf8'))
+  .join('\n');
 const siteData = read('src/data/site.ts');
+const catalogData = JSON.parse(read('src/data/projectCatalog.json'));
+const registryData = read('src/content/projectRegistry.ts');
+const catalogSlugs = catalogData.map((project) => project.slug);
+const projectFiles = fs.readdirSync(projectDir).filter((name) => name.endsWith('.ts'));
+if (projectFiles.length !== catalogSlugs.length) fail(`project catalog/content count mismatch: ${catalogSlugs.length} catalog entries vs ${projectFiles.length} project files.`);
+for (const slug of catalogSlugs) {
+  if (!registryData.includes(slug)) fail(`project registry is missing catalog slug: ${slug}`);
+}
+if (fs.existsSync(path.join(root, 'src/data/projects.ts'))) fail('legacy monolithic src/data/projects.ts should remain removed.');
 for (const match of `${projects}
 ${siteData}`.matchAll(/href:\s*['"]([^'"]*)['"]/g)) {
   const href = match[1];
@@ -49,6 +63,13 @@ ${siteData}`.matchAll(/href:\s*['"]([^'"]*)['"]/g)) {
 for (const match of projects.matchAll(/(?:src|poster):\s*['"](\/work\/[^'"]+)['"]/g)) {
   const assetPath = path.join(root, 'public', match[1].replace(/^\//, ''));
   if (!fs.existsSync(assetPath)) fail(`case-study media asset is missing: ${match[1]}`);
+}
+
+for (const project of catalogData) {
+  if (!project.socialImage) continue;
+  if (!project.socialImage.startsWith('/')) fail(`social image must be a local absolute path: ${project.socialImage}`);
+  const socialPath = path.join(root, 'public', project.socialImage.replace(/^\//, ''));
+  if (!fs.existsSync(socialPath)) fail(`catalog social image is missing: ${project.socialImage}`);
 }
 
 // Follow static relative imports from the application entry. Dynamic imports are
@@ -82,7 +103,15 @@ while (stack.length) {
 }
 
 if (packages.has('three')) fail('Three.js is reachable from the initial static import graph; keep WebGL behind lazy imports.');
+for (const file of seen) {
+  if (file.startsWith(path.join(root, 'src/content/projects') + path.sep)) {
+    fail('long-form project content is reachable from the initial static import graph; keep it behind the lazy project route.');
+    break;
+  }
+}
+if (!combined.includes('404 / COORDINATE NOT FOUND')) fail('portfolio-native 404 surface is missing.');
+if (!combined.includes('View system as text +')) fail('complex system diagrams need a text equivalent.');
 
 if (!process.exitCode) {
-  console.log(`SANITY OK: ${sourceFiles.length} source files checked; content links/assets are bounded; Three.js remains outside the initial static graph.`);
+  console.log(`SANITY OK: ${sourceFiles.length} source files checked; content links/assets are bounded; long-form project content and Three.js remain outside the initial static graph.`);
 }

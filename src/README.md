@@ -15,9 +15,9 @@ runner available here), so the architecture is preserved in React terms:
 | Astro routes / layouts     | `pages/` + `App.tsx` routing, static-first section markup  |
 | React islands              | `lazy()` + IntersectionObserver mounts (`Hero`, artifact)  |
 | `client:visible` / `idle`  | observer + `requestIdleCallback` before canvas mount       |
-| Content Collections        | `data/projects.ts` typed against `types/project.ts`        |
+| Content Collections        | `content/projects/*` typed against `types/project.ts`        |
 | View transitions           | route lifecycle + shared preview → case-study media        |
-| Playwright                 | not runnable in this environment                           |
+| Playwright                 | `tests/e2e/*`; runnable once dependencies + browser are installed |
 
 Everything else — the WebGL system, GSAP choreography, Lenis, quality tiers,
 fallbacks, reduced motion, accessibility — is implemented.
@@ -29,7 +29,7 @@ components/
   hero/        Three.js scene: manifold, field, streamlines, lattice, particles, probe
   work/        editorial project index, SVG previews, source links + evidence case modules
   about/       discipline graph (SVG, keyboard accessible)
-  artifact/    OBJECT / 001 — instanced armillary object + Spline slot + fallback
+  artifact/    OBJECT / 001 — instanced armillary object + optional Spline scene
   sections/    Now, Lab, Tools, Contact
   global/      Nav (Radix Dialog mobile menu), Cursor, Footer, Seo
   ui/          CVA button primitive, magnetic link
@@ -38,7 +38,8 @@ lib/
   math/field.ts        Three.js adapter + RK4 streamlines
   motion/              GSAP registration, reveal vocabulary, shared ticker, Lenis
   webgl/sceneState.ts  frame-loop state + quality profiles
-data/                  projects, site content (single edit point)
+data/                  lightweight project catalog + site content
+content/projects/       one lazy long-form module per case study
 ```
 
 ## The field
@@ -86,8 +87,10 @@ partnership or test-success claim is inferred from a design or repository descri
 
 `CONTENT_EVIDENCE.md` is the internal claim ledger for the current content pass.
 It distinguishes verified implementation facts from defined-but-not-proven-green
-quality gates and explicit non-claims. The media renderer accepts real screenshots
-and user-initiated video, but no fake product screenshot is generated to fill an empty slot.
+quality gates and explicit non-claims. The media renderer accepts genuine screenshots with stable dimensions/fit controls and
+user-initiated video, but no fake product screenshot is generated to fill an empty slot.
+Playwright + axe browser gates now live under `tests/e2e/`; this cloud pass could define and
+parse them but could not execute them because npm/browser dependencies are unavailable here.
 
 The GitHub contact uses the known public profile; no email or LinkedIn address is
 published automatically. `SPLINE_SCENE_URL` in `data/site.ts` stays intentionally

@@ -95,7 +95,7 @@ export function DigitalArtifact() {
             ['CORE', 'Parametric knot section'],
             ['INPUT', 'Pointer orientation, damped'],
             ['STATE', 'EXPERIMENT'],
-            ['SOURCE', useSpline ? 'Spline scene, lazy embedded' : 'Spline slot empty — procedural stand-in']].
+            ['SOURCE', useSpline ? 'Spline scene, lazy embedded' : 'Procedural / Three.js']].
             map(([k, v]) =>
             <div key={k} className="flex items-baseline justify-between gap-4">
                 <span className="mono-label">{k}</span>

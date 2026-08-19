@@ -55,39 +55,23 @@ export const now = {
 };
 
 export const lab = [
-{
-  id: 'L01',
-  title: 'Vector Field Playground',
-  status: 'EXPERIMENT',
-  note: 'The portfolio hero itself: analytic fields, trajectories, particles and a custom GLSL manifold treated as one interactive system.',
-  tag: 'WEBGL',
-  href: ''
-},
-{
-  id: 'L02',
-  title: 'AedriAIn / Spatial Student Desktop',
-  status: 'PROTOTYPE',
-  note: 'Webcam hand tracking, pinch manipulation, holographic windows, local state and an Electron shell scaffold.',
-  tag: 'INTERACTION',
-  href: 'https://github.com/Diannn3/AedriAIn'
-},
-{
-  id: 'L03',
-  title: 'Local Model Experiments',
-  status: 'EXPERIMENT',
-  note: 'Testing how smaller models behave when computation, memory and hardware limits are part of the interface constraint.',
-  tag: 'AI',
-  href: ''
-},
-{
-  id: 'L04',
-  title: 'Spatial Map Experiments',
-  status: 'EXPERIMENT',
-  note: 'Route graphs, projections, indoor geometry and map rendering explored as computational objects rather than static pictures.',
-  tag: 'SPATIAL',
-  href: ''
-}]
-;
+  {
+    id: 'L01',
+    title: 'Vector Field Playground',
+    status: 'EXPERIMENT',
+    note: 'The portfolio hero itself: analytic fields, trajectories, particles and a custom GLSL manifold treated as one interactive system.',
+    tag: 'WEBGL',
+    href: '',
+  },
+  {
+    id: 'L02',
+    title: 'AedriAIn / Spatial Student Desktop',
+    status: 'PROTOTYPE',
+    note: 'Webcam hand tracking, pinch manipulation, holographic windows, local state and an Electron shell scaffold.',
+    tag: 'INTERACTION',
+    href: 'https://github.com/Diannn3/AedriAIn',
+  },
+];
 
 export const tools = [
 { group: 'INTERFACE', items: 'Astro / SvelteKit / React / TypeScript' },

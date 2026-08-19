@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import gsap from 'gsap';
-import { projects } from '../../data/projects';
+import { projectCatalog } from '../../data/projectCatalog';
+import { preloadProjectPage } from '../../lib/navigation/projectPrefetch';
+import { preloadProject } from '../../content/projectRegistry';
 import { ProjectPreview } from './ProjectPreview';
 import { usePointerFine, useReducedMotion } from '../../hooks/useEnvironment';
 
@@ -26,7 +28,7 @@ export function WorkIndex() {
     return () => window.removeEventListener('pointermove', onMove);
   }, [fine, reduced]);
 
-  const current = active === null ? null : projects[active];
+  const current = active === null ? null : projectCatalog[active];
 
   return (
     <section id="work" className="relative pt-24 md:pt-36" aria-labelledby="work-heading">
@@ -35,12 +37,12 @@ export function WorkIndex() {
           <h2 id="work-heading" className="mono-label text-ink">
             SELECTED WORK
           </h2>
-          <span className="mono-label">{String(projects.length).padStart(2, '0')} ENTRIES / 2026</span>
+          <span className="mono-label">{String(projectCatalog.length).padStart(2, '0')} ENTRIES / 2026</span>
         </div>
       </div>
 
       <ul className="mt-2">
-        {projects.map((project, i) => {
+        {projectCatalog.map((project, i) => {
           const isActive = active === i;
           return (
             <li key={project.slug}>
@@ -48,9 +50,9 @@ export function WorkIndex() {
                 to={`/work/${project.slug}`}
                 className="group block border-b border-hairline transition-colors duration-500 ease-atlas hover:border-ink focus-visible:border-ink"
                 data-cursor="view"
-                onPointerEnter={() => setActive(i)}
+                onPointerEnter={() => { setActive(i); preloadProjectPage(); preloadProject(project.slug); }}
                 onPointerLeave={() => setActive((prev) => prev === i ? null : prev)}
-                onFocus={() => setActive(i)}
+                onFocus={() => { setActive(i); preloadProjectPage(); preloadProject(project.slug); }}
                 onBlur={() => setActive((prev) => prev === i ? null : prev)}
                 aria-label={`${project.title} — ${project.category}, ${project.status}`}>
                 
