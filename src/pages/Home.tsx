@@ -5,31 +5,23 @@ import { Hero } from '../components/hero/Hero';
 import { SectionFrame } from '../components/ui/SectionFrame';
 import { WorkLedger } from '../components/work/WorkLedger';
 import { About } from '../components/about/About';
+import { Orientation } from '../components/sections/Orientation';
 import { Now } from '../components/sections/Now';
 import { DigitalArtifact } from '../components/artifact/DigitalArtifact';
 import { Lab } from '../components/lab/Lab';
 import { Tools } from '../components/sections/Tools';
 import { Contact } from '../components/sections/Contact';
 import { Seo } from '../components/global/Seo';
-import { useAtlas, type SectionMeta } from '../contexts/AtlasContext';
+import { useAtlas } from '../contexts/AtlasContext';
 import { useSectionObserver } from '../hooks/useSectionObserver';
 import { useReducedMotion } from '../hooks/useEnvironment';
-
-const SECTIONS: SectionMeta[] = [
-  { id: 'work', index: '01', label: 'SELECTED WORK' },
-  { id: 'about', index: '02', label: 'ABOUT' },
-  { id: 'now', index: '03', label: 'CURRENT VECTOR' },
-  { id: 'artifact', index: '04', label: 'DIGITAL ARTIFACT' },
-  { id: 'lab', index: '05', label: 'LAB' },
-  { id: 'tools', index: '06', label: 'TOOLS' },
-  { id: 'contact', index: '07', label: 'CONTACT' },
-];
+import { homeSections } from '../data/sections';
 
 export function Home() {
   const shell = useRef<HTMLDivElement>(null);
   const { setMode, setProject, setChapter } = useAtlas();
   const reduced = useReducedMotion();
-  useSectionObserver(SECTIONS);
+  useSectionObserver(homeSections);
 
   useEffect(() => {
     setProject(null);
@@ -61,13 +53,14 @@ export function Home() {
       />
 
       <Hero />
+      <Orientation />
       <main id="main">
         <SectionFrame
           id="work"
           index="01"
           title="Selected Work"
           coordinate="PLATE 01 / FOUR SYSTEMS"
-          lede="Four systems at different stages of proof. The status labels are part of the content, not decoration."
+          lede="Product systems, a studio practice, and two system studies at different stages of proof. The status labels are part of the content, not decoration."
         >
           <WorkLedger />
         </SectionFrame>

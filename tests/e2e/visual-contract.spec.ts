@@ -29,7 +29,11 @@ const viewports = [
 ] as const;
 
 for (const viewport of viewports) {
-  test(`hero fallback contract / ${viewport.name}`, async ({ page }) => {
+  test(`hero fallback contract / ${viewport.name}`, async ({ page }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== 'desktop-chromium',
+      'Deterministic pixel baselines are recorded in desktop Chromium; mobile behavior is covered structurally and by axe.',
+    );
     await prepareDeterministicHero(page);
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await page.goto('/');
@@ -48,7 +52,11 @@ for (const viewport of viewports) {
   });
 }
 
-test('hero fallback keeps the protected identity values visible', async ({ page }) => {
+test('hero fallback keeps the protected identity values visible', async ({ page }, testInfo) => {
+  test.skip(
+    testInfo.project.name !== 'desktop-chromium',
+    'Deterministic pixel baselines are recorded in desktop Chromium; mobile behavior is covered structurally and by axe.',
+  );
   await prepareDeterministicHero(page);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
@@ -58,7 +66,11 @@ test('hero fallback keeps the protected identity values visible', async ({ page 
   await expect(page.locator('[data-hero] svg')).toBeVisible();
 });
 
-test('Work stage boundary remains static at 1279 and eligible at 1280', async ({ page }) => {
+test('Work stage boundary remains static at 1279 and eligible at 1280', async ({ page }, testInfo) => {
+  test.skip(
+    testInfo.project.name !== 'desktop-chromium',
+    'The 1279/1280 capability boundary is a desktop pointer contract; mobile uses the static fallback.',
+  );
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, get: () => 8 });
     Object.defineProperty(navigator, 'deviceMemory', { configurable: true, get: () => 8 });

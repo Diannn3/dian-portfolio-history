@@ -10,6 +10,7 @@ import { railState } from '../../lib/atlas/railState';
 import { subscribeTick } from '../../lib/motion/ticker';
 import { nextCatalogProject } from '../../data/projectCatalog';
 import { identity } from '../../data/site';
+import { sectionNav } from '../../data/sections';
 
 const TICKS = 24;
 
@@ -126,14 +127,14 @@ export function AtlasRail() {
               </> :
 
             <nav aria-label="Sections" className="flex items-baseline gap-6">
-                {['WORK', 'ABOUT', 'LAB', 'CONTACT'].map((item) =>
+                {sectionNav.filter((item) => ['work', 'about', 'lab', 'contact'].includes(item.id)).map((item) =>
               <Link
-                key={item}
-                to={`/#${item.toLowerCase()}`}
+                key={item.id}
+                to={`/#${item.id}`}
                 className="mono-label link-underline hover:text-ink"
                 data-cursor="link">
 
-                    {item}
+                    {item.id.toUpperCase()}
                   </Link>
               )}
               </nav>

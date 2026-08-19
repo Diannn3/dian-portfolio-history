@@ -107,6 +107,31 @@ test('direct lazy case-study hash deep link reaches its chapter', async ({ page 
   await expect(page.locator('#case-01-context')).toBeInViewport({ ratio: 0.1 });
 });
 
+test('post-hero orientation and Selected Work hierarchy are evidence-led', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  const orientation = page.locator('[data-orientation]');
+  await expect(orientation).toBeVisible();
+  await expect(orientation.locator('[data-orientation-copy]')).toContainText(
+    'A small atlas of product systems, studio practice, and system studies.',
+  );
+  await expect(orientation.getByRole('link', { name: /VIEW SELECTED WORK/i })).toHaveAttribute('href', '#work');
+
+  const work = page.locator('#work');
+  await expect(work.getByRole('heading', { name: 'Product Systems' })).toBeVisible();
+  await expect(work.getByRole('heading', { name: 'Studio Practice' })).toBeVisible();
+  await expect(work.getByRole('heading', { name: 'System Studies' })).toBeVisible();
+  await expect(work.locator('[data-work-evidence]')).toHaveCount(2);
+  await expect(work.getByRole('link', { name: /VISIT AESCENT/i })).toHaveAttribute(
+    'href',
+    'https://aescentwebstudios.com/',
+  );
+  await expect(work.getByText('PUBLIC REPOSITORY', { exact: true })).toHaveCount(0);
+  await expect(work.locator('[data-study-entry]')).toHaveCount(2);
+  await expect(work.locator('[data-study-entry]').first()).toContainText('CONCEPT STUDY');
+});
+
 test('case index uses real hash navigation and updates project reading context', async ({ page }) => {
   await page.goto('/work/uppetite/');
   const caseIndex = page.getByRole('navigation', { name: 'Case study sections' });
