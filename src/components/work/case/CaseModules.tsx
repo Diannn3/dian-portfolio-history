@@ -5,6 +5,7 @@ import { ProjectPreview } from '../ProjectPreview';
 import { CaseMedia } from './CaseMedia';
 import { DecisionBlock } from './DecisionBlock';
 import { ValidationBlock } from './ValidationBlock';
+import { getCaseSectionId } from '../../../lib/caseNavigation';
 
 function SectionHead({ index, title }: { index: number; title: string }) {
   return (
@@ -45,11 +46,12 @@ export function CaseModule({
   index: number;
 }) {
   const head = <SectionHead index={index} title={module.title} />;
+  const sectionId = getCaseSectionId(module, index);
 
   switch (module.kind) {
     case 'context':
       return (
-        <section className="pt-24 md:pt-32">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-32">
           {head}
           <div className="atlas-grid mt-8 md:mt-12">
             <p className="col-span-4 text-body-lg leading-[1.5] text-ink md:col-span-5 xl:col-span-6 xl:col-start-1">
@@ -64,7 +66,7 @@ export function CaseModule({
 
     case 'architecture':
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           <div className="atlas-grid mt-8 md:mt-10">
             <p className="col-span-4 max-w-[46ch] text-[0.95rem] leading-relaxed text-graphite md:col-span-5 xl:col-span-5">
@@ -86,7 +88,7 @@ export function CaseModule({
 
     case 'flow':
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           {module.body ? (
             <div className="atlas-grid mt-8 md:mt-10">
@@ -118,7 +120,7 @@ export function CaseModule({
 
     case 'interface':
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           <div className="atlas-grid mt-8 items-start md:mt-12">
             <div className="col-span-4 md:col-span-5 xl:col-span-7">
@@ -136,7 +138,7 @@ export function CaseModule({
 
     case 'spatial':
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           <div className="atlas-grid mt-8 md:mt-12">
             <p className="col-span-4 text-body-lg leading-[1.5] md:col-span-5 xl:col-span-5 xl:col-start-1">
@@ -153,7 +155,7 @@ export function CaseModule({
 
     case 'detail':
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           <div className="atlas-grid mt-8 md:mt-12">
             <p className="col-span-4 font-heading text-display-3 leading-snug md:col-span-8 xl:col-span-7 xl:col-start-4">
@@ -165,7 +167,7 @@ export function CaseModule({
 
     case 'evidence':
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           <div className="atlas-grid mt-8 md:mt-12">
             {module.body ? (
@@ -186,7 +188,7 @@ export function CaseModule({
     case 'decision':
       if (!module.decision) return null;
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           {module.body ? (
             <div className="atlas-grid mt-8">
@@ -201,7 +203,7 @@ export function CaseModule({
 
     case 'validation':
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           {module.body ? (
             <div className="atlas-grid mt-8">
@@ -216,7 +218,7 @@ export function CaseModule({
 
     case 'reflection':
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           <div className="atlas-grid mt-8 gap-y-8 md:mt-12">
             <p className="col-span-4 font-heading text-display-3 leading-snug md:col-span-5 xl:col-span-6">
@@ -233,7 +235,7 @@ export function CaseModule({
 
     case 'openQuestions':
       return (
-        <section className="pt-24 md:pt-36">
+        <section id={sectionId} className="scroll-mt-28 pt-24 md:pt-36">
           {head}
           {module.body ? (
             <div className="atlas-grid mt-8">

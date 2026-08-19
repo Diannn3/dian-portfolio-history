@@ -1,0 +1,30 @@
+name: Portfolio CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Static guards
+        run: |
+          npm run sanity
+          npm run guard:frozen
+          npm run typecheck
+      - name: Production build
+        run: npm run build
+      - name: Verify generated route entrypoints
+        run: npm run verify:dist
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser and accessibility checks
+        run: npm run test:e2e

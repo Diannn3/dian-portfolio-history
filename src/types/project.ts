@@ -32,7 +32,20 @@ export interface ProjectMedia {
   alt: string;
   caption: string;
   poster?: string;
+  /** Use exact source dimensions whenever they are known to reserve layout space. */
+  width?: number;
+  height?: number;
+  /** Optional override when source dimensions are not available. */
   aspectRatio?: string;
+  /** Screenshots should usually use contain; decorative/photographic media may use cover. */
+  fit?: 'contain' | 'cover';
+  /** Only the first genuinely above-the-fold evidence image should be marked priority. */
+  priority?: boolean;
+}
+
+export interface CurrentStateItem {
+  label: string;
+  value: string;
 }
 
 export interface ProjectDecision {
@@ -58,7 +71,6 @@ export interface ProjectModule {
     | 'spatial'
     | 'detail'
     | 'openQuestions'
-    | 'status'
     | 'evidence'
     | 'decision'
     | 'validation'
@@ -89,9 +101,12 @@ export interface Project {
   technologies: { group: string; items: string[]; intent: 'in use' | 'considered' }[];
   accent: string;
   preview: PreviewKey;
-  featured: boolean;
+  /** Optional route-level social preview. Omit until a real local image exists. */
+  socialImage?: string;
   verification: string;
   evidenceLevel?: EvidenceLevel;
   links?: ProjectLink[];
+  /** compact, evidence-bounded snapshot shown near the top of mature case studies */
+  currentState?: CurrentStateItem[];
   modules: ProjectModule[];
 }

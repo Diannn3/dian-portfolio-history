@@ -1,28 +1,52 @@
-import React, { useRef } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { getProject, nextProject } from '../data/projects';
+import { hasProject, loadProject, preloadProject } from '../content/projectRegistry';
+import type { Project } from '../types/project';
+import { nextCatalogProject } from '../data/projectCatalog';
 import { ProjectPreview } from '../components/work/ProjectPreview';
 import { CaseModule } from '../components/work/case/CaseModules';
 import { ProjectLinks } from '../components/work/case/ProjectLinks';
+import { CaseIndex } from '../components/work/case/CaseIndex';
+import { CurrentState } from '../components/work/case/CurrentState';
 import { Seo } from '../components/global/Seo';
 import { useReveals } from '../hooks/useReveals';
+import { NotFound } from './NotFound';
 
 export function ProjectPage() {
   const { slug } = useParams<{slug: string;}>();
-  const project = getProject(slug);
+  const [project, setProject] = useState<Project | null>(null);
+  const [loadedSlug, setLoadedSlug] = useState<string | null>(null);
   const scope = useRef<HTMLDivElement>(null);
-  useReveals(scope, [slug]);
+  useReveals(scope, [slug, loadedSlug]);
 
-  if (!project) return <Navigate to="/" replace />;
-  const next = nextProject(project.slug);
+  useEffect(() => {
+    let current = true;
+    setProject(null);
+    setLoadedSlug(null);
+    if (!hasProject(slug)) return () => { current = false; };
+    loadProject(slug).then((result) => {
+      if (!current || !result) return;
+      setProject(result);
+      setLoadedSlug(slug);
+    });
+    return () => { current = false; };
+  }, [slug]);
+
+  if (!hasProject(slug)) return <NotFound />;
+  if (!project || loadedSlug !== slug) {
+    return <main id="main" className="min-h-[70vh] pt-[8rem]" aria-busy="true" aria-label="Loading project" />;
+  }
+  const next = nextCatalogProject(project.slug);
 
   return (
     <div ref={scope} className="pt-[5.5rem]">
       <Seo
         title={`${project.title} — ${project.category} / Dian`}
         description={project.summary}
-        path={`/work/${project.slug}`} />
+        path={`/work/${project.slug}`}
+        image={project.socialImage}
+      />
       
 
       <main id="main">
@@ -86,13 +110,16 @@ export function ProjectPage() {
               {project.verification}
             </p>
           </div>
+
+          {project.currentState?.length ? <CurrentState items={project.currentState} /> : null}
+          <CaseIndex modules={project.modules} />
         </header>
 
         {project.modules.map((module, i) =>
         <CaseModule key={module.title} module={module} project={project} index={i + 1} />
         )}
 
-        <section className="pt-24 md:pt-36">
+        <section id="case-technology" className="scroll-mt-28 pt-24 md:pt-36">
           <div className="atlas-grid">
             <div className="col-span-4 border-t border-ink pt-4 md:col-span-8 xl:col-span-12">
               <h2 className="mono-label text-ink">TECHNOLOGY</h2>
@@ -124,6 +151,8 @@ export function ProjectPage() {
           <Link
             to={`/work/${next.slug}`}
             data-cursor="view"
+            onPointerEnter={() => preloadProject(next.slug)}
+            onFocus={() => preloadProject(next.slug)}
             className="group block border-t border-ink">
             
             <div className="atlas-grid items-baseline py-10 md:py-14">

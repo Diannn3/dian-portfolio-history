@@ -81,3 +81,13 @@ Primary source: https://github.com/Diannn3/AedriAIn
 - MediaPipe hand tracking runs through a Web Worker.
 - Pinch/drag and two-hand transform interactions are implemented in the prototype description.
 - Mouse fallback, local persisted state and Electron shell scaffolding exist.
+
+## Repository media evidence discovered during upgrade pass
+
+### UPPETITE
+
+The public repository contains committed Playwright visual-regression snapshots under `app/tests/e2e/visual.spec.ts-snapshots/`, including Explore and Smart Picks mobile baselines. Their existence is evidence that deterministic UI visual states are versioned; it is **not** evidence of a public production launch or current green CI status.
+
+### IMS
+
+The repository contains `third-preview.png` plus three `reference/*-floor-source.jpeg` orientation images. The floor reference images are explicitly not app-interface evidence and must not be presented as screenshots of the implemented product.
