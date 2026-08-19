@@ -12,6 +12,8 @@ function handler(time: number, deltaMs: number) {
 /**
  * One timing source for all non-R3F frame work, driven by GSAP's ticker so we
  * never spin up competing requestAnimationFrame loops.
+ *
+ * FROZEN SURFACE — the hero canvas and pointer smoothing subscribe here.
  */
 export function subscribeTick(fn: Fn) {
   subs.add(fn);

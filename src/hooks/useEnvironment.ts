@@ -67,3 +67,51 @@ export function useQuality(): {supported: boolean;profile: QualityProfile;} {
 
   return state;
 }
+
+/**
+ * Mounts a spatial island only once it is genuinely worth mounting: near the
+ * viewport, and after the browser has had an idle moment.
+ */
+export function useNearViewport(
+ref: React.RefObject<HTMLElement>,
+rootMargin = '200px')
+: boolean {
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          const idle =
+          (window as unknown as {requestIdleCallback?: (cb: () => void) => number;}).
+          requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
+          idle(() => setNear(true));
+          io.disconnect();
+        }
+      },
+      { rootMargin }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, rootMargin]);
+  return near;
+}
+
+/** True while the element is on screen. Used to stop render loops. */
+export function useInViewport(
+ref: React.RefObject<HTMLElement>,
+threshold = 0.05)
+: boolean {
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => setInView(entries[0]?.isIntersecting ?? false), {
+      threshold
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, threshold]);
+  return inView;
+}

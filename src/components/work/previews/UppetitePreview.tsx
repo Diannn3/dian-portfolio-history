@@ -11,30 +11,18 @@ export function UppetitePreview() {
   'M140 60 L520 34'];
 
   const points = [
-  [96, 118, 5],
-  [268, 132, 3],
-  [268, 208, 6],
-  [432, 214, 3],
-  [120, 226, 4],
-  [432, 96, 3],
-  [176, 34, 2],
-  [356, 240, 4]];
+  [96, 118, 5], [268, 132, 3], [268, 208, 6], [432, 214, 3],
+  [120, 226, 4], [432, 96, 3], [176, 34, 2], [356, 240, 4]];
 
   return (
     <svg viewBox="0 0 520 300" className="h-full w-full" role="img" aria-label="Map preview: place points clustered along a road network in Los Baños">
       <rect width="520" height="300" fill="var(--surface)" />
       <g stroke="var(--hairline)" strokeWidth="1">
-        {Array.from({ length: 11 }).map((_, i) =>
-        <line key={i} x1={i * 52} y1="0" x2={i * 52} y2="300" />
-        )}
-        {Array.from({ length: 6 }).map((_, i) =>
-        <line key={`h${i}`} x1="0" y1={i * 60} x2="520" y2={i * 60} />
-        )}
+        {Array.from({ length: 11 }).map((_, i) => <line key={i} x1={i * 52} y1="0" x2={i * 52} y2="300" />)}
+        {Array.from({ length: 6 }).map((_, i) => <line key={`h${i}`} x1="0" y1={i * 60} x2="520" y2={i * 60} />)}
       </g>
       <g fill="none" stroke="var(--ink)" strokeOpacity="0.28" strokeWidth="1.6">
-        {roads.map((d) =>
-        <path key={d} d={d} />
-        )}
+        {roads.map((d) => <path key={d} d={d} />)}
       </g>
       <g>
         {points.map(([x, y, r], i) =>

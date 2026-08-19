@@ -5,7 +5,7 @@ const VIEWER_SRC = 'https://unpkg.com/@splinetool/viewer@1.9.28/build/spline-vie
 
 let loading: Promise<void> | null = null;
 
-/** Loads the Spline viewer element once, on demand. No bundled dependency. */
+/** Module-level singleton: exactly one Spline runtime is ever injected. */
 function loadViewer() {
   if (loading) return loading;
   loading = new Promise<void>((resolve, reject) => {
@@ -24,9 +24,10 @@ function loadViewer() {
 }
 
 /**
- * Spline island. Only rendered when data/site.ts SPLINE_SCENE_URL is set, so
- * nothing is fetched for an empty slot. Falls back to the static instrument
- * drawing if the viewer or scene cannot load; reduced motion makes it inert.
+ * Spline has exactly one job on this site, and it only does it when a real
+ * published scene exists. The runtime is never in the route bundle, only one
+ * instance is ever mounted, and every failure path lands on the procedural
+ * artifact rather than an empty frame.
  */
 export function SplineScene({ url, reduced }: {url: string;reduced: boolean;}) {
   const [state, setState] = useState<'loading' | 'ready' | 'failed'>('loading');
@@ -34,8 +35,12 @@ export function SplineScene({ url, reduced }: {url: string;reduced: boolean;}) {
   useEffect(() => {
     let alive = true;
     loadViewer().
-    then(() => alive && setState('ready')).
-    catch(() => alive && setState('failed'));
+    then(() => {
+      if (alive) setState('ready');
+    }).
+    catch(() => {
+      if (alive) setState('failed');
+    });
     return () => {
       alive = false;
     };

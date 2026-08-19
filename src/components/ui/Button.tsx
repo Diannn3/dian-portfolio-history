@@ -3,8 +3,9 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { twMerge } from 'tailwind-merge';
 
 /**
- * shadcn-style primitive, art-directed for this site: square corners, hairline
- * borders, mono labels, no shadows, no default radius.
+ * Square geometry, hairline borders, mono labels. No radius, no shadow, no pill.
+ * Accessible behaviour comes from the native element; the visual language is
+ * entirely Vector Atlas.
  */
 export const button = cva(
   'inline-flex items-center justify-center gap-2 font-mono uppercase tracking-[0.14em] transition-[background-color,color,border-color,transform] duration-500 ease-atlas focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-40',
@@ -31,6 +32,5 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof
 export const Button = forwardRef<HTMLButtonElement, Props>(
   ({ className, intent, size, ...props }, ref) =>
   <button ref={ref} className={twMerge(button({ intent, size }), className)} {...props} />
-
 );
 Button.displayName = 'Button';

@@ -2,24 +2,36 @@ import React, { useEffect, useRef } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { contactLinks } from '../../data/site';
 import { subscribeTick } from '../../lib/motion/ticker';
-import { usePointerFine, useReducedMotion } from '../../hooks/useEnvironment';
-import { MagneticLink } from '../ui/MagneticLink';
+import { gsap, registerGsap } from '../../lib/motion/gsap';
+import { useMotion } from '../../lib/motion/MotionProvider';
+import { useSectionRegistration } from '../../hooks/useReveals';
+import { MagneticLink } from '../motion/Magnetic';
 
 /**
- * The Vector Atlas returns, flattened: one long streamline across the footer
- * whose control points bend toward the pointer with heavy damping.
+ * The atlas returns, flattened: one long streamline crossing the footer, its
+ * control points bending toward the pointer with heavy damping, terminating at
+ * the contact links rather than trailing off.
+ *
+ * Only verified contact methods appear here. GitHub is the one that exists, so
+ * it is the only one shown — no email, phone, LinkedIn, availability or client
+ * list is invented, and there is no href="#".
  */
 export function Contact() {
-  const path = useRef<SVGPathElement>(null);
+  const section = useRef<HTMLElement>(null);
   const shell = useRef<HTMLDivElement>(null);
-  const fine = usePointerFine();
-  const reduced = useReducedMotion();
+  const path = useRef<SVGPathElement>(null);
+  const weird = useRef<HTMLSpanElement>(null);
+  const { fine, reduced } = useMotion();
+
+  useSectionRegistration(section, {
+    id: 'contact',
+    index: '07',
+    label: 'CONTACT',
+    nav: '#contact'
+  });
 
   useEffect(() => {
-    if (!path.current) return;
-    const el = shell.current;
     const state = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
-
     const draw = () => {
       state.x += (state.tx - state.x) * (reduced ? 1 : 0.05);
       state.y += (state.ty - state.y) * (reduced ? 1 : 0.05);
@@ -31,13 +43,14 @@ export function Contact() {
       path.current?.setAttribute('d', d);
     };
     draw();
-
     if (reduced || !fine) return;
+
+    const el = shell.current;
     const onMove = (e: PointerEvent) => {
       if (!el) return;
       const r = el.getBoundingClientRect();
-      state.tx = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);
-      state.ty = Math.min(Math.max((e.clientY - r.top) / r.height, 0), 1);
+      state.tx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      state.ty = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
     };
     window.addEventListener('pointermove', onMove);
     const unsub = subscribeTick(draw);
@@ -47,8 +60,32 @@ export function Contact() {
     };
   }, [fine, reduced]);
 
+  /* "WEIRD PROBLEM?" leans in the direction the pointer is travelling. */
+  useEffect(() => {
+    const el = weird.current;
+    if (!el || !fine || reduced) return;
+    registerGsap();
+    const xTo = gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power3.out' });
+    let last = 0;
+    const onMove = (e: PointerEvent) => {
+      const dx = e.clientX - last;
+      last = e.clientX;
+      xTo(Math.max(-10, Math.min(10, dx * 0.8)));
+    };
+    window.addEventListener('pointermove', onMove);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      gsap.killTweensOf(el);
+    };
+  }, [fine, reduced]);
+
   return (
-    <section id="contact" className="relative mt-28 md:mt-44" aria-labelledby="contact-heading">
+    <section
+      ref={section}
+      id="contact"
+      className="anchor-offset relative mt-28 md:mt-44"
+      aria-labelledby="contact-heading">
+      
       <div ref={shell} className="relative overflow-hidden border-t border-ink pt-14 md:pt-20">
         <svg
           viewBox="0 0 1200 300"
@@ -65,16 +102,17 @@ export function Contact() {
         </svg>
 
         <div className="atlas-grid relative">
-          <div className="col-span-4 md:col-span-8 xl:col-span-12" data-reveal-group>
+          <div className="col-span-4 md:col-span-8 xl:col-span-12">
             <h2
               id="contact-heading"
-              className="font-heading text-display-1 font-medium uppercase leading-[0.86]">
+              className="font-heading text-display-1 font-medium uppercase leading-[0.86]"
+              data-reveal-group>
               
               <span className="reveal-line" data-reveal>
-                <span>Have a weird</span>
+                <span>Have a</span>
               </span>
               <span className="reveal-line" data-reveal>
-                <span>problem?</span>
+                <span ref={weird} className="inline-block">weird problem?</span>
               </span>
               <span className="reveal-line" data-reveal>
                 <span className="text-accent">Let’s build something useful.</span>
@@ -83,19 +121,23 @@ export function Contact() {
           </div>
         </div>
 
-        <div className="atlas-grid relative mt-14 md:mt-20">
+        <div className="atlas-grid relative mt-14 items-end md:mt-20">
           <div className="col-span-4 md:col-span-4 xl:col-span-4">
-            <MagneticLink href="https://github.com/Diannn3" target="_blank" rel="noreferrer" data-cursor="external" aria-label="View Dian on GitHub">
+            <MagneticLink
+              href="https://github.com/Diannn3"
+              target="_blank"
+              rel="noreferrer"
+              data-cursor="external"
+              aria-label="View Dian on GitHub">
+              
               VIEW GITHUB
             </MagneticLink>
             <p className="mt-4 font-mono text-micro uppercase tracking-[0.16em] text-graphite">
               PROJECTS / CODE / EXPERIMENTS
             </p>
           </div>
-        </div>
 
-        <div className="atlas-grid relative mt-14 md:mt-20">
-          <ul className="col-span-4 md:col-span-8 xl:col-span-8 xl:col-start-5">
+          <ul className="col-span-4 mt-12 md:col-span-4 md:mt-0 xl:col-span-7 xl:col-start-6">
             {contactLinks.map((link) =>
             <li key={link.label} className="border-t border-hairline">
                 <a
@@ -105,7 +147,7 @@ export function Contact() {
                 data-cursor="external"
                 className="group flex items-baseline justify-between gap-6 py-5">
                 
-                  <span className="font-mono text-label uppercase tracking-[0.16em] text-graphite">
+                  <span className="font-mono text-label uppercase tracking-[0.14em] text-graphite">
                     {link.label}
                   </span>
                   <span className="flex items-baseline gap-3">
@@ -121,9 +163,13 @@ export function Contact() {
                 </a>
               </li>
             )}
+            <li className="border-t border-hairline pt-4">
+              <p className="text-note text-graphite">
+                This is the only contact channel published here. Anything else would be invented.
+              </p>
+            </li>
           </ul>
         </div>
-
       </div>
     </section>);
 

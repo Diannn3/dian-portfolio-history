@@ -4,7 +4,7 @@ const loaders: Record<string, () => Promise<Project>> = {
   uppetite: () => import('./projects/uppetite').then((module) => module.project),
   'campus-navigation': () => import('./projects/ims').then((module) => module.project),
   pasada: () => import('./projects/pasada').then((module) => module.project),
-  'disaster-response': () => import('./projects/disaster').then((module) => module.project),
+  'disaster-response': () => import('./projects/disaster').then((module) => module.project)
 };
 
 export function hasProject(slug?: string): slug is string {

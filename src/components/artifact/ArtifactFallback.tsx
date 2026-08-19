@@ -1,6 +1,5 @@
 import React from 'react';
 
-/** Static instrument drawing used when WebGL is unavailable. */
 export function ArtifactFallback() {
   return (
     <svg viewBox="0 0 420 420" className="h-full w-full" aria-hidden="true">

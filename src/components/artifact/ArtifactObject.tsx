@@ -5,13 +5,17 @@ const COUNT = 68;
 
 export interface ArtifactHandle {
   object: THREE.Object3D;
-  update: (delta: number, pointer: {x: number;y: number;}) => void;
+  update: (delta: number, pointer: {x: number;y: number;}, focus: number) => void;
   dispose: () => void;
 }
 
 /**
  * OBJECT / 001 — an armillary instrument: three coordinate rings built from
  * instanced plates around a section of a knotted curve. One draw call per ring.
+ *
+ * FROZEN GEOMETRY. The only addition is `focus`, a 0–4 index from the scroll
+ * staging that biases orientation toward whichever part is being annotated. No
+ * geometry was added to make it busier.
  */
 export function createArtifact(reduced: boolean): ArtifactHandle {
   const group = new THREE.Group();
@@ -67,16 +71,21 @@ export function createArtifact(reduced: boolean): ArtifactHandle {
 
   return {
     object: group,
-    update(delta, pointer) {
+    update(delta, pointer, focus) {
       const d = reduced ? 0 : Math.min(delta, 0.05);
       time += d;
       group.rotation.y += d * 0.16;
+      const bias = focus * 0.06;
       group.rotation.x = THREE.MathUtils.lerp(
         group.rotation.x,
-        0.22 + pointer.y * 0.22,
+        0.22 + pointer.y * 0.22 + bias,
         reduced ? 1 : 0.06
       );
-      group.rotation.z = THREE.MathUtils.lerp(group.rotation.z, pointer.x * 0.2, reduced ? 1 : 0.06);
+      group.rotation.z = THREE.MathUtils.lerp(
+        group.rotation.z,
+        pointer.x * 0.2 - bias * 0.4,
+        reduced ? 1 : 0.06
+      );
       core.rotation.y -= d * 0.4;
       core.rotation.x = Math.sin(time * 0.4) * 0.22;
     },

@@ -11,7 +11,7 @@ interface Props {
 }
 
 function setMeta(attr: 'name' | 'property', key: string, content: string) {
-  let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
+  let el = document.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
   if (!el) {
     el = document.createElement('meta');
     el.setAttribute(attr, key);
@@ -20,8 +20,18 @@ function setMeta(attr: 'name' | 'property', key: string, content: string) {
   el.setAttribute('content', content);
 }
 
-/** Per-route document metadata: title, description, canonical, Open Graph, theme. */
-export function Seo({ title, description, path, themeColor = '#f4f2ed', noIndex = false, image }: Props) {
+function removeMeta(selector: string) {
+  document.querySelector(selector)?.remove();
+}
+
+export function Seo({
+  title,
+  description,
+  path,
+  themeColor = '#f4f2ed',
+  noIndex = false,
+  image
+}: Props) {
   useEffect(() => {
     document.title = title;
     setMeta('name', 'description', description);
@@ -33,26 +43,28 @@ export function Seo({ title, description, path, themeColor = '#f4f2ed', noIndex 
     setMeta('name', 'twitter:card', image ? 'summary_large_image' : 'summary');
 
     if (image) {
-      const imageHref = new URL(image, window.location.origin).href;
-      setMeta('property', 'og:image', imageHref);
-      setMeta('name', 'twitter:image', imageHref);
+      const absolute = new URL(image, window.location.origin).href;
+      setMeta('property', 'og:image', absolute);
+      setMeta('name', 'twitter:image', absolute);
     } else {
-      document.head.querySelector('meta[property="og:image"]')?.remove();
-      document.head.querySelector('meta[name="twitter:image"]')?.remove();
+      removeMeta('meta[property="og:image"]');
+      removeMeta('meta[name="twitter:image"]');
     }
 
     const href = window.location.origin + path;
-    const existingCanonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (noIndex) {
-      existingCanonical?.remove();
-      document.head.querySelector('meta[property="og:url"]')?.remove();
-    } else {
-      const link = existingCanonical ?? document.createElement('link');
-      link.rel = 'canonical';
-      link.href = href;
-      if (!existingCanonical) document.head.appendChild(link);
-      setMeta('property', 'og:url', href);
+      removeMeta('link[rel="canonical"]');
+      removeMeta('meta[property="og:url"]');
+      return;
     }
+    let link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.setAttribute('rel', 'canonical');
+      document.head.appendChild(link);
+    }
+    link.setAttribute('href', href);
+    setMeta('property', 'og:url', href);
   }, [title, description, path, themeColor, noIndex, image]);
 
   return null;

@@ -1,34 +1,38 @@
 import React, { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { usePointerFine, useReducedMotion } from '../../hooks/useEnvironment';
+import { gsap, registerGsap } from '../../lib/motion/gsap';
+import { useMotion } from '../../lib/motion/MotionProvider';
 
+/**
+ * Semantic cursor. It never replaces the pointer's meaning — links and buttons
+ * keep native behaviour and native focus — it only names the action the surface
+ * under the pointer affords. Disabled on touch, coarse pointers and reduced
+ * motion.
+ */
 const labels: Record<string, string> = {
   view: 'VIEW',
   probe: 'PROBE',
   external: '↗',
   rotate: 'ROTATE',
-  drag: 'DRAG'
+  drag: 'DRAG',
+  open: 'OPEN',
+  explore: 'EXPLORE',
+  copy: 'COPY'
 };
 
-/**
- * The native cursor stays. This adds a small analytical marker that follows it
- * with inertia and names the current affordance. Desktop only, off for reduced
- * motion.
- */
 export function Cursor() {
   const dot = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
-  const fine = usePointerFine();
-  const reduced = useReducedMotion();
+  const { fine, reduced } = useMotion();
 
   useEffect(() => {
-    if (!fine || reduced || !dot.current) return;
     const el = dot.current;
+    if (!fine || reduced || !el) return;
+    registerGsap();
     gsap.set(el, { xPercent: -50, yPercent: -50, opacity: 0 });
     const xTo = gsap.quickTo(el, 'x', { duration: 0.28, ease: 'power3.out' });
     const yTo = gsap.quickTo(el, 'y', { duration: 0.28, ease: 'power3.out' });
-
     let shown = false;
+
     const onMove = (e: PointerEvent) => {
       xTo(e.clientX);
       yTo(e.clientY);
@@ -48,6 +52,7 @@ export function Cursor() {
       shown = false;
       gsap.to(el, { opacity: 0, duration: 0.25 });
     };
+
     window.addEventListener('pointermove', onMove);
     document.addEventListener('pointerleave', onLeave);
     return () => {
@@ -66,10 +71,7 @@ export function Cursor() {
       className="pointer-events-none fixed left-0 top-0 z-[90] flex scale-[0.6] items-center gap-2 opacity-0">
       
       <span className="block h-[6px] w-[6px] translate-y-[0.5px] bg-accent" />
-      <span
-        ref={label}
-        className="font-mono text-micro uppercase tracking-[0.18em] text-ink" />
-      
+      <span ref={label} className="font-mono text-micro uppercase tracking-[0.18em] text-ink" />
     </div>);
 
 }

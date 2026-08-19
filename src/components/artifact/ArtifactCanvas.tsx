@@ -7,16 +7,21 @@ import { subscribeTick } from '../../lib/motion/ticker';
 interface Props {
   reduced: boolean;
   lowQuality: boolean;
+  /** rendering stops entirely when false */
   active: boolean;
+  /** 0–4, which annotation row the scroll stage is currently on */
+  focus: number;
 }
 
-export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
+export function ArtifactCanvas({ reduced, lowQuality, active, focus }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const pointer = useRef({ x: 0, y: 0 });
   const activeRef = useRef(active);
+  const focusRef = useRef(focus);
   const [failed, setFailed] = useState(false);
 
   activeRef.current = active;
+  focusRef.current = focus;
 
   useEffect(() => {
     const el = host.current;
@@ -56,7 +61,7 @@ export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
 
     const unsub = subscribeTick((_time, deltaMs) => {
       if (!activeRef.current) return;
-      artifact.update(deltaMs / 1000, pointer.current);
+      artifact.update(deltaMs / 1000, pointer.current, focusRef.current);
       renderer.render(scene, camera);
     });
 
