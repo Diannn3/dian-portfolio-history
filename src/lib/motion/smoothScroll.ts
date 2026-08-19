@@ -7,7 +7,8 @@ let rafFn: ((time: number) => void) | null = null;
 
 /**
  * Lenis is only used where it earns its place: fine-pointer devices with motion
- * allowed. Touch keeps native scrolling. Timing is delegated to GSAP's ticker.
+ * allowed. Touch keeps native scrolling. Timing is delegated to GSAP's ticker,
+ * so there is exactly one scroll driver and one frame loop.
  */
 export function initSmoothScroll(): () => void {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

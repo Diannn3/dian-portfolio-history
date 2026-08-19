@@ -10,8 +10,8 @@ function handler(time: number, deltaMs: number) {
 }
 
 /**
- * One timing source for all non-R3F frame work, driven by GSAP's ticker so we
- * never spin up competing requestAnimationFrame loops.
+ * One timing source for all frame work, driven by GSAP's ticker so we never
+ * spin up competing requestAnimationFrame loops.
  */
 export function subscribeTick(fn: Fn) {
   subs.add(fn);
