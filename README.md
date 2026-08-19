@@ -2,7 +2,7 @@
 
 A creative developer portfolio that keeps the original Magic Patterns art direction while hardening the project into a source-backed, production-oriented case-study system.
 
-The protected visual system includes the custom Three.js / GLSL hero, atlas grid, procedural project previews, GSAP/Lenis motion vocabulary, procedural artifact and reduced-motion fallbacks. Production/content work is guarded so those surfaces cannot drift accidentally.
+The protected visual system includes the custom Three.js / GLSL hero, contextual Atlas Rail, expanding Work Ledger, procedural project previews, GSAP/Lenis motion vocabulary, procedural artifact and reduced-motion fallbacks. Production/content work remains guarded so the redesign does not trade away routing, SEO, accessibility, code-splitting or content honesty.
 
 ## Getting started
 
@@ -43,7 +43,7 @@ src/content/projects/
   disaster.ts
 ```
 
-Pointer/focus intent on a Work Index entry preloads both the case-study page module and that project's content. Three.js and long-form project copy remain outside the initial synchronous import graph; `npm run sanity` enforces both boundaries.
+Pointer/focus intent on a Work Ledger entry preloads both the case-study page module and that project's content. Three.js and long-form project copy remain outside the initial synchronous import graph; `npm run sanity` enforces both boundaries.
 
 ## Static route metadata / deep links
 
@@ -84,4 +84,6 @@ See:
 
 - `CONTENT_EVIDENCE.md` — internal claim ledger
 - `MEDIA_CAPTURE_PLAN.md` — genuine screenshot sources/capture requirements
-- `CONTENT_UPGRADE_REPORT.md` — implementation and validation handoff
+- `CONTENT_UPGRADE_REPORT.md` — earlier production/content hardening handoff
+- `docs/PRODUCT.md` + `docs/DESIGN.md` — Vector Atlas product/design contracts
+- `VECTOR_ATLAS_MERGE_REPORT.md` — redesign merge implementation handoff

@@ -6,7 +6,7 @@ export function DecisionBlock({ decision }: { decision: ProjectDecision }) {
     <div className="atlas-grid mt-8 gap-y-8 md:mt-12">
       <div className="col-span-4 md:col-span-3 xl:col-span-4 xl:col-start-1">
         <span className="mono-label block">QUESTION</span>
-        <p className="mt-3 font-heading text-[1.25rem] leading-snug text-ink md:text-[1.4rem]">
+        <p className="mt-3 font-heading text-display-3 leading-snug text-ink">
           {decision.question}
         </p>
         {decision.considered?.length ? (
@@ -14,7 +14,7 @@ export function DecisionBlock({ decision }: { decision: ProjectDecision }) {
             <span className="mono-label block">CONSIDERED</span>
             <ul className="mt-3 space-y-2">
               {decision.considered.map((item) => (
-                <li key={item} className="text-[0.88rem] leading-relaxed text-graphite">
+                <li key={item} className="text-read-sm text-graphite">
                   {item}
                 </li>
               ))}
@@ -31,7 +31,7 @@ export function DecisionBlock({ decision }: { decision: ProjectDecision }) {
         ].map(([label, value]) => (
           <div key={label} className="border-t border-hairline py-4 md:grid md:grid-cols-[8rem_1fr] md:gap-6">
             <dt className="font-mono text-micro uppercase tracking-[0.16em] text-graphite">{label}</dt>
-            <dd className="mt-2 text-[0.94rem] leading-relaxed text-ink md:mt-0">{value}</dd>
+            <dd className="mt-2 text-read text-ink md:mt-0">{value}</dd>
           </div>
         ))}
       </dl>

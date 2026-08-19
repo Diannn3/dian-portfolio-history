@@ -22,7 +22,7 @@ export function ValidationBlock({ items }: { items: ValidationItem[] }) {
               {item.state}
             </span>
           </div>
-          <dd className="mt-3 max-w-[38ch] text-[0.9rem] leading-relaxed text-graphite">{item.value}</dd>
+          <dd className="mt-3 max-w-[42ch] text-read-sm text-graphite">{item.value}</dd>
         </div>
       ))}
     </dl>

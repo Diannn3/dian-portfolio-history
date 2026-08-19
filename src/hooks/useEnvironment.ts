@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { profiles, type QualityProfile } from '../lib/webgl/sceneState';
 
 export function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
+  const [reduced, setReduced] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReduced(mq.matches);
@@ -14,7 +16,9 @@ export function useReducedMotion() {
 }
 
 export function usePointerFine() {
-  const [fine, setFine] = useState(false);
+  const [fine, setFine] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  );
   useEffect(() => {
     const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
     setFine(mq.matches);
@@ -23,6 +27,20 @@ export function usePointerFine() {
     return () => mq.removeEventListener('change', onChange);
   }, []);
   return fine;
+}
+
+export function useCompact() {
+  const [compact, setCompact] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    setCompact(mq.matches);
+    const onChange = () => setCompact(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return compact;
 }
 
 function detectWebGL(): boolean {

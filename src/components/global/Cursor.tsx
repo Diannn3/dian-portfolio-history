@@ -7,7 +7,9 @@ const labels: Record<string, string> = {
   probe: 'PROBE',
   external: '↗',
   rotate: 'ROTATE',
-  drag: 'DRAG'
+  drag: 'DRAG',
+  row: 'VIEW',
+  link: 'OPEN'
 };
 
 /**

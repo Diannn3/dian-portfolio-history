@@ -45,7 +45,7 @@ export function CaseMedia({ media }: { media: ProjectMedia[] }) {
               <span className="font-mono text-micro tracking-[0.16em] text-graphite">
                 FIG / {String(index + 1).padStart(2, '0')}
               </span>
-              <span className="max-w-[62ch] text-[0.86rem] leading-relaxed text-graphite">
+              <span className="max-w-[62ch] text-read-sm text-graphite">
                 {item.caption}
               </span>
             </figcaption>

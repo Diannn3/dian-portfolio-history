@@ -14,6 +14,7 @@ export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const pointer = useRef({ x: 0, y: 0 });
   const activeRef = useRef(active);
+  const dirty = useRef(true);
   const [failed, setFailed] = useState(false);
 
   activeRef.current = active;
@@ -56,8 +57,10 @@ export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
 
     const unsub = subscribeTick((_time, deltaMs) => {
       if (!activeRef.current) return;
+      if (reduced && !dirty.current) return;
       artifact.update(deltaMs / 1000, pointer.current);
       renderer.render(scene, camera);
+      dirty.current = false;
     });
 
     const onResize = () => {
@@ -67,6 +70,7 @@ export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+      dirty.current = true;
     };
     const onMove = (e: PointerEvent) => {
       const r = el.getBoundingClientRect();
@@ -78,15 +82,20 @@ export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
       pointer.current.y = 0;
     };
 
-    window.addEventListener('resize', onResize);
-    el.addEventListener('pointermove', onMove);
-    el.addEventListener('pointerleave', onLeave);
+    const resizeObserver = new ResizeObserver(onResize);
+    resizeObserver.observe(el);
+    if (!reduced) {
+      el.addEventListener('pointermove', onMove);
+      el.addEventListener('pointerleave', onLeave);
+    }
 
     return () => {
       unsub();
-      window.removeEventListener('resize', onResize);
-      el.removeEventListener('pointermove', onMove);
-      el.removeEventListener('pointerleave', onLeave);
+      resizeObserver.disconnect();
+      if (!reduced) {
+        el.removeEventListener('pointermove', onMove);
+        el.removeEventListener('pointerleave', onLeave);
+      }
       scene.remove(artifact.object);
       artifact.dispose();
       renderer.dispose();

@@ -14,7 +14,7 @@ export function initSmoothScroll(): () => void {
   const coarse = window.matchMedia('(pointer: coarse)').matches;
   if (reduced || coarse) return () => undefined;
 
-  lenis = new Lenis({ duration: 0.95, wheelMultiplier: 0.92, smoothWheel: true, touchMultiplier: 1 });
+  lenis = new Lenis({ duration: 0.95, wheelMultiplier: 0.92, smoothWheel: true, touchMultiplier: 1, anchors: { offset: -96 } });
   const instance = lenis;
   instance.on('scroll', ScrollTrigger.update);
   rafFn = (time: number) => instance.raf(time * 1000);
