@@ -71,6 +71,44 @@ State: **CONCEPT**
 - No deployment, responder validation, model accuracy or operational use is claimed.
 - Human authority remains explicit in the concept framing.
 
+## Aescent Web Studio
+
+Public destination: https://aescentwebstudios.com/
+
+Canonical source checkout audited separately: `businesses/aescent_web_studio/aescent-website`.
+The public repository is `https://github.com/Diannn3/aescent-website`; its `origin/main`
+was observed at `0a38934` during the source audit, and its Astro site metadata points at
+`https://aescentwebstudios.com`.
+
+### VERIFIED
+
+- Aescent Web Studio is Dian's client-facing web practice.
+- The public destination is a live studio site and is an approved external destination
+  for the compact Studio Practice module.
+- The audited source contains Astro implementation, responsive/editorial presentation,
+  and public brand assets.
+- The approved identity wording is first-person: "founder of Aescent Web Studio and a
+  UPLB student here in Laguna." It is used only as a short trajectory marker, not as a
+  client-outcome claim.
+
+### SOURCE / DEPLOYMENT BOUNDARY
+
+- The live site includes newer visible work (including Aescent Smiles and SMOR) that is
+  absent from the public `main` snapshot audited above.
+- The local Aescent checkout is dirty and contains newer changes that are not on live.
+- Therefore the portfolio must not describe the public repository as the exact source
+  for the deployed site. If linked, its label is only `PUBLIC REPOSITORY`.
+- Source/deployment reconciliation is a separate, approval-gated task. This portfolio
+  change does not reset, clean, branch, or modify that checkout.
+
+### NOT CLAIMED
+
+- Client counts, revenue, leads, conversion, bookings, testimonials or measured results.
+- Client identities, private materials, team size, sole authorship or founding date.
+- Aescent Smiles or SMOR as paying-client or measured-venture outcomes.
+- Exact production-source mapping, deployment parity, performance, accessibility or
+  speed without a dated audit.
+
 ## AedriAIn
 
 Primary source: https://github.com/Diannn3/AedriAIn
@@ -91,3 +129,20 @@ The public repository contains committed Playwright visual-regression snapshots 
 ### IMS
 
 The repository contains `third-preview.png` plus three `reference/*-floor-source.jpeg` orientation images. The floor reference images are explicitly not app-interface evidence and must not be presented as screenshots of the implemented product.
+
+## Approved Vector Atlas media manifest (2026-08-20)
+
+Only the following derivatives are copied into this repository. They are cropped or
+directly copied from genuine project-owned/public-safe sources, and each is captioned
+with its state in the rendered case-study data.
+
+| Asset | Source and treatment | State / allowed use |
+| --- | --- | --- |
+| `public/work/uppetite/smart-picks-mobile.webp` | UPPETITE committed Playwright baseline `smart-picks-list-mobile-390-visual-chromium-win32.png`; top 1200 CSS pixels cropped and scaled 2× with WebP quality 84 | Public-safe deterministic mobile evidence; proves route/time-aware Smart Picks UI, not production/adoption |
+| `public/work/uppetite/explore-mobile.webp` | UPPETITE committed Playwright baseline `explore-results-mobile-390-visual-chromium-win32.png`; top 1200 CSS pixels cropped and scaled 2× with WebP quality 84 | Public-safe deterministic mobile evidence; proves discovery/search/filter UI, not live data accuracy |
+| `public/work/ims/third-floor-schematic.png` | IMS repository `third-preview.png`, copied without redrawing | Prototype / synthetic / site-unverified; proves schematic floor-map language only |
+
+No Aescent screenshot is approved in this commit. The local dirty Aescent assets are
+not copied or treated as deployment proof. The Studio Practice module may use the
+verified external link and a restrained public brand token; adding a dated live-site
+capture requires a separate capture review with browser, date, viewport and state.
