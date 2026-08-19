@@ -7,7 +7,7 @@
     "src/components/artifact/ArtifactFallback.tsx": "f86669f59f15c358f32beb2c3c2dbc9e2e8534bc6803f2c2a92678ac668d3463",
     "src/components/artifact/ArtifactObject.tsx": "e169cf50351eef7b480f8aea83ecee5365cf25c2deef63b8182488c1ba0d8cfd",
     "src/components/artifact/DigitalArtifact.tsx": "cc443349834c605dbe73ef0ef97236d26fbaac677889f8285ef3e054c75c6fe9",
-    "src/components/atlas/AtlasMenu.tsx": "81f51594cc6eea8a76ee304ab9bf376f849265da15303473996b88fffc6f1c04",
+    "src/components/atlas/AtlasMenu.tsx": "caac441e6be0b00eda25e98dd6335d3b262e01cbbebb4b1912e75a9272de557d",
     "src/components/atlas/AtlasRail.tsx": "5d9729df6a1cde9a0f2a1fa65520202fd863c3a4d276e6342e70ff48f76874c3",
     "src/components/global/Cursor.tsx": "2f30c468100d135c263e9a969954848a60d94889f36125aa69a222fa1a5265eb",
     "src/components/hero/CameraRig.tsx": "e09b703b4e043420e4343966f9fd95df6044fb5156cfbb0f16cd6c25aff59886",

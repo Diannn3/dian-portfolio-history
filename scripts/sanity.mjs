@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 const root = process.cwd();
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
@@ -22,7 +23,11 @@ if (pkg.dependencies?.['@radix-ui/react-collapsible'] !== '1.1.3') fail('Lab col
 if (pkg.dependencies?.['gsap/ScrollTrigger']) fail('gsap/ScrollTrigger must not be listed as a package dependency.');
 if (fs.existsSync(path.join(root, 'src/package.json'))) fail('duplicate src/package.json exists.');
 if (!fs.existsSync(path.join(root, 'public/favicon.svg'))) fail('public/favicon.svg is missing.');
-if (fs.existsSync(path.join(root, '.vercel'))) fail('.vercel is local deployment linkage and must not be tracked.');
+const trackedDeploymentLinkage = execFileSync('git', ['ls-files', '--', '.vercel'], {
+  cwd: root,
+  encoding: 'utf8',
+}).trim();
+if (trackedDeploymentLinkage) fail('.vercel is local deployment linkage and must not be tracked.');
 for (const legacy of [
   'src/components/global/Nav.tsx',
   'src/components/sections/Lab.tsx',

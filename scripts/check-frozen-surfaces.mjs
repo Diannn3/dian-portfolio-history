@@ -7,6 +7,13 @@ const manifestPath = path.join(root, 'scripts/frozen-surfaces.json');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 let failed = false;
 
+// Git stores the reviewed source with LF endings, while a Windows checkout may
+// materialize the same bytes as CRLF. Hash the canonical text representation so
+// the guard protects content, not the host's checkout setting.
+function canonicalSourceBytes(file) {
+  return fs.readFileSync(file, 'utf8').replaceAll('\r\n', '\n');
+}
+
 for (const [relative, expected] of Object.entries(manifest.files)) {
   const file = path.join(root, relative);
   if (!fs.existsSync(file)) {
@@ -14,7 +21,7 @@ for (const [relative, expected] of Object.entries(manifest.files)) {
     failed = true;
     continue;
   }
-  const actual = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+  const actual = crypto.createHash('sha256').update(canonicalSourceBytes(file), 'utf8').digest('hex');
   if (actual !== expected) {
     console.error(`FROZEN FAIL: ${relative} changed (${actual.slice(0, 12)} != ${expected.slice(0, 12)})`);
     failed = true;

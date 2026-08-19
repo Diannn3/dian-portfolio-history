@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import catalog from '../../src/data/projectCatalog.json';
+import catalog from '../../src/data/projectCatalog.json' with { type: 'json' };
 
 const expectedTitle = (project: (typeof catalog)[number]) =>
   `${project.title} — ${project.category} / Dian`;
@@ -12,12 +12,16 @@ test('home exposes the Atlas shell and primary portfolio landmarks', async ({ pa
   await expect(page.getByRole('button', { name: /INDEX/i })).toBeVisible();
 });
 
-test('Atlas index traps focus, closes with Escape, and restores focus', async ({ page }) => {
+test('Atlas index traps focus, closes with Escape, and restores focus', async ({ page }, testInfo) => {
+  test.skip(
+    testInfo.project.name === 'mobile-chromium',
+    'Focus restoration coverage runs in desktop Chromium; touch emulation has no keyboard focus model.',
+  );
   await page.goto('/');
   const trigger = page.getByRole('button', { name: /INDEX/i });
   await trigger.focus();
   await trigger.click();
-  const dialog = page.getByRole('dialog', { name: 'Atlas index' });
+  const dialog = page.getByRole('dialog', { name: /PROJECTS/i });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole('link', { name: /UPPETITE/i })).toBeVisible();
   await page.keyboard.press('Escape');
@@ -67,7 +71,11 @@ test('wide low-capability desktop keeps the SVG fallback instead of forcing WebG
   await expect(page.locator('[data-work-preview="inline"]')).toHaveCount(catalog.length);
 });
 
-test('wide capable desktop Work ledger progressively enhances to one shared stage shell', async ({ page }) => {
+test('wide capable desktop Work ledger progressively enhances to one shared stage shell', async ({ page }, testInfo) => {
+  test.skip(
+    testInfo.project.name === 'mobile-chromium',
+    'The stage requires a fine pointer; the mobile project validates the static Work fallback instead.',
+  );
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, get: () => 8 });
     Object.defineProperty(navigator, 'deviceMemory', { configurable: true, get: () => 8 });

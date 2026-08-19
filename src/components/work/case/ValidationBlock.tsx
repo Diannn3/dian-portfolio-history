@@ -16,12 +16,12 @@ export function ValidationBlock({ items }: { items: ValidationItem[] }) {
           key={`${item.label}-${item.value}`}
           className="col-span-4 border-t border-hairline py-5 md:col-span-4 xl:col-span-4"
         >
-          <div className="flex items-baseline justify-between gap-4">
-            <dt className="font-mono text-label uppercase tracking-[0.16em] text-ink">{item.label}</dt>
+          <dt className="flex items-baseline justify-between gap-4 font-mono text-label uppercase tracking-[0.16em] text-ink">
+            <span>{item.label}</span>
             <span className={`font-mono text-micro uppercase tracking-[0.14em] ${stateTone[item.state]}`}>
               {item.state}
             </span>
-          </div>
+          </dt>
           <dd className="mt-3 max-w-[42ch] text-read-sm text-graphite">{item.value}</dd>
         </div>
       ))}

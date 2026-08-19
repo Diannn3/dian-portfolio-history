@@ -49,6 +49,17 @@ export function ProjectPage() {
     };
   }, [project, setMode, setRailProject, setChapter]);
 
+  // RouteLifecycle remains the single scroll owner. This event simply tells it
+  // that the lazy case module has committed its chapter DOM for a hash deep
+  // link, avoiding a race with the initial retry window.
+  useEffect(() => {
+    if (!project || loadedSlug !== slug) return;
+    const timer = window.setTimeout(() => {
+      window.dispatchEvent(new Event('vector:route-ready'));
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [project, loadedSlug, slug]);
+
   if (!hasProject(slug)) return <NotFound />;
   if (!project || loadedSlug !== slug) {
     return <main id="main" className="min-h-[70vh] pt-[8rem]" aria-busy="true" aria-label="Loading project" />;
@@ -73,7 +84,7 @@ export function ProjectPage() {
                 <ArrowLeft className="mr-2 inline h-3.5 w-3.5 -translate-y-[1px]" strokeWidth={1.5} aria-hidden="true" />
                 INDEX
               </Link>
-              <span className="mono-label" style={{ color: project.accent }}>
+              <span className="mono-label text-accent">
                 {project.index} / {project.status}
               </span>
             </div>

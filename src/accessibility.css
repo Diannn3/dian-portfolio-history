@@ -1,0 +1,27 @@
+/*
+ * Text contrast is intentionally separate from the orange signal used by the
+ * hero/canvas and Contact streamline. Small editorial labels need a darker
+ * ink value when they carry information; the visual signal remains orange in
+ * decorative strokes and the protected Contact finale.
+ */
+:root {
+  --accent-text: #9f3a24;
+}
+
+#main > :not(#contact) .text-accent,
+#main > :not(#contact).text-accent {
+  color: var(--accent-text);
+}
+
+/* Inactive work and artifact rows retain hierarchy through graphite text, not
+ * opacity, so the full reading order remains WCAG-readable. */
+#work .opacity-55,
+#artifact .opacity-35 {
+  opacity: 1;
+  color: var(--graphite);
+}
+
+#work .opacity-55 h3,
+#artifact .opacity-35 h3 {
+  color: var(--graphite);
+}

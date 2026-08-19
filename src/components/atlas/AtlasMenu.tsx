@@ -29,6 +29,8 @@ const SECTIONS = [
 export function AtlasMenu() {
   const { menuOpen, setMenuOpen } = useAtlas();
   const panel = useRef<HTMLDivElement>(null);
+  const wasOpen = useRef(false);
+  const restoreFocus = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
   const navigate = useNavigate();
 
@@ -38,6 +40,20 @@ export function AtlasMenu() {
     setMenuOpen(false);
     navigate(`/#${id}`);
   };
+
+  useEffect(() => {
+    if (menuOpen && !wasOpen.current) {
+      restoreFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
+    if (!menuOpen && wasOpen.current) {
+      const target = restoreFocus.current;
+      if (target && document.contains(target)) {
+        window.requestAnimationFrame(() => target.focus());
+      }
+      restoreFocus.current = null;
+    }
+    wasOpen.current = menuOpen;
+  }, [menuOpen]);
 
   useEffect(() => {
     const lenis = getLenis();

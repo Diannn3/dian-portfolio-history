@@ -1,4 +1,5 @@
 import "./index.css";
+import "./accessibility.css";
 import "lenis/dist/lenis.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
