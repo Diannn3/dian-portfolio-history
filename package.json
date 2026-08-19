@@ -16,7 +16,6 @@
     "react-router-dom": "^6.26.2",
     "three": "^0.170.0",
     "gsap": "^3.12.5",
-    "gsap/ScrollTrigger": "latest",
     "lenis": "latest",
     "@gsap/react": "latest",
     "@radix-ui/react-dialog": "^1.1.6",
