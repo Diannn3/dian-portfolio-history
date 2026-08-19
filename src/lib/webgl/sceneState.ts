@@ -1,6 +1,8 @@
 /**
  * One mutable module-level record shared between GSAP/ScrollTrigger, the pointer
- * listener and the R3F render loop. Frame-rate work never touches React state.
+ * listener and the render loops. Frame-rate work never touches React state.
+ *
+ * FROZEN SURFACE — hero scroll decomposition and pointer probe read this.
  */
 export const sceneState = {
   /** hero scroll progress 0 → 1 */

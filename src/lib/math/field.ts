@@ -7,6 +7,8 @@ export { A, B, C, manifoldHeight, seeded } from './fieldCore';
  * Three.js adapter for the site's pure mathematical field.
  * The equations live in fieldCore.ts so non-WebGL UI can use them without
  * synchronously loading Three.js.
+ *
+ * FROZEN SURFACE — shared by the hero scene and the new spatial layer.
  */
 export function fieldAt(x: number, y: number, z: number, t: number, out: THREE.Vector3) {
   fieldComponents(x, y, z, t, out);

@@ -1,25 +1,26 @@
 import React, { useEffect, useRef } from 'react';
-import gsap from 'gsap';
 import { twMerge } from 'tailwind-merge';
-import { button } from './Button';
-import { usePointerFine, useReducedMotion } from '../../hooks/useEnvironment';
+import { gsap, registerGsap } from '../../lib/motion/gsap';
+import { useMotion } from '../../lib/motion/MotionProvider';
+import { button } from '../ui/Button';
 
 interface Props extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   intent?: 'solid' | 'outline';
 }
 
 /**
- * Used for exactly one thing: the primary contact CTA. The pull is small — 8px
- * at the edge — and disabled for touch and reduced motion.
+ * INDEX SHIFT, applied to a pointer. The pull is deliberately small — a couple
+ * of grid units at most — so the element still feels like it belongs to the
+ * layout rather than escaping it. Disabled entirely without a fine pointer.
  */
 export function MagneticLink({ className, intent = 'solid', children, ...props }: Props) {
   const ref = useRef<HTMLAnchorElement>(null);
-  const fine = usePointerFine();
-  const reduced = useReducedMotion();
+  const { fine, reduced } = useMotion();
 
   useEffect(() => {
     const el = ref.current;
     if (!el || !fine || reduced) return;
+    registerGsap();
     const xTo = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3.out' });
     const yTo = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3.out' });
     const onMove = (e: PointerEvent) => {

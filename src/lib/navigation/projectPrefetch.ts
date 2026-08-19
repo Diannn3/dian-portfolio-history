@@ -1,9 +1,14 @@
-let projectPagePromise: Promise<{ default: typeof import('../../pages/ProjectPage').ProjectPage }> | null = null;
+let projectPagePromise: Promise<{
+  default: typeof import('../../pages/ProjectPage').ProjectPage;
+}> | null = null;
 
-/** Shared lazy boundary so route rendering and intent-prefetch reuse the same request. */
+/**
+ * The case-study route is split out of the homepage graph. It is fetched on
+ * intent — hover or focus on a work row — never eagerly for every visitor.
+ */
 export function loadProjectPage() {
   projectPagePromise ??= import('../../pages/ProjectPage').then((module) => ({
-    default: module.ProjectPage,
+    default: module.ProjectPage
   }));
   return projectPagePromise;
 }
