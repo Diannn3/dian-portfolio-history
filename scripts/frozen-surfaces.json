@@ -1,7 +1,7 @@
 {
   "note": "Protected Vector Atlas creative/runtime surfaces after the code-reviewed redesign merge. Hero/math hashes remain inherited from the approved pre-merge baseline. New redesign hashes are an integration checkpoint pending browser visual regression; update only after an intentional review.",
   "files": {
-    "src/components/about/About.tsx": "9979b83873640da3dd2c50b009ff3bc92965c38f78b51f6e3075f2091805b717",
+    "src/components/about/About.tsx": "99daae732b7aa379ee99e2e59fde08f15b3f99656c30204bd589190419f03189",
     "src/components/about/DisciplineGraph.tsx": "21c27fcb689e3f14169928b5ed09db60f91564de8e0690ed6fc36e67d308b9fc",
     "src/components/artifact/ArtifactCanvas.tsx": "aafdfd014111237f60673ce020867900d57bd27b6ddc4af726089075224e3097",
     "src/components/artifact/ArtifactFallback.tsx": "f86669f59f15c358f32beb2c3c2dbc9e2e8534bc6803f2c2a92678ac668d3463",

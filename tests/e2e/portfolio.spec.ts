@@ -132,6 +132,18 @@ test('post-hero orientation and Selected Work hierarchy are evidence-led', async
   await expect(work.locator('[data-study-entry]').first()).toContainText('CONCEPT STUDY');
 });
 
+test('About carries one concise Aescent trajectory marker without changing Contact', async ({ page }) => {
+  await page.goto('/');
+  const about = page.locator('#about');
+  await expect(about.locator('[data-trajectory-marker]')).toHaveCount(1);
+  await expect(about.locator('[data-trajectory-marker]')).toContainText(
+    'Founder of Aescent Web Studio and a UPLB student here in Laguna.',
+  );
+  await expect(page.locator('#contact')).not.toContainText('Aescent', { timeout: 1000 });
+  await expect(page.locator('#contact').getByRole('link', { name: /VIEW GITHUB/i })).toHaveCount(1);
+  await expect(page.locator('[data-contact-actions]')).toHaveCount(0);
+});
+
 for (const product of catalog.slice(0, 2)) {
   test(`${product.slug} opening exposes proof state, role and media provenance`, async ({ page }) => {
     await page.goto(`/work/${product.slug}/`);

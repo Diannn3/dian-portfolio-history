@@ -23,6 +23,12 @@ export function About() {
               </p>
             )}
           </div>
+          <div data-trajectory-marker className="mt-10 border-t border-hairline pt-4">
+            <p className="mono-label text-accent">TRAJECTORY / PRACTICE</p>
+            <p className="mt-2 max-w-[48ch] text-read-sm text-graphite">
+              Founder of Aescent Web Studio and a UPLB student here in Laguna.
+            </p>
+          </div>
         </div>
 
         {/* annotation axis: metadata reads as marginalia, not as a sidebar widget */}
