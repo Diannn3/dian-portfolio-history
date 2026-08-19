@@ -5,6 +5,8 @@ import type { LabEntry } from '../../data/site';
 interface Props {
   entry: LabEntry;
   defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   children: React.ReactNode;
 }
 
@@ -12,11 +14,21 @@ interface Props {
  * One notebook entry. Collapsed by default so nothing runs until it is opened —
  * the content is only mounted while the entry is expanded.
  */
-export function LabExperiment({ entry, defaultOpen = false, children }: Props) {
-  const [open, setOpen] = useState(defaultOpen);
+export function LabExperiment({ entry, defaultOpen = false, open: controlledOpen, onOpenChange, children }: Props) {
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const open = controlledOpen ?? internalOpen;
+  const handleOpenChange = (next: boolean) => {
+    if (controlledOpen === undefined) setInternalOpen(next);
+    onOpenChange?.(next);
+  };
 
   return (
-    <Collapsible.Root open={open} onOpenChange={setOpen} className="border-b border-hairline">
+    <Collapsible.Root
+      open={open}
+      onOpenChange={handleOpenChange}
+      className="border-b border-hairline"
+      data-lab-experiment={entry.id}
+    >
       <Collapsible.Trigger
         className="group flex w-full items-baseline gap-4 py-5 text-left"
         data-cursor="link">

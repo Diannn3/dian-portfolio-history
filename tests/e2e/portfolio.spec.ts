@@ -144,6 +144,28 @@ test('About carries one concise Aescent trajectory marker without changing Conta
   await expect(page.locator('[data-contact-actions]')).toHaveCount(0);
 });
 
+test('Artifact is a compact Lab threshold and empty Spline stays hidden', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const artifact = page.locator('#artifact [data-artifact-shell]');
+  await expect(artifact).toHaveCount(1);
+  const duration = await artifact.evaluate((node) => node.getBoundingClientRect().height / window.innerHeight);
+  expect(duration).toBeGreaterThanOrEqual(1.6);
+  expect(duration).toBeLessThanOrEqual(2.2);
+
+  const lab = page.locator('#lab');
+  await expect(lab.locator('[data-lab-experiment]')).toHaveCount(3);
+  await expect(lab.getByText('Spline Spatial Study', { exact: true })).toHaveCount(0);
+  const entries = lab.locator('[data-lab-experiment]');
+  const firstTrigger = entries.nth(0).getByRole('button').first();
+  const secondTrigger = entries.nth(1).getByRole('button').first();
+  await firstTrigger.click();
+  await expect(firstTrigger).toHaveAttribute('aria-expanded', 'true');
+  await secondTrigger.click();
+  await expect(firstTrigger).toHaveAttribute('aria-expanded', 'false');
+  await expect(secondTrigger).toHaveAttribute('aria-expanded', 'true');
+});
+
 for (const product of catalog.slice(0, 2)) {
   test(`${product.slug} opening exposes proof state, role and media provenance`, async ({ page }) => {
     await page.goto(`/work/${product.slug}/`);

@@ -102,10 +102,18 @@ export function DigitalArtifact() {
       coordinate="PLATE 04 / PROCEDURAL"
       lede="The existing Three.js instrument, staged as a five-part reading rather than replaced by another 3D asset."
     >
-      <div ref={shell} className={sticky ? 'relative h-[360vh]' : 'relative'}>
+      <div
+        ref={shell}
+        data-artifact-shell
+        className={sticky ? 'relative h-[190vh]' : 'relative'}
+      >
         <div className={sticky ? 'atlas-grid sticky top-24 items-start gap-y-8 pb-10' : 'atlas-grid items-start gap-y-8 pb-10'}>
           <div className="col-span-4 md:col-span-4 xl:col-span-6">
-            <div ref={canvasShell} className="aspect-square w-full border border-hairline bg-surface/30">
+            <div
+              ref={canvasShell}
+              data-artifact-canvas
+              className="aspect-square w-full border border-hairline bg-surface/30"
+            >
               {supported && visible ? (
                 <Suspense
                   fallback={
