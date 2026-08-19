@@ -27,7 +27,7 @@ fallbacks, reduced motion, accessibility — is implemented.
 ```
 components/
   hero/        Three.js scene: manifold, field, streamlines, lattice, particles, probe
-  work/        editorial project index, per-project SVG previews, case modules
+  work/        editorial project index, SVG previews, source links + evidence case modules
   about/       discipline graph (SVG, keyboard accessible)
   artifact/    OBJECT / 001 — instanced armillary object + Spline slot + fallback
   sections/    Now, Lab, Tools, Contact
@@ -76,12 +76,20 @@ complete SVG hero fallback when WebGL is unavailable.
 drift, field animation, particle travel and all reveal travel — the static
 composition is the intended design, not a degraded one.
 
-## Content honesty
+## Content evidence and honesty
 
-No metrics, users, awards, dates, deployments or validation results are claimed.
-Project state is one of `CONCEPT` / `PROTOTYPE` / `IN DEVELOPMENT` / `EXPERIMENT`,
-each case study carries a `STATUS / TO VERIFY` line. The GitHub contact uses the
-known public profile; no email or LinkedIn address is invented. `SPLINE_SCENE_URL`
-in `data/site.ts` stays intentionally empty until a real scene exists. Drop a published
-Spline scene URL into that constant and the artifact section loads it lazily;
-until then the procedural object stands in.
+Project state is one of `CONCEPT` / `PROTOTYPE` / `IN DEVELOPMENT` / `EXPERIMENT`.
+Implemented flagship projects can link to inspectable public sources and use optional
+`evidence`, `decision`, `validation` and `reflection` modules. Concept work is kept
+explicitly on the concept side of the line: no deployment, adoption, accuracy,
+partnership or test-success claim is inferred from a design or repository description.
+
+`CONTENT_EVIDENCE.md` is the internal claim ledger for the current content pass.
+It distinguishes verified implementation facts from defined-but-not-proven-green
+quality gates and explicit non-claims. The media renderer accepts real screenshots
+and user-initiated video, but no fake product screenshot is generated to fill an empty slot.
+
+The GitHub contact uses the known public profile; no email or LinkedIn address is
+published automatically. `SPLINE_SCENE_URL` in `data/site.ts` stays intentionally
+empty until a real scene exists. Drop a published Spline scene URL into that constant
+and the artifact section loads it lazily; until then the procedural object stands in.

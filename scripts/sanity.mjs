@@ -32,8 +32,23 @@ for (const marker of [
   'SMS IN / 5',
   'DEDUPED / 3',
   'NODES 42',
+  "href: '#'",
+  'href="#"',
 ]) {
   if (combined.includes(marker)) fail(`stale generated marker remains: ${marker}`);
+}
+
+const projects = read('src/data/projects.ts');
+const siteData = read('src/data/site.ts');
+for (const match of `${projects}
+${siteData}`.matchAll(/href:\s*['"]([^'"]*)['"]/g)) {
+  const href = match[1];
+  if (href && !href.startsWith('https://')) fail(`external content link must use https: ${href}`);
+}
+
+for (const match of projects.matchAll(/(?:src|poster):\s*['"](\/work\/[^'"]+)['"]/g)) {
+  const assetPath = path.join(root, 'public', match[1].replace(/^\//, ''));
+  if (!fs.existsSync(assetPath)) fail(`case-study media asset is missing: ${match[1]}`);
 }
 
 // Follow static relative imports from the application entry. Dynamic imports are
@@ -69,5 +84,5 @@ while (stack.length) {
 if (packages.has('three')) fail('Three.js is reachable from the initial static import graph; keep WebGL behind lazy imports.');
 
 if (!process.exitCode) {
-  console.log(`SANITY OK: ${sourceFiles.length} source files checked; Three.js remains outside the initial static graph.`);
+  console.log(`SANITY OK: ${sourceFiles.length} source files checked; content links/assets are bounded; Three.js remains outside the initial static graph.`);
 }
