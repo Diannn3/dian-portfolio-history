@@ -64,21 +64,21 @@ export interface ValidationItem {
 
 export interface ProjectModule {
   kind:
-    | 'context'
-    | 'interface'
-    | 'architecture'
-    | 'flow'
-    | 'spatial'
-    | 'detail'
-    | 'openQuestions'
-    | 'evidence'
-    | 'decision'
-    | 'validation'
-    | 'reflection';
+  'context' |
+  'interface' |
+  'architecture' |
+  'flow' |
+  'spatial' |
+  'detail' |
+  'openQuestions' |
+  'evidence' |
+  'decision' |
+  'validation' |
+  'reflection';
   title: string;
   body?: string;
-  items?: { label: string; value: string; note?: string }[];
-  steps?: { label: string; body: string }[];
+  items?: {label: string;value: string;note?: string;}[];
+  steps?: {label: string;body: string;}[];
   nodes?: DiagramNode[];
   edges?: DiagramEdge[];
   media?: ProjectMedia[];
@@ -98,7 +98,7 @@ export interface Project {
   summary: string;
   role: string[];
   /** technologies under consideration / in use — labelled by intent, never as a deployment claim */
-  technologies: { group: string; items: string[]; intent: 'in use' | 'considered' }[];
+  technologies: {group: string;items: string[];intent: 'in use' | 'considered';}[];
   accent: string;
   preview: PreviewKey;
   /** Optional route-level social preview. Omit until a real local image exists. */

@@ -1,130 +1,127 @@
 import React, { useEffect, useRef } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import { contactLinks } from '../../data/site';
-import { subscribeTick } from '../../lib/motion/ticker';
+import { SectionFrame } from '../ui/SectionFrame';
 import { usePointerFine, useReducedMotion } from '../../hooks/useEnvironment';
-import { MagneticLink } from '../ui/MagneticLink';
 
 /**
- * The Vector Atlas returns, flattened: one long streamline across the footer
- * whose control points bend toward the pointer with heavy damping.
+ * CONTACT. Only verified methods appear here — GitHub is the one channel I can
+ * point at honestly, so it is the only one listed. No email, availability or
+ * client history is implied.
  */
 export function Contact() {
-  const path = useRef<SVGPathElement>(null);
   const shell = useRef<HTMLDivElement>(null);
+  const vector = useRef<SVGLineElement>(null);
   const fine = usePointerFine();
   const reduced = useReducedMotion();
 
+  /* DEPTH FOCUS: the rule under the headline draws itself once, in view */
+  useGSAP(
+    () => {
+      const rule = shell.current?.querySelector('[data-contact-rule]');
+      if (!rule) return;
+      if (reduced) {
+        gsap.set(rule, { scaleX: 1 });
+        return;
+      }
+      gsap.fromTo(
+        rule,
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          duration: 1.1,
+          ease: 'expo.inOut',
+          transformOrigin: 'left center',
+          scrollTrigger: { trigger: shell.current, start: 'top 82%' }
+        }
+      );
+    },
+    { dependencies: [reduced], scope: shell, revertOnUpdate: true }
+  );
+
+  /* a single directional readout: where the pointer sits relative to the plate */
   useEffect(() => {
-    if (!path.current) return;
+    if (!fine || reduced) return;
     const el = shell.current;
-    const state = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
-
-    const draw = () => {
-      state.x += (state.tx - state.x) * (reduced ? 1 : 0.05);
-      state.y += (state.ty - state.y) * (reduced ? 1 : 0.05);
-      const bx = 200 + state.x * 600;
-      const by = 60 + state.y * 100;
-      const d = `M0 150 C 220 ${150 - (by - 110) * 0.9}, ${bx - 160} ${by}, ${bx} ${by} S ${
-      bx + 260} ${
-      200 - (by - 110) * 0.6}, 1200 120`;
-      path.current?.setAttribute('d', d);
-    };
-    draw();
-
-    if (reduced || !fine) return;
+    const target = vector.current;
+    if (!el || !target) return;
     const onMove = (e: PointerEvent) => {
-      if (!el) return;
       const r = el.getBoundingClientRect();
-      state.tx = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);
-      state.ty = Math.min(Math.max((e.clientY - r.top) / r.height, 0), 1);
+      const x = (e.clientX - r.left) / r.width;
+      const y = (e.clientY - r.top) / r.height;
+      target.setAttribute('x2', String(6 + x * 88));
+      target.setAttribute('y2', String(4 + y * 40));
     };
-    window.addEventListener('pointermove', onMove);
-    const unsub = subscribeTick(draw);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      unsub();
-    };
+    el.addEventListener('pointermove', onMove);
+    return () => el.removeEventListener('pointermove', onMove);
   }, [fine, reduced]);
 
   return (
-    <section id="contact" className="relative mt-28 md:mt-44" aria-labelledby="contact-heading">
-      <div ref={shell} className="relative overflow-hidden border-t border-ink pt-14 md:pt-20">
-        <svg
-          viewBox="0 0 1200 300"
-          className="pointer-events-none absolute inset-x-0 top-8 h-[300px] w-full"
-          aria-hidden="true"
-          preserveAspectRatio="none">
-          
-          <g stroke="var(--hairline)" strokeWidth="1">
-            {Array.from({ length: 13 }).map((_, i) =>
-            <line key={i} x1={i * 100} y1="0" x2={i * 100} y2="300" />
-            )}
-          </g>
-          <path ref={path} fill="none" stroke="var(--accent)" strokeWidth="1.6" />
-        </svg>
+    <SectionFrame id="contact" index="07" title="Contact" coordinate="PLATE 07 / CHANNEL">
+      <div ref={shell} className="atlas-grid gap-y-10 pb-24">
+        <div className="col-span-4 md:col-span-8 xl:col-span-7" data-reveal-group>
+          <p className="mono-label mb-4">HAVE A WEIRD PROBLEM?</p>
+          <h3 className="overflow-hidden font-heading text-display-1 font-medium uppercase leading-[0.9] text-ink">
+            <span className="reveal-line" data-reveal>
+              <span>Let&apos;s build</span>
+            </span>
+            <span className="reveal-line" data-reveal>
+              <span>something useful.</span>
+            </span>
+          </h3>
+          <span
+            data-contact-rule
+            className="mt-8 block h-[1px] w-full origin-left bg-hairline"
+            aria-hidden="true" />
 
-        <div className="atlas-grid relative">
-          <div className="col-span-4 md:col-span-8 xl:col-span-12" data-reveal-group>
-            <h2
-              id="contact-heading"
-              className="font-heading text-display-1 font-medium uppercase leading-[0.86]">
-              
-              <span className="reveal-line" data-reveal>
-                <span>Have a weird</span>
-              </span>
-              <span className="reveal-line" data-reveal>
-                <span>problem?</span>
-              </span>
-              <span className="reveal-line" data-reveal>
-                <span className="text-accent">Let’s build something useful.</span>
-              </span>
-            </h2>
-          </div>
-        </div>
-
-        <div className="atlas-grid relative mt-14 md:mt-20">
-          <div className="col-span-4 md:col-span-4 xl:col-span-4">
-            <MagneticLink href="https://github.com/Diannn3" target="_blank" rel="noreferrer" data-cursor="external" aria-label="View Dian on GitHub">
-              VIEW GITHUB
-            </MagneticLink>
-            <p className="mt-4 font-mono text-micro uppercase tracking-[0.16em] text-graphite">
-              PROJECTS / CODE / EXPERIMENTS
-            </p>
-          </div>
-        </div>
-
-        <div className="atlas-grid relative mt-14 md:mt-20">
-          <ul className="col-span-4 md:col-span-8 xl:col-span-8 xl:col-start-5">
-            {contactLinks.map((link) =>
-            <li key={link.label} className="border-t border-hairline">
+          <ul className="mt-8 flex flex-col gap-4">
+            {contactLinks.map((c) =>
+            <li key={c.label} className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
+                <span className="mono-label w-20 shrink-0">{c.label}</span>
                 <a
-                href={link.href}
+                href={c.href}
                 target="_blank"
-                rel="noreferrer"
-                data-cursor="external"
-                className="group flex items-baseline justify-between gap-6 py-5">
-                
-                  <span className="font-mono text-label uppercase tracking-[0.16em] text-graphite">
-                    {link.label}
-                  </span>
-                  <span className="flex items-baseline gap-3">
-                    <span className="font-heading text-[1.1rem] tracking-tight transition-colors duration-500 ease-atlas group-hover:text-accent md:text-[1.3rem]">
-                      {link.value}
-                    </span>
-                    <ArrowUpRight
-                    className="h-4 w-4 shrink-0 text-graphite transition-transform duration-500 ease-atlas group-hover:-translate-y-[2px] group-hover:translate-x-[2px]"
-                    strokeWidth={1.5}
-                    aria-hidden="true" />
-                  
-                  </span>
+                rel="noreferrer noopener"
+                className="link-underline text-read-lg text-ink"
+                data-cursor="link">
+
+                  {c.value} ↗<span className="sr-only"> (opens in a new tab)</span>
                 </a>
+                <span className="mono-label ml-auto">VERIFIED</span>
               </li>
             )}
           </ul>
+          <p className="mt-6 max-w-[56ch] text-read-sm text-graphite">
+            GitHub is the only channel listed because it is the only one this page can verify. No
+            availability, rate or client history is implied.
+          </p>
         </div>
 
+        <div className="col-span-4 md:col-span-8 xl:col-span-4 xl:col-start-9">
+          <p className="mono-label mb-3">FIG / BEARING</p>
+          <div className="border border-hairline bg-surface/30 p-3">
+            <svg viewBox="0 0 100 48" className="h-auto w-full" aria-hidden="true">
+              <g stroke="var(--hairline)" strokeWidth="0.3">
+                {Array.from({ length: 8 }).map((_, i) =>
+                <line key={i} x1={6 + i * 12.5} y1="4" x2={6 + i * 12.5} y2="44" />
+                )}
+              </g>
+              <line
+                ref={vector}
+                x1="6"
+                y1="44"
+                x2="50"
+                y2="24"
+                stroke="var(--accent)"
+                strokeWidth="0.8" />
+
+              <rect x="4.6" y="42.6" width="2.8" height="2.8" fill="var(--ink)" />
+            </svg>
+          </div>
+          <p className="mono-label mt-3">POINTER BEARING — DECORATIVE READOUT</p>
+        </div>
       </div>
-    </section>);
+    </SectionFrame>);
 
 }

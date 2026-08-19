@@ -1,41 +1,68 @@
-import React from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
-import { Seo } from '../components/global/Seo';
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAtlas } from '../contexts/AtlasContext';
+import { projectCatalog } from '../data/projectCatalog';
 
 export function NotFound() {
-  const { pathname } = useLocation();
+  const { setMode, setProject, setChapter, registerSections } = useAtlas();
+
+  useEffect(() => {
+    setMode('content');
+    setProject(null);
+    setChapter(null);
+    registerSections([]);
+  }, [setMode, setProject, setChapter, registerSections]);
 
   return (
-    <main id="main" className="min-h-[78vh] pt-[8rem] md:pt-[11rem]">
-      <Seo
-        title="404 — Outside Defined Field / Dian"
-        description="The requested coordinate does not belong to this atlas."
-        path={pathname}
-        noIndex
-      />
+    <div className="min-h-[100svh] pt-28">
       <div className="atlas-grid">
-        <div className="col-span-4 border-t border-ink pt-4 md:col-span-8 xl:col-span-12">
-          <span className="mono-label text-ink">404 / COORDINATE NOT FOUND</span>
+        <div className="col-span-4 md:col-span-8 xl:col-span-12">
+          <span className="block h-[1px] w-full bg-hairline" />
+          <div className="flex flex-wrap items-baseline justify-between gap-4 pt-5">
+            <span className="mono-label text-accent">ERR / 404</span>
+            <span className="mono-label">OUT OF ATLAS BOUNDS</span>
+          </div>
+          <h1 className="mt-10 font-heading text-display-1 font-medium uppercase text-ink">
+            No plate at
+            <br />
+            this coordinate.
+          </h1>
+          <p className="mt-6 max-w-[52ch] text-read text-graphite">
+            The route you requested is not part of this atlas. The four project plates below are the
+            complete index.
+          </p>
         </div>
       </div>
-      <div className="atlas-grid mt-10 md:mt-16">
-        <h1 className="col-span-4 font-heading text-display-1 font-medium uppercase leading-[0.88] md:col-span-7 xl:col-span-9">
-          Outside defined field.
-        </h1>
-        <p className="col-span-4 mt-8 max-w-[42ch] text-body-lg leading-[1.5] text-graphite md:col-span-5 xl:col-span-5">
-          The requested coordinate is not part of this atlas. The route may have moved, or it may never have existed.
-        </p>
-        <div className="col-span-4 mt-10 md:col-span-4 xl:col-span-4">
-          <Link
-            to="/"
-            className="link-underline inline-flex items-center gap-2 font-mono text-label uppercase tracking-[0.16em] text-ink"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden="true" />
-            Return to origin
-          </Link>
-        </div>
+
+      <div className="atlas-grid pt-14">
+        <ul className="col-span-4 border-t border-hairline md:col-span-8 xl:col-span-8">
+          {projectCatalog.map((p) =>
+          <li key={p.slug} className="border-b border-hairline">
+              <Link
+              to={`/work/${p.slug}`}
+              className="flex items-baseline gap-4 py-5"
+              data-cursor="row">
+
+                <span className="mono-label w-7 text-accent">{p.index}</span>
+                <span className="font-heading text-display-3 font-medium uppercase text-ink">
+                  {p.title}
+                </span>
+                <span className="mono-label ml-auto">{p.status}</span>
+              </Link>
+            </li>
+          )}
+        </ul>
       </div>
-    </main>
-  );
+
+      <div className="atlas-grid py-14">
+        <Link
+          to="/"
+          className="mono-label link-underline col-span-4 text-ink md:col-span-8 xl:col-span-12"
+          data-cursor="link">
+
+          ← RETURN TO INDEX
+        </Link>
+      </div>
+    </div>);
+
 }

@@ -1,114 +1,142 @@
-import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
-import { SPLINE_SCENE_URL } from '../../data/site';
-import { useQuality, useReducedMotion } from '../../hooks/useEnvironment';
+import React, { useRef, useState } from 'react';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SectionFrame } from '../ui/SectionFrame';
+import { ArtifactCanvas } from './ArtifactCanvas';
 import { ArtifactFallback } from './ArtifactFallback';
+import { artifactState } from '../../lib/atlas/artifactState';
+import { useCompact, useQuality, useReducedMotion } from '../../hooks/useEnvironment';
 
-const ArtifactCanvas = lazy(() =>
-import('./ArtifactCanvas').then((m) => ({ default: m.ArtifactCanvas }))
-);
-/** Mounted only when a published scene URL is supplied — no invented asset URLs. */
-const SplineScene = lazy(() => import('./SplineScene').then((m) => ({ default: m.SplineScene })));
+const CHAPTERS = [
+{
+  key: 'GEOMETRY',
+  body:
+  'The form is swept along a trajectory of the same vector field the hero renders. Nothing here was modelled by hand.'
+},
+{
+  key: 'CORE',
+  body:
+  'A lattice cage sits underneath it, displaced by the manifold height function so the object and its ground share one equation.'
+},
+{
+  key: 'INPUT',
+  body:
+  'Sample points mark where the field was evaluated during integration — the visible object is a record of a computation.'
+},
+{
+  key: 'STATE',
+  body:
+  'As the sequence advances the object aligns toward plan orientation, the same field-to-diagram move the hero makes.'
+},
+{
+  key: 'SOURCE',
+  body:
+  'Finally the solid resolves into its own wireframe: the construction, not the render, is the point.'
+}];
 
+
+/**
+ * Sticky presentation of one procedural object. On compact screens and under
+ * reduced motion the long scroll collapses into a short static plate — the same
+ * five chapters, no pinning.
+ */
 export function DigitalArtifact() {
-  const [visible, setVisible] = useState(false);
-  const [inView, setInView] = useState(false);
   const shell = useRef<HTMLDivElement>(null);
+  const [step, setStep] = useState(0);
   const reduced = useReducedMotion();
-  const { supported, profile } = useQuality();
+  const compact = useCompact();
+  const { supported } = useQuality();
+  const sticky = !compact && !reduced;
 
-  useEffect(() => {
-    const el = shell.current;
-    if (!el) return;
-    const preload = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setVisible(true);
-          preload.disconnect();
+  useGSAP(
+    () => {
+      if (!sticky || !shell.current) return;
+      ScrollTrigger.create({
+        trigger: shell.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate: (self) => {
+          const raw = self.progress * CHAPTERS.length;
+          const next = Math.min(CHAPTERS.length - 1, Math.floor(raw));
+          /* per-frame value stays outside React; only the chapter index re-renders */
+          artifactState.step = next;
+          artifactState.progress = raw - next;
+          setStep((prev) => prev === next ? prev : next);
         }
-      },
-      { rootMargin: '200px' }
-    );
-    const activity = new IntersectionObserver(
-      (entries) => setInView(entries[0]?.isIntersecting ?? false),
-      { threshold: 0.05 }
-    );
-    preload.observe(el);
-    activity.observe(el);
-    return () => {
-      preload.disconnect();
-      activity.disconnect();
-    };
-  }, []);
-
-  const useSpline = Boolean(SPLINE_SCENE_URL);
+      });
+    },
+    { dependencies: [sticky], scope: shell, revertOnUpdate: true }
+  );
 
   return (
-    <section className="pt-28 md:pt-44" aria-labelledby="artifact-heading">
-      <div className="atlas-grid">
-        <div className="col-span-4 flex items-baseline justify-between border-t border-ink pt-4 md:col-span-8 xl:col-span-12">
-          <h2 id="artifact-heading" className="mono-label text-ink">
-            OBJECT / 001 — COMPUTATIONAL ARTIFACT
-          </h2>
-          <span className="mono-label hidden md:inline">
-            {useSpline ? 'AUTHORED / SPLINE' : 'PROCEDURAL / INSTANCED'}
-          </span>
-        </div>
-      </div>
+    <SectionFrame
+      id="artifact"
+      index="04"
+      title="Digital Artifact"
+      coordinate="PLATE 04 / PROCEDURAL"
+      lede="One object, generated from the site's own equations and taken apart in five steps.">
 
-      <div className="atlas-grid mt-8 items-center md:mt-12">
+      <div
+        ref={shell}
+        className={sticky ? 'relative h-[420vh]' : 'relative'}>
+
         <div
-          ref={shell}
-          className="col-span-4 aspect-square md:col-span-5 xl:col-span-6 xl:col-start-1">
-          
-          {supported && visible ?
-          <Suspense
-            fallback={
-            <div className="h-full w-full opacity-40">
+          className={
+          sticky ?
+          'atlas-grid sticky top-24 items-start gap-y-8 pb-10' :
+          'atlas-grid items-start gap-y-8 pb-10'
+          }>
+
+          <div className="col-span-4 md:col-span-4 xl:col-span-6">
+            <div className="aspect-square w-full border border-hairline bg-surface/30">
+              {supported && !reduced ?
+              <ArtifactCanvas reduced={reduced} /> :
+
+              <div className="h-full w-full p-4">
                   <ArtifactFallback />
                 </div>
-            }>
-            
-              {useSpline ?
-            <SplineScene url={SPLINE_SCENE_URL} reduced={reduced} /> :
-
-            <ArtifactCanvas
-              reduced={reduced}
-              lowQuality={profile.tier === 'low'}
-              active={inView} />
-
-            }
-            </Suspense> :
-
-          <div className="h-full w-full opacity-70">
-              <ArtifactFallback />
+              }
             </div>
-          }
-        </div>
-
-        <div className="col-span-4 md:col-span-3 xl:col-span-4 xl:col-start-8">
-          <p className="font-heading text-display-3">
-            “An experiment in translating mathematical structure into spatial interfaces.”
-          </p>
-          <div className="mt-8 space-y-3 border-t border-hairline pt-4">
-            {[
-            ['GEOMETRY', 'Three coordinate rings, instanced'],
-            ['CORE', 'Parametric knot section'],
-            ['INPUT', 'Pointer orientation, damped'],
-            ['STATE', 'EXPERIMENT'],
-            ['SOURCE', useSpline ? 'Spline scene, lazy embedded' : 'Procedural / Three.js']].
-            map(([k, v]) =>
-            <div key={k} className="flex items-baseline justify-between gap-4">
-                <span className="mono-label">{k}</span>
-                <span className="text-right text-[0.85rem] text-graphite">{v}</span>
-              </div>
-            )}
+            <p className="mono-label mt-3">
+              PROCEDURAL THREE.JS — DERIVED FROM THE SITE FIELD EQUATIONS
+            </p>
           </div>
-          <p className="mt-6 text-[0.85rem] leading-relaxed text-graphite">
-            An instrument, not an ornament: the rings are coordinate frames, the core is a section
-            through a knotted curve. Rotate it with the pointer.
-          </p>
+
+          <ol className="col-span-4 md:col-span-4 xl:col-span-5 xl:col-start-8">
+            {CHAPTERS.map((c, i) => {
+              const on = sticky ? i === step : true;
+              return (
+                <li
+                  key={c.key}
+                  className={`border-t border-hairline py-5 transition-opacity duration-500 ease-atlas ${
+                  sticky && !on ? 'opacity-35' : 'opacity-100'}`
+                  }>
+
+                  <div className="flex items-baseline gap-4">
+                    <span
+                      className={`mono-label w-7 shrink-0 ${
+                      sticky && on ? 'text-accent' : ''}`
+                      }>
+
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <h3 className="mono-label text-ink">{c.key}</h3>
+                  </div>
+                  <p className="mt-3 max-w-[52ch] pl-0 text-read text-graphite md:pl-11">{c.body}</p>
+                </li>);
+
+            })}
+            <li className="border-t border-hairline pt-4">
+              <p className="mono-label" aria-live="polite">
+                {sticky ?
+                `STEP ${String(step + 1).padStart(2, '0')} / ${String(CHAPTERS.length).padStart(2, '0')}` :
+                'STATIC PRESENTATION — REDUCED MOTION OR COMPACT VIEWPORT'}
+              </p>
+            </li>
+          </ol>
         </div>
       </div>
-    </section>);
+    </SectionFrame>);
 
 }
