@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { getProject, nextProject } from '../data/projects';
 import { ProjectPreview } from '../components/work/ProjectPreview';
 import { CaseModule } from '../components/work/case/CaseModules';
+import { ProjectLinks } from '../components/work/case/ProjectLinks';
 import { Seo } from '../components/global/Seo';
 import { useReveals } from '../hooks/useReveals';
 
@@ -55,7 +56,8 @@ export function ProjectPage() {
               ['CATEGORY', project.category],
               ['ROLE', project.role.join(', ')],
               ['PERIOD', project.period],
-              ['STATE', project.status]].
+              ['STATE', project.status],
+              ...(project.evidenceLevel ? [['EVIDENCE', project.evidenceLevel] as [string, string]] : [])].
               map(([k, v]) =>
               <div key={k} className="border-t border-hairline py-2">
                   <dt className="mono-label">{k}</dt>
@@ -64,6 +66,14 @@ export function ProjectPage() {
               )}
             </dl>
           </div>
+
+          {project.links?.length ? (
+            <div className="atlas-grid mt-8">
+              <div className="col-span-4 md:col-span-8 xl:col-span-5 xl:col-start-8">
+                <ProjectLinks links={project.links} />
+              </div>
+            </div>
+          ) : null}
 
           <div className="atlas-grid mt-12 md:mt-16">
             <div

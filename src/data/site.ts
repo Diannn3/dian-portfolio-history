@@ -4,7 +4,7 @@ export const identity = {
   name: 'Dian',
   headline: ['BUILDS SYSTEMS', 'BETWEEN EQUATIONS', 'AND INTERFACES.'],
   support:
-  'Applied Mathematics student building software, AI, maps, spatial systems and experimental interfaces.',
+  'Applied Mathematics student building spatial, data and AI-backed tools around real local systems.',
   meta: [
   { key: 'FIELD', value: 'APPLIED MATHEMATICS' },
   { key: 'LOC', value: 'LOS BAÑOS' },
@@ -17,8 +17,8 @@ export const about = {
   statement: 'I like problems that sit between equations and interfaces.',
   paragraphs: [
   'Most of what I work on starts as a structure — a field, a graph, a schema — and ends as something a person can actually touch. The translation between those two states is the part I find interesting.',
-  'I study applied mathematics and spend the rest of my time building: community tools, map interfaces, small AI systems, and experiments that only exist to answer one question.',
-  'I prefer specific problems in places I know over general problems in the abstract.']
+  'Applied mathematics shapes how I approach software: identify the objects, constraints and relationships first, then decide what the interface needs to expose.',
+  'Maps, local data and spatial systems keep recurring because they turn abstract structures into decisions people make in places I actually know.']
 
 };
 
@@ -45,12 +45,12 @@ export const disciplineEdges: [string, string][] = [
 
 
 export const now = {
-  period: 'NOW / 2026',
+  period: 'NOW / AUG 2026',
   entries: [
-  { label: 'BUILDING', value: 'community + spatial tools' },
-  { label: 'LEARNING', value: 'computational mathematics' },
-  { label: 'EXPERIMENTING', value: 'AI agents + spatial interfaces' },
-  { label: 'EXPLORING', value: 'creative WebGL' }]
+  { label: 'BUILDING', value: 'UPPETITE — route-aware food discovery' },
+  { label: 'BUILDING', value: 'IMS Academic Hub — spatial + academic tooling' },
+  { label: 'PROTOTYPING', value: 'AedriAIn — hand-tracked spatial desktop' },
+  { label: 'EXPLORING', value: 'creative computation + spatial interfaces' }]
 
 };
 
@@ -59,54 +59,44 @@ export const lab = [
   id: 'L01',
   title: 'Vector Field Playground',
   status: 'EXPERIMENT',
-  note: 'Integrating trajectories through analytic fields and watching where they disagree.',
-  tag: 'WEBGL'
+  note: 'The portfolio hero itself: analytic fields, trajectories, particles and a custom GLSL manifold treated as one interactive system.',
+  tag: 'WEBGL',
+  href: ''
 },
 {
   id: 'L02',
-  title: 'Gesture Interface',
-  status: 'CONCEPT',
-  note: 'Pointer and hand input as continuous parameters rather than discrete clicks.',
-  tag: 'INTERACTION'
+  title: 'AedriAIn / Spatial Student Desktop',
+  status: 'PROTOTYPE',
+  note: 'Webcam hand tracking, pinch manipulation, holographic windows, local state and an Electron shell scaffold.',
+  tag: 'INTERACTION',
+  href: 'https://github.com/Diannn3/AedriAIn'
 },
 {
   id: 'L03',
-  title: 'Local LLM Experiments',
-  status: 'PROTOTYPE',
-  note: 'Small models running close to the data they are asked about.',
-  tag: 'AI'
+  title: 'Local Model Experiments',
+  status: 'EXPERIMENT',
+  note: 'Testing how smaller models behave when computation, memory and hardware limits are part of the interface constraint.',
+  tag: 'AI',
+  href: ''
 },
 {
   id: 'L04',
-  title: 'WebGL Map Experiments',
+  title: 'Spatial Map Experiments',
   status: 'EXPERIMENT',
-  note: 'Tiles, projections and terrain treated as geometry instead of images.',
-  tag: 'SPATIAL'
-},
-{
-  id: 'L05',
-  title: 'Computer Vision Interface',
-  status: 'CONCEPT',
-  note: 'Reading the physical world as an input surface.',
-  tag: 'AI'
-},
-{
-  id: 'L06',
-  title: 'Data Visualisation Experiments',
-  status: 'EXPERIMENT',
-  note: 'Plotting systems that keep uncertainty visible.',
-  tag: 'DATA'
-}];
-
+  note: 'Route graphs, projections, indoor geometry and map rendering explored as computational objects rather than static pictures.',
+  tag: 'SPATIAL',
+  href: ''
+}]
+;
 
 export const tools = [
-{ group: 'INTERFACE', items: 'Astro / React / TypeScript' },
+{ group: 'INTERFACE', items: 'Astro / SvelteKit / React / TypeScript' },
 { group: 'COMPUTATION', items: 'Python / NumPy / Pandas' },
-{ group: 'SPATIAL', items: 'MapLibre / PMTiles / GIS' },
-{ group: 'VISUAL', items: 'Three.js / R3F / Spline / GSAP' },
-{ group: 'AI', items: 'LLMs / ML tooling' },
-{ group: 'SYSTEMS', items: 'Node / APIs / databases' }];
-
+{ group: 'SPATIAL', items: 'MapLibre / graph routing / GIS' },
+{ group: 'VISUAL', items: 'Three.js / R3F / GSAP / GLSL' },
+{ group: 'DATA', items: 'Postgres / Supabase / structured pipelines' },
+{ group: 'AI', items: 'LLMs / computer vision / local model experiments' }]
+;
 
 export const contactLinks = [
 { label: 'GITHUB', value: 'github.com/Diannn3', href: 'https://github.com/Diannn3' }];
