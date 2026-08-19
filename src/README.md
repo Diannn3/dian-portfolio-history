@@ -1,98 +1,105 @@
-# DIAN — VECTOR ATLAS
+# DIAN — VECTOR ATLAS / SOURCE ARCHITECTURE
 
-A personal portfolio built around one visual system: a mathematical field that the
-whole site is derived from. The hero renders that field in WebGL; every diagram,
-preview and contour elsewhere is the same system flattened into SVG.
+The application is a React + TypeScript portfolio with a protected imperative Three.js hero and a progressively enhanced editorial shell. `upgrade-pass-1` remains the architectural authority: SEO, lazy project/content loading, static route generation, media contracts, browser tests and regression guards are preserved while the newer Atlas interaction layer is merged on top.
 
-## Environment note
+## Runtime structure
 
-The original brief specified Astro with React islands. This project runs in a
-React + TypeScript single-project runtime (no Astro compiler, no Node test
-runner available here), so the architecture is preserved in React terms:
-
-| Brief (Astro)              | Here                                                      |
-| -------------------------- | --------------------------------------------------------- |
-| Astro routes / layouts     | `pages/` + `App.tsx` routing, static-first section markup  |
-| React islands              | `lazy()` + IntersectionObserver mounts (`Hero`, artifact)  |
-| `client:visible` / `idle`  | observer + `requestIdleCallback` before canvas mount       |
-| Content Collections        | `content/projects/*` typed against `types/project.ts`        |
-| View transitions           | route lifecycle + shared preview → case-study media        |
-| Playwright                 | `tests/e2e/*`; runnable once dependencies + browser are installed |
-
-Everything else — the WebGL system, GSAP choreography, Lenis, quality tiers,
-fallbacks, reduced motion, accessibility — is implemented.
-
-## Structure
-
-```
-components/
-  hero/        Three.js scene: manifold, field, streamlines, lattice, particles, probe
-  work/        editorial project index, SVG previews, source links + evidence case modules
-  about/       discipline graph (SVG, keyboard accessible)
-  artifact/    OBJECT / 001 — instanced armillary object + optional Spline scene
-  sections/    Now, Lab, Tools, Contact
-  global/      Nav (Radix Dialog mobile menu), Cursor, Footer, Seo
-  ui/          CVA button primitive, magnetic link
-lib/
-  math/fieldCore.ts    pure F(x,y,z,t), manifold height, seeded PRNG
-  math/field.ts        Three.js adapter + RK4 streamlines
-  motion/              GSAP registration, reveal vocabulary, shared ticker, Lenis
-  webgl/sceneState.ts  frame-loop state + quality profiles
-data/                  lightweight project catalog + site content
-content/projects/       one lazy long-form module per case study
+```text
+App.tsx
+└─ BrowserRouter
+   └─ AtlasProvider
+      └─ MotionProvider
+         ├─ AtlasRail + AtlasMenu
+         ├─ Cursor + RouteMask
+         ├─ Routes
+         │  ├─ Home
+         │  ├─ lazy ProjectPage
+         │  └─ NotFound
+         └─ Footer
 ```
 
-## The field
+### Home
 
-`lib/math/fieldCore.ts` defines `F(x,y,z,t)` (an ABC-style divergence-free flow) and
-the manifold height function without importing Three.js. `lib/math/field.ts` adapts
-that pure field to Three.js vectors for the WebGL scene. The GLSL in `components/hero/shaders/manifold.ts`
-mirrors the height function exactly, so the surface, its contours, the vector
-glyphs, the tracer particles and the lattice all agree.
+```text
+Hero                    protected, lazy WebGL island
+Selected Work           DOM ledger + SVG fallback + lazy shared Three stage on xl/fine-pointer desktops
+About                    editorial spread + HTML/SVG Discipline Graph
+Current Vector           factual NOW ledger + decorative route diagram
+Digital Artifact         sticky reading sequence + lazy viewport-aware ArtifactCanvas
+Lab                      collapsed notebook; every experiment is dynamically imported
+Tools                    relationship map, no proficiency ratings
+Contact                  verified channels only
+```
 
-Scroll drives one uniform set: `uFlatten`, `uDecompose`, `uContour`. The scene
-goes volumetric → decomposing → contour diagram, and the camera walks from a
-three-quarter view to a near-plan projection as it does.
+## Protected hero
 
-## Performance
+`components/hero/*`, `lib/math/*` and the manifold shader are inherited unchanged from the approved pre-merge baseline. The hero owns its own ScrollTrigger choreography and lazy canvas lifecycle. Do not convert it to R3F or alter its field equations/camera merely to modernize the shell.
 
-- one instanced draw call for the vector field, one for each artifact ring
-- geometry and streamlines are computed once from a seeded PRNG
-- Three.js is driven imperatively (no reconciler): React mounts the scene, the
-  scene owns its own objects and disposes all geometry/materials on unmount
-- no `Vector3` allocation inside frame loops; no React state per frame
-- `frameloop` is switched off when a canvas leaves the viewport
-- quality tiers (`low` / `medium` / `high`) inferred from WebGL support, cores,
-  memory, DPR and pointer type — never from viewport width
-- a single timing source: GSAP's ticker drives Lenis and all DOM frame work
+## Motion
 
-## Accessibility
+- `lib/motion/reveal.ts` registers `ScrollTrigger` + `useGSAP` once.
+- `MotionProvider` owns the one Lenis instance and document-level reveal/progress lifecycle.
+- `RouteLifecycle` is the single owner of route/hash scrolling.
+- Lenis is disabled for coarse pointers/reduced motion and runs through GSAP's ticker when enabled.
+- Anchor handling is enabled so skip navigation, Atlas links and case-study chapter links remain functional.
+- `lib/motion/ticker.ts` is the shared imperative tick source for non-GSAP frame work.
 
-Skip link, semantic landmarks, ordered headings, visible focus, keyboard-operable
-SVG graph nodes, Radix Dialog mobile menu (Escape, focus trap and return,
-`aria-expanded`), decorative WebGL hidden from the accessibility tree, and a
-complete SVG hero fallback when WebGL is unavailable.
+## WebGL boundaries
 
-`prefers-reduced-motion` disables Lenis, the custom cursor, magnetism, camera
-drift, field animation, particle travel and all reveal travel — the static
-composition is the intended design, not a degraded one.
+Three.js must remain absent from the synchronous `src/index.tsx` graph. `npm run sanity` enforces this.
 
-## Content evidence and honesty
+- Hero canvas: lazy from the protected Hero.
+- Work `ProjectStage`: dynamically imported only when the Work section approaches the viewport, and only used on xl/fine-pointer/non-reduced configurations. All smaller/coarse/reduced modes retain the SVG project previews.
+- Digital Artifact: `ArtifactCanvas` remains lazy and only mounts near its section.
+- Lab Spline: remote viewer infrastructure is lazy and Lab-only; an empty `SPLINE_SCENE_URL` means no viewer request.
 
-Project state is one of `CONCEPT` / `PROTOTYPE` / `IN DEVELOPMENT` / `EXPERIMENT`.
-Implemented flagship projects can link to inspectable public sources and use optional
-`evidence`, `decision`, `validation` and `reflection` modules. Concept work is kept
-explicitly on the concept side of the line: no deployment, adoption, accuracy,
-partnership or test-success claim is inferred from a design or repository description.
+## Project/content architecture
 
-`CONTENT_EVIDENCE.md` is the internal claim ledger for the current content pass.
-It distinguishes verified implementation facts from defined-but-not-proven-green
-quality gates and explicit non-claims. The media renderer accepts genuine screenshots with stable dimensions/fit controls and
-user-initiated video, but no fake product screenshot is generated to fill an empty slot.
-Playwright + axe browser gates now live under `tests/e2e/`; this cloud pass could define and
-parse them but could not execute them because npm/browser dependencies are unavailable here.
+```text
+src/data/projectCatalog.json       lightweight home/route metadata
+src/content/projectRegistry.ts     lazy project-module loader
+src/content/projects/*.ts          long-form verified case studies
+src/components/work/case/*         reusable evidence/decision/validation/media layouts
+```
 
-The GitHub contact uses the known public profile; no email or LinkedIn address is
-published automatically. `SPLINE_SCENE_URL` in `data/site.ts` stays intentionally
-empty until a real scene exists. Drop a published Spline scene URL into that constant
-and the artifact section loads it lazily; until then the procedural object stands in.
+No long-form project module may become synchronously reachable from the homepage. Project and route modules are prefetched only on interaction intent.
+
+## Case-study reading system
+
+The existing evidence model is retained. The redesigned presentation adds a sticky chapter index and Atlas header chapter state without replacing:
+
+- `Seo`
+- `ProjectLinks`
+- `CurrentState`
+- `CaseMedia`
+- `SystemDiagram`
+- `DecisionBlock`
+- `ValidationBlock`
+- project-specific lazy content modules
+
+Procedural previews are labelled `SYSTEM DIAGRAM — NOT A PRODUCT SCREENSHOT`; real interface evidence must use the media contract.
+
+## Lab
+
+The Lab is intentionally collapsed and code-split:
+
+- L01 Vector Field Playground — real field math.
+- L02 AedriAIn — diagram of the separate prototype, not live hand tracking.
+- L03 Spline Spatial Study — infrastructure only until a real authored URL exists.
+- L04 Motion Studies — the portfolio motion vocabulary.
+
+## Regression contract
+
+Run:
+
+```bash
+npm run sanity
+npm run guard:frozen
+npm run typecheck
+npm run build
+npm run verify:dist
+npm run test:e2e
+npm run test:a11y
+```
+
+The frozen-surface manifest protects the approved hero/math core and reviewed creative/runtime merge surfaces. Hashes are not a substitute for browser regression review; update them only after an intentional change.

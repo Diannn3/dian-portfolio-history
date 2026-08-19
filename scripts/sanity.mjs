@@ -9,10 +9,30 @@ const fail = (message) => {
 };
 
 const pkg = JSON.parse(read('package.json'));
+for (const [groupName, group] of Object.entries({ dependencies: pkg.dependencies ?? {}, devDependencies: pkg.devDependencies ?? {} })) {
+  for (const [name, version] of Object.entries(group)) {
+    if (version === 'latest' || version === '*' || String(version).trim() === '') {
+      fail(`${groupName} must use a pinned version for ${name}: ${version}`);
+    }
+  }
+}
+if (pkg.dependencies?.['@emotion/react']) fail('@emotion/react is unused and should not be restored.');
+if (pkg.dependencies?.['@gsap/react'] !== '2.1.1') fail('@gsap/react must remain pinned to the reviewed React 18-compatible integration version.');
+if (pkg.dependencies?.['@radix-ui/react-collapsible'] !== '1.1.3') fail('Lab collapsibles require the pinned Radix Collapsible dependency.');
 if (pkg.dependencies?.['gsap/ScrollTrigger']) fail('gsap/ScrollTrigger must not be listed as a package dependency.');
 if (fs.existsSync(path.join(root, 'src/package.json'))) fail('duplicate src/package.json exists.');
 if (!fs.existsSync(path.join(root, 'public/favicon.svg'))) fail('public/favicon.svg is missing.');
 if (fs.existsSync(path.join(root, '.vercel'))) fail('.vercel is local deployment linkage and must not be tracked.');
+for (const legacy of [
+  'src/components/global/Nav.tsx',
+  'src/components/sections/Lab.tsx',
+  'src/components/work/WorkIndex.tsx',
+  'src/components/artifact/SplineScene.tsx',
+  'src/components/ui/Button.tsx',
+  'src/components/ui/MagneticLink.tsx',
+]) {
+  if (fs.existsSync(path.join(root, legacy))) fail(`obsolete pre-merge surface should remain removed: ${legacy}`);
+}
 
 const sourceFiles = [];
 function walk(dir) {
@@ -45,6 +65,15 @@ const projects = fs.readdirSync(projectDir)
   .map((name) => fs.readFileSync(path.join(projectDir, name), 'utf8'))
   .join('\n');
 const siteData = read('src/data/site.ts');
+const revealData = read('src/lib/motion/reveal.ts');
+const scrollData = read('src/lib/motion/smoothScroll.ts');
+const entryData = read('src/index.tsx');
+const artifactData = read('src/components/artifact/DigitalArtifact.tsx');
+if (!revealData.includes('gsap.registerPlugin(ScrollTrigger, useGSAP)')) fail('GSAP React integration must register useGSAP with ScrollTrigger.');
+if (!scrollData.includes('anchors: { offset: -96 }')) fail('Lenis anchor handling must stay enabled for skip/header/case navigation.');
+if (!entryData.includes("lenis/dist/lenis.css")) fail('Lenis recommended stylesheet must remain imported so stopped/smooth states behave consistently.');
+if (artifactData.includes('SPLINE_SCENE_URL') || artifactData.includes('SplineScene')) fail('Spline must remain a Lab-only experiment and must not replace the procedural Digital Artifact.');
+if (!artifactData.includes("lazy(() =>") || !artifactData.includes("import('./ArtifactCanvas')")) fail('Digital Artifact WebGL must remain behind a lazy import.');
 const catalogData = JSON.parse(read('src/data/projectCatalog.json'));
 const registryData = read('src/content/projectRegistry.ts');
 const catalogSlugs = catalogData.map((project) => project.slug);
@@ -103,6 +132,18 @@ while (stack.length) {
 }
 
 if (packages.has('three')) fail('Three.js is reachable from the initial static import graph; keep WebGL behind lazy imports.');
+const forbiddenInitialModules = [
+  'src/components/work/ProjectStage.tsx',
+  'src/components/artifact/ArtifactCanvas.tsx',
+  'src/components/lab/VectorFieldPlayground.tsx',
+  'src/components/lab/AedriAInStudy.tsx',
+  'src/components/lab/SplineStudy.tsx',
+  'src/components/lab/SplineScene.tsx',
+  'src/components/lab/MotionStudies.tsx',
+];
+for (const relative of forbiddenInitialModules) {
+  if (seen.has(path.join(root, relative))) fail(`${relative} leaked into the initial static import graph; keep expensive/experimental surfaces lazy.`);
+}
 for (const file of seen) {
   if (file.startsWith(path.join(root, 'src/content/projects') + path.sep)) {
     fail('long-form project content is reachable from the initial static import graph; keep it behind the lazy project route.');
@@ -113,5 +154,5 @@ if (!combined.includes('404 / COORDINATE NOT FOUND')) fail('portfolio-native 404
 if (!combined.includes('View system as text +')) fail('complex system diagrams need a text equivalent.');
 
 if (!process.exitCode) {
-  console.log(`SANITY OK: ${sourceFiles.length} source files checked; content links/assets are bounded; long-form project content and Three.js remain outside the initial static graph.`);
+  console.log(`SANITY OK: ${sourceFiles.length} source files checked; content links/assets are bounded; long-form project content, Three.js and lazy experiment surfaces remain outside the initial static graph.`);
 }

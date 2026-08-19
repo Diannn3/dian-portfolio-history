@@ -1,15 +1,19 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 
 let registered = false;
 export function registerGsap() {
   if (!registered) {
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger, useGSAP);
     registered = true;
   }
   return gsap;
 }
 
+
+// Register before child useGSAP hooks can run.
+registerGsap();
 /**
  * The site's motion vocabulary. Three verbs only — masked line reveal for
  * typography, draw for rules, and a short clipped rise for media. Everything

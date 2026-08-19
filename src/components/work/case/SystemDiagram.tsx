@@ -139,13 +139,13 @@ export function SystemDiagram({ nodes, edges, accent, caption }: Props) {
             {nodes.map((node) => (
               <div key={node.id} className="grid grid-cols-[8rem_1fr] gap-4 border-t border-hairline pt-3">
                 <dt className="font-mono text-micro uppercase tracking-[0.14em] text-ink">{node.label}</dt>
-                <dd className="text-[0.85rem] leading-relaxed text-graphite">{node.detail}</dd>
+                <dd className="text-read-sm text-graphite">{node.detail}</dd>
               </div>
             ))}
           </dl>
           <ol className="space-y-3" aria-label="System connections">
             {edges.map((edge, index) => (
-              <li key={`${edge.from}-${edge.to}-${index}`} className="border-t border-hairline pt-3 text-[0.85rem] leading-relaxed text-graphite">
+              <li key={`${edge.from}-${edge.to}-${index}`} className="border-t border-hairline pt-3 text-read-sm text-graphite">
                 <span className="font-mono text-micro uppercase tracking-[0.14em] text-ink">{labelFor(edge.from)}</span>
                 <span aria-hidden="true"> → </span>
                 <span className="font-mono text-micro uppercase tracking-[0.14em] text-ink">{labelFor(edge.to)}</span>

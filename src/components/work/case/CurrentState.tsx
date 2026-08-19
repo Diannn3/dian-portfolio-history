@@ -11,7 +11,7 @@ export function CurrentState({ items }: { items: CurrentStateItem[] }) {
         {items.map((item) => (
           <div key={item.label} className="border-t border-hairline py-4">
             <dt className="font-mono text-micro uppercase tracking-[0.16em] text-graphite">{item.label}</dt>
-            <dd className="mt-2 max-w-[34ch] text-[0.9rem] leading-relaxed text-ink">{item.value}</dd>
+            <dd className="mt-2 max-w-[36ch] text-read-sm text-ink">{item.value}</dd>
           </div>
         ))}
       </dl>
