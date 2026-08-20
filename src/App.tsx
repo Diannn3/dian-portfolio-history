@@ -35,8 +35,14 @@ function RouteLifecycle() {
         const target = document.getElementById(id);
         if (target) {
           const lenis = getLenis();
-          if (lenis) lenis.scrollTo(target, { offset: -96, immediate: false });
-          else target.scrollIntoView({ block: 'start' });
+          const targetTop = Math.max(0, target.getBoundingClientRect().top + window.scrollY - 96);
+          if (lenis) {
+            lenis.scrollTo(targetTop, { immediate: true, force: true });
+            // Hash entry is a navigational jump. Keep Lenis available for
+            // in-page interaction, but make the initial position deterministic
+            // even before its ticker has produced a frame.
+            window.scrollTo({ top: targetTop, left: 0, behavior: 'auto' });
+          } else target.scrollIntoView({ block: 'start' });
           ScrollTrigger.refresh();
           return;
         }
@@ -57,9 +63,15 @@ function RouteLifecycle() {
     };
 
     timer = window.setTimeout(scrollToRoutePosition, 40);
+    const onRouteContentReady = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(scrollToRoutePosition, 0);
+    };
+    window.addEventListener('vector:route-ready', onRouteContentReady);
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
+      window.removeEventListener('vector:route-ready', onRouteContentReady);
     };
   }, [pathname, hash]);
 

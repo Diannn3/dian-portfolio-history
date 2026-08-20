@@ -41,6 +41,11 @@ export interface ProjectMedia {
   fit?: 'contain' | 'cover';
   /** Only the first genuinely above-the-fold evidence image should be marked priority. */
   priority?: boolean;
+  /** Evidence ledger fields shown with the media, never hidden in metadata. */
+  proves?: string;
+  capturedAt?: string;
+  dataState?: string;
+  source?: string;
 }
 
 export interface CurrentStateItem {
@@ -106,6 +111,8 @@ export interface Project {
   verification: string;
   evidenceLevel?: EvidenceLevel;
   links?: ProjectLink[];
+  /** Real, evidence-led media shown in the opening of mature product cases. */
+  leadMedia?: ProjectMedia;
   /** compact, evidence-bounded snapshot shown near the top of mature case studies */
   currentState?: CurrentStateItem[];
   modules: ProjectModule[];

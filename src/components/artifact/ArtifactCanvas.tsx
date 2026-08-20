@@ -14,6 +14,7 @@ export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const pointer = useRef({ x: 0, y: 0 });
   const activeRef = useRef(active);
+  const pageVisible = useRef(document.visibilityState === 'visible');
   const dirty = useRef(true);
   const [failed, setFailed] = useState(false);
 
@@ -56,7 +57,7 @@ export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
     scene.add(artifact.object);
 
     const unsub = subscribeTick((_time, deltaMs) => {
-      if (!activeRef.current) return;
+      if (!activeRef.current || !pageVisible.current) return;
       if (reduced && !dirty.current) return;
       artifact.update(deltaMs / 1000, pointer.current);
       renderer.render(scene, camera);
@@ -84,6 +85,11 @@ export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
 
     const resizeObserver = new ResizeObserver(onResize);
     resizeObserver.observe(el);
+    const onVisibilityChange = () => {
+      pageVisible.current = document.visibilityState === 'visible';
+      dirty.current = true;
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
     if (!reduced) {
       el.addEventListener('pointermove', onMove);
       el.addEventListener('pointerleave', onLeave);
@@ -92,6 +98,7 @@ export function ArtifactCanvas({ reduced, lowQuality, active }: Props) {
     return () => {
       unsub();
       resizeObserver.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       if (!reduced) {
         el.removeEventListener('pointermove', onMove);
         el.removeEventListener('pointerleave', onLeave);

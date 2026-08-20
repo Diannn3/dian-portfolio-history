@@ -9,6 +9,7 @@ import { CaseModule } from '../components/work/case/CaseModules';
 import { ProjectLinks } from '../components/work/case/ProjectLinks';
 import { CaseIndex } from '../components/work/case/CaseIndex';
 import { CurrentState } from '../components/work/case/CurrentState';
+import { CaseMedia } from '../components/work/case/CaseMedia';
 import { Seo } from '../components/global/Seo';
 import { useAtlas } from '../contexts/AtlasContext';
 import { useReveals } from '../hooks/useReveals';
@@ -49,6 +50,17 @@ export function ProjectPage() {
     };
   }, [project, setMode, setRailProject, setChapter]);
 
+  // RouteLifecycle remains the single scroll owner. This event simply tells it
+  // that the lazy case module has committed its chapter DOM for a hash deep
+  // link, avoiding a race with the initial retry window.
+  useEffect(() => {
+    if (!project || loadedSlug !== slug) return;
+    const timer = window.setTimeout(() => {
+      window.dispatchEvent(new Event('vector:route-ready'));
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [project, loadedSlug, slug]);
+
   if (!hasProject(slug)) return <NotFound />;
   if (!project || loadedSlug !== slug) {
     return <main id="main" className="min-h-[70vh] pt-[8rem]" aria-busy="true" aria-label="Loading project" />;
@@ -65,7 +77,7 @@ export function ProjectPage() {
         image={project.socialImage}
       />
 
-      <main id="main">
+      <main id="main" data-project-evidence={project.evidenceLevel ?? 'CONCEPT'}>
         <header className="pt-8 md:pt-16">
           <div className="atlas-grid">
             <div className="col-span-4 flex items-baseline justify-between border-t border-ink pt-4 md:col-span-8 xl:col-span-12">
@@ -73,7 +85,7 @@ export function ProjectPage() {
                 <ArrowLeft className="mr-2 inline h-3.5 w-3.5 -translate-y-[1px]" strokeWidth={1.5} aria-hidden="true" />
                 INDEX
               </Link>
-              <span className="mono-label" style={{ color: project.accent }}>
+              <span className="mono-label text-accent">
                 {project.index} / {project.status}
               </span>
             </div>
@@ -115,14 +127,21 @@ export function ProjectPage() {
             ) : null}
           </div>
 
-          <div className="atlas-grid mt-12 md:mt-16">
-            <div className="col-span-4 aspect-[16/10] overflow-hidden border border-ink md:col-span-8 xl:col-span-12" data-clip>
-              <ProjectPreview preview={project.preview} />
+          {project.leadMedia ? (
+            <CaseMedia media={[project.leadMedia]} lead />
+          ) : (
+            <div className="atlas-grid mt-12 md:mt-16">
+              <div className="col-span-4 aspect-[16/10] overflow-hidden border border-ink md:col-span-8 xl:col-span-12" data-clip>
+                <ProjectPreview preview={project.preview} />
+              </div>
+              <div className="col-span-4 mt-3 flex flex-wrap items-baseline justify-between gap-3 md:col-span-8 xl:col-span-12">
+                <p className="mono-label">CONCEPT STUDY / SYSTEM DIAGRAM — NOT A PRODUCT SCREENSHOT</p>
+              </div>
             </div>
-            <div className="col-span-4 mt-3 flex flex-wrap items-baseline justify-between gap-3 md:col-span-8 xl:col-span-12">
-              <p className="mono-label">SYSTEM DIAGRAM — NOT A PRODUCT SCREENSHOT</p>
-              <p className="mono-label">{project.verification}</p>
-            </div>
+          )}
+
+          <div className="atlas-grid mt-4">
+            <p className="col-span-4 mono-label text-graphite md:col-span-8 xl:col-span-12">{project.verification}</p>
           </div>
 
           {project.currentState?.length ? <CurrentState items={project.currentState} /> : null}

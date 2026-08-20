@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import catalog from '../../src/data/projectCatalog.json';
+import catalog from '../../src/data/projectCatalog.json' with { type: 'json' };
 
 const expectedTitle = (project: (typeof catalog)[number]) =>
   `${project.title} — ${project.category} / Dian`;
@@ -12,12 +12,16 @@ test('home exposes the Atlas shell and primary portfolio landmarks', async ({ pa
   await expect(page.getByRole('button', { name: /INDEX/i })).toBeVisible();
 });
 
-test('Atlas index traps focus, closes with Escape, and restores focus', async ({ page }) => {
+test('Atlas index traps focus, closes with Escape, and restores focus', async ({ page }, testInfo) => {
+  test.skip(
+    testInfo.project.name === 'mobile-chromium',
+    'Focus restoration coverage runs in desktop Chromium; touch emulation has no keyboard focus model.',
+  );
   await page.goto('/');
   const trigger = page.getByRole('button', { name: /INDEX/i });
   await trigger.focus();
   await trigger.click();
-  const dialog = page.getByRole('dialog', { name: 'Atlas index' });
+  const dialog = page.getByRole('dialog', { name: /PROJECTS/i });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole('link', { name: /UPPETITE/i })).toBeVisible();
   await page.keyboard.press('Escape');
@@ -67,7 +71,11 @@ test('wide low-capability desktop keeps the SVG fallback instead of forcing WebG
   await expect(page.locator('[data-work-preview="inline"]')).toHaveCount(catalog.length);
 });
 
-test('wide capable desktop Work ledger progressively enhances to one shared stage shell', async ({ page }) => {
+test('wide capable desktop Work ledger progressively enhances to one shared stage shell', async ({ page }, testInfo) => {
+  test.skip(
+    testInfo.project.name === 'mobile-chromium',
+    'The stage requires a fine pointer; the mobile project validates the static Work fallback instead.',
+  );
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, get: () => 8 });
     Object.defineProperty(navigator, 'deviceMemory', { configurable: true, get: () => 8 });
@@ -98,6 +106,84 @@ test('direct lazy case-study hash deep link reaches its chapter', async ({ page 
   await page.goto('/work/uppetite/#case-01-context');
   await expect(page.locator('#case-01-context')).toBeInViewport({ ratio: 0.1 });
 });
+
+test('post-hero orientation and Selected Work hierarchy are evidence-led', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  const orientation = page.locator('[data-orientation]');
+  await expect(orientation).toBeVisible();
+  await expect(orientation.locator('[data-orientation-copy]')).toContainText(
+    'A small atlas of product systems, studio practice, and system studies.',
+  );
+  await expect(orientation.getByRole('link', { name: /VIEW SELECTED WORK/i })).toHaveAttribute('href', '#work');
+
+  const work = page.locator('#work');
+  await expect(work.getByRole('heading', { name: 'Product Systems' })).toBeVisible();
+  await expect(work.getByRole('heading', { name: 'Studio Practice' })).toBeVisible();
+  await expect(work.getByRole('heading', { name: 'System Studies' })).toBeVisible();
+  await expect(work.locator('[data-work-evidence]')).toHaveCount(2);
+  await expect(work.getByRole('link', { name: /VISIT AESCENT/i })).toHaveAttribute(
+    'href',
+    'https://aescentwebstudios.com/',
+  );
+  await expect(work.getByText('PUBLIC REPOSITORY', { exact: true })).toHaveCount(0);
+  await expect(work.locator('[data-study-entry]')).toHaveCount(2);
+  await expect(work.locator('[data-study-entry]').first()).toContainText('CONCEPT STUDY');
+});
+
+test('About carries one concise Aescent trajectory marker without changing Contact', async ({ page }) => {
+  await page.goto('/');
+  const about = page.locator('#about');
+  await expect(about.locator('[data-trajectory-marker]')).toHaveCount(1);
+  await expect(about.locator('[data-trajectory-marker]')).toContainText(
+    'Founder of Aescent Web Studio and a UPLB student here in Laguna.',
+  );
+  await expect(page.locator('#contact')).not.toContainText('Aescent', { timeout: 1000 });
+  await expect(page.locator('#contact').getByRole('link', { name: /VIEW GITHUB/i })).toHaveCount(1);
+  await expect(page.locator('[data-contact-actions]')).toHaveCount(0);
+});
+
+test('Artifact is a compact Lab threshold and empty Spline stays hidden', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const artifact = page.locator('#artifact [data-artifact-shell]');
+  await expect(artifact).toHaveCount(1);
+  const duration = await artifact.evaluate((node) => node.getBoundingClientRect().height / window.innerHeight);
+  expect(duration).toBeGreaterThanOrEqual(1.6);
+  expect(duration).toBeLessThanOrEqual(2.2);
+
+  const lab = page.locator('#lab');
+  await expect(lab.locator('[data-lab-experiment]')).toHaveCount(3);
+  await expect(lab.getByText('Spline Spatial Study', { exact: true })).toHaveCount(0);
+  const entries = lab.locator('[data-lab-experiment]');
+  const firstTrigger = entries.nth(0).getByRole('button').first();
+  const secondTrigger = entries.nth(1).getByRole('button').first();
+  await firstTrigger.click();
+  await expect(firstTrigger).toHaveAttribute('aria-expanded', 'true');
+  await secondTrigger.click();
+  await expect(firstTrigger).toHaveAttribute('aria-expanded', 'false');
+  await expect(secondTrigger).toHaveAttribute('aria-expanded', 'true');
+});
+
+for (const product of catalog.slice(0, 2)) {
+  test(`${product.slug} opening exposes proof state, role and media provenance`, async ({ page }) => {
+    await page.goto(`/work/${product.slug}/`);
+    const main = page.locator('#main');
+    const lead = main.locator('[data-case-lead-evidence]');
+    await expect(lead).toHaveCount(1);
+    await expect(lead.locator('img')).toBeVisible();
+    await expect(lead.getByText('PROVES', { exact: true })).toBeVisible();
+    await expect(lead.getByText('DATA STATE', { exact: true })).toBeVisible();
+    await expect(lead.getByText('SOURCE', { exact: true })).toBeVisible();
+    await expect(lead).toContainText(/audit derivative/i);
+    await expect(main).toHaveAttribute(
+      'data-project-evidence',
+      product.slug === 'uppetite' ? 'IMPLEMENTATION' : 'PROTOTYPE',
+    );
+    await expect(main.getByText('ROLE', { exact: true })).toBeVisible();
+  });
+}
 
 test('case index uses real hash navigation and updates project reading context', async ({ page }) => {
   await page.goto('/work/uppetite/');

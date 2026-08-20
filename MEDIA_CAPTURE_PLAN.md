@@ -80,6 +80,28 @@ Suggested portfolio directory: `public/work/ims/`
 5. `admin-review.webp`
    - Synthetic import/review records only; show stage → verify → publish governance.
 
+## Aescent Web Studio — capture gate
+
+The verified external destination is `https://aescentwebstudios.com/`. Aescent is
+represented in Vector Atlas as Studio Practice, not as an internal product case.
+
+The source/deployment audit found drift between the public repository, the dirty local
+checkout and the visible live site. Until that is reconciled, do not label any
+repository capture as the deployed production source and do not copy screenshots from
+the dirty checkout into this repository.
+
+If a dated live capture is approved later, it must include:
+
+1. one desktop and one mobile state (or a deliberate responsive pair);
+2. the URL, capture date, viewport, browser and visible route/state;
+3. no private client material, credentials, personal data or browser chrome;
+4. a caption that names what the frame proves without implying outcomes;
+5. optimized derivatives with intrinsic dimensions and a checked-in source note.
+
+The current CORE implementation is therefore allowed to use the live external CTA and
+an approved public Aescent brand mark only. It must not invent a screenshot, iframe,
+client result or production-source claim.
+
 ## Integration
 
 Add media only to the appropriate `evidence` module in the corresponding project file, for example `src/content/projects/uppetite.ts`:

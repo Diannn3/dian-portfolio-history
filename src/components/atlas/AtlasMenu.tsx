@@ -10,15 +10,7 @@ import { preloadProject } from '../../content/projectRegistry';
 import { preloadProjectPage } from '../../lib/navigation/projectPrefetch';
 import { getLenis } from '../../lib/motion/smoothScroll';
 import { useReducedMotion } from '../../hooks/useEnvironment';
-
-const SECTIONS = [
-{ id: 'work', index: '01', label: 'SELECTED WORK' },
-{ id: 'about', index: '02', label: 'ABOUT' },
-{ id: 'now', index: '03', label: 'CURRENT VECTOR' },
-{ id: 'artifact', index: '04', label: 'DIGITAL ARTIFACT' },
-{ id: 'lab', index: '05', label: 'LAB' },
-{ id: 'tools', index: '06', label: 'TOOLS' },
-{ id: 'contact', index: '07', label: 'CONTACT' }];
+import { sectionNav } from '../../data/sections';
 
 
 /**
@@ -29,6 +21,8 @@ const SECTIONS = [
 export function AtlasMenu() {
   const { menuOpen, setMenuOpen } = useAtlas();
   const panel = useRef<HTMLDivElement>(null);
+  const wasOpen = useRef(false);
+  const restoreFocus = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
   const navigate = useNavigate();
 
@@ -38,6 +32,20 @@ export function AtlasMenu() {
     setMenuOpen(false);
     navigate(`/#${id}`);
   };
+
+  useEffect(() => {
+    if (menuOpen && !wasOpen.current) {
+      restoreFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
+    if (!menuOpen && wasOpen.current) {
+      const target = restoreFocus.current;
+      if (target && document.contains(target)) {
+        window.requestAnimationFrame(() => target.focus());
+      }
+      restoreFocus.current = null;
+    }
+    wasOpen.current = menuOpen;
+  }, [menuOpen]);
 
   useEffect(() => {
     const lenis = getLenis();
@@ -159,7 +167,7 @@ export function AtlasMenu() {
               <div className="col-span-4 md:col-span-3 xl:col-span-4 xl:col-start-9">
                 <p className="mono-label mb-4">SECTIONS</p>
                 <ul className="mb-10 flex flex-col gap-1">
-                  {SECTIONS.map((s) =>
+                  {sectionNav.map((s) =>
                   <li key={s.id} className="overflow-hidden">
                       <a
                       href={`/#${s.id}`}

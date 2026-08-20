@@ -15,4 +15,12 @@ module.exports = {
       { allowConstantExport: true },
     ],
   },
+  overrides: [
+    {
+      // This reviewed hero source is byte-frozen; keep its pre-existing
+      // formatting intact while the rest of the project remains linted.
+      files: ['src/components/hero/Streamlines.tsx'],
+      rules: { '@typescript-eslint/no-extra-semi': 'off' },
+    },
+  ],
 }

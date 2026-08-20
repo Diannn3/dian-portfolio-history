@@ -13,6 +13,8 @@
     "postbuild": "node scripts/generate-route-entrypoints.mjs",
     "guard:frozen": "node scripts/check-frozen-surfaces.mjs",
     "test:e2e": "playwright test",
+    "test:visual": "playwright test tests/e2e/visual-contract.spec.ts",
+    "test:responsive": "playwright test tests/e2e/responsive.spec.ts",
     "test:a11y": "playwright test tests/e2e/accessibility.spec.ts",
     "verify:dist": "node scripts/verify-dist.mjs"
   },
@@ -32,6 +34,7 @@
     "@types/node": "20.11.18",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.1",
+    "@types/three": "0.170.0",
     "@typescript-eslint/eslint-plugin": "5.54.0",
     "@typescript-eslint/parser": "5.54.0",
     "@vitejs/plugin-react": "4.2.1",

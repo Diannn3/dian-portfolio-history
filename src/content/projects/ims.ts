@@ -3,7 +3,7 @@ import { projectCatalog } from '../../data/projectCatalog';
 
 export const project: Project = {
     ...projectCatalog[1],
-    evidenceLevel: 'IMPLEMENTATION',
+    evidenceLevel: 'PROTOTYPE',
     verification: 'PROTOTYPE / PUBLIC SOURCE VERIFIED — floor geometry is schematic + site-unverified',
     thesis: 'Indoors, a map stops being a plane and becomes a stack.',
     role: ['Product architecture', 'Spatial data', 'Data governance', 'Interface'],
@@ -27,6 +27,21 @@ export const project: Project = {
         note: 'Architecture, import, map and validation documentation.',
       },
     ],
+    leadMedia: {
+      type: 'image',
+      src: '/work/ims/third-floor-schematic.png',
+      alt: 'IMS Academic Hub schematic third-floor map with rooms, stairs and a site-verification note.',
+      caption: 'The map is a schematic prototype; the geometry remains explicitly site-unverified.',
+      width: 1200,
+      height: 760,
+      aspectRatio: '16 / 10',
+      fit: 'contain',
+      priority: true,
+      proves: 'A real prototype state: semantic floor-map structure and room identities are visible without claiming surveyed geometry.',
+      capturedAt: '2026-08-20 audit derivative from the local IMS repository preview',
+      dataState: 'SYNTHETIC / SITE-UNVERIFIED',
+      source: 'IMS repository: third-preview.png',
+    },
     technologies: [
       { group: 'Interface', items: ['SvelteKit', 'Svelte', 'TypeScript'], intent: 'in use' },
       { group: 'Spatial', items: ['Semantic SVG floor maps', 'A* route graph'], intent: 'in use' },
