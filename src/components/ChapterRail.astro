@@ -1,0 +1,86 @@
+---
+const chapters = [
+  { id: 'hero-scroll-stage', label: '01', title: 'Monolith' },
+  { id: 'philosophy', label: '02', title: 'Philosophy' },
+  { id: 'work', label: '03', title: 'Selected Work' },
+  { id: 'explorer', label: '04', title: 'Systems Matrix' },
+  { id: 'constellation', label: '05', title: 'Constellation' },
+  { id: 'method', label: '06', title: 'Method' },
+  { id: 'contact', label: '07', title: 'Contact' }
+];
+---
+
+<aside
+  id="chapter-rail"
+  class="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col gap-4 font-mono text-[11px] select-none pointer-events-auto"
+  aria-label="Chapter navigation"
+>
+  <div class="flex flex-col gap-3.5 items-end pr-2 border-r border-[#22262B]">
+    {chapters.map((ch) => (
+      <a
+        href={`#${ch.id}`}
+        data-chapter={ch.id}
+        class="chapter-link group flex items-center gap-2.5 text-[#666B6E] hover:text-[#F5F5F7] transition-all duration-200"
+      >
+        <span class="chapter-title opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-[10px] uppercase tracking-wider text-[#8C9296]">
+          {ch.title}
+        </span>
+        <span class="chapter-label font-bold tracking-wider">{ch.label}</span>
+        <span class="chapter-tick w-1.5 h-0.5 bg-[#22262B] group-hover:w-3 group-hover:bg-[#8EBBC8] transition-all duration-200"></span>
+      </a>
+    ))}
+  </div>
+</aside>
+
+<script>
+  const chapterLinks = document.querySelectorAll('.chapter-link');
+  const sections = Array.from(chapterLinks).map((link) => {
+    const targetId = link.getAttribute('data-chapter');
+    return targetId ? document.getElementById(targetId) : null;
+  });
+
+  const observerOptions = {
+    root: null,
+    rootMargin: '-30% 0px -50% 0px',
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        chapterLinks.forEach((link) => {
+          const isTarget = link.getAttribute('data-chapter') === id;
+          const tick = link.querySelector('.chapter-tick') as HTMLElement;
+          const label = link.querySelector('.chapter-label') as HTMLElement;
+
+          if (isTarget) {
+            link.classList.add('text-[#8EBBC8]');
+            link.classList.remove('text-[#666B6E]');
+            if (tick) {
+              tick.style.width = '14px';
+              tick.style.backgroundColor = '#8EBBC8';
+            }
+            if (label) {
+              label.style.color = '#8EBBC8';
+            }
+          } else {
+            link.classList.remove('text-[#8EBBC8]');
+            link.classList.add('text-[#666B6E]');
+            if (tick) {
+              tick.style.width = '6px';
+              tick.style.backgroundColor = '#22262B';
+            }
+            if (label) {
+              label.style.color = '';
+            }
+          }
+        });
+      }
+    });
+  }, observerOptions);
+
+  sections.forEach((sec) => {
+    if (sec) observer.observe(sec);
+  });
+</script>

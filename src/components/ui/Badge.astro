@@ -1,0 +1,20 @@
+---
+interface Props {
+  status: 'active' | 'prototype' | 'case-study' | 'live';
+  className?: string;
+}
+
+const { status, className = '' } = Astro.props;
+
+const styles = {
+  active: 'border-[#8EBBC8] text-[#8EBBC8] bg-[#8EBBC8]/10',
+  prototype: 'border-[#E5A93C] text-[#E5A93C] bg-[#E5A93C]/10',
+  'case-study': 'border-[#C8CDD0] text-[#C8CDD0] bg-[#C8CDD0]/10',
+  live: 'border-[#48BB78] text-[#48BB78] bg-[#48BB78]/10'
+};
+---
+
+<span class={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono tracking-wider uppercase border rounded ${styles[status]} ${className}`}>
+  <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+  {status}
+</span>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none" width="100%" height="100%">
+  <defs>
+    <linearGradient id="prism_obsidian" x1="100" y1="50" x2="700" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#101214" />
+      <stop offset="100%" stop-color="#050607" />
+    </linearGradient>
+    <linearGradient id="prism_arc" x1="200" y1="100" x2="600" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8EBBC8" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#4A7582" stop-opacity="0.2" />
+    </linearGradient>
+    <pattern id="prism_grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#22262B" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#prism_obsidian)" rx="8" />
+  <rect width="800" height="500" fill="url(#prism_grid)" opacity="0.6" rx="8" />
+
+  <!-- Isochrone Ellipses (Time Distance Bands) -->
+  <ellipse cx="380" cy="250" rx="300" ry="180" stroke="#2A3036" stroke-width="1.5" stroke-dasharray="4 6" />
+  <ellipse cx="380" cy="250" rx="210" ry="125" stroke="#374149" stroke-width="1.5" />
+  <ellipse cx="380" cy="250" rx="110" ry="65" stroke="#8EBBC8" stroke-width="1.5" stroke-opacity="0.6" />
+
+  <!-- Route Prism Ray Tracing -->
+  <polygon points="380,250 180,140 240,360" fill="url(#prism_arc)" />
+  <polygon points="380,250 560,160 520,350" fill="url(#prism_arc)" fill-opacity="0.5" />
+
+  <!-- Route Vectors -->
+  <path d="M 380 250 L 180 140" stroke="#C8CDD0" stroke-width="2" stroke-linecap="round" />
+  <path d="M 380 250 L 240 360" stroke="#C8CDD0" stroke-width="2" stroke-linecap="round" />
+  <path d="M 380 250 L 560 160" stroke="#8EBBC8" stroke-width="2" stroke-linecap="round" />
+  <path d="M 380 250 L 520 350" stroke="#8EBBC8" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Nodes -->
+  <!-- Origin Student Location -->
+  <circle cx="380" cy="250" r="7" fill="#8EBBC8" />
+  <circle cx="380" cy="250" r="14" stroke="#8EBBC8" stroke-width="1.5" stroke-opacity="0.5" />
+  <text x="396" y="246" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="11" letter-spacing="1">ORIGIN: STUDENT LOC (T=0)</text>
+
+  <!-- Vendor Candidate Nodes -->
+  <circle cx="180" cy="140" r="5" fill="#C8CDD0" />
+  <text x="110" y="132" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="10">NODE_V1 (T+8m · OPEN)</text>
+
+  <circle cx="240" cy="360" r="5" fill="#C8CDD0" />
+  <text x="160" y="380" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="10">NODE_V2 (T+12m · OPEN)</text>
+
+  <circle cx="560" cy="160" r="5" fill="#8EBBC8" />
+  <text x="575" y="164" fill="#8EBBC8" font-family="'Fragment Mono', monospace" font-size="10">OPTIMAL_PATH (T+5m)</text>
+
+  <circle cx="520" cy="350" r="5" fill="#666B6E" />
+  <text x="535" y="354" fill="#666B6E" font-family="'Fragment Mono', monospace" font-size="10">NODE_V4 (CLOSED)</text>
+
+  <!-- Technical Telemetry Box -->
+  <rect x="24" y="24" width="230" height="58" fill="#101214" stroke="#22262B" stroke-width="1" rx="4" />
+  <text x="36" y="44" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="11" font-weight="bold">SYSTEM STUDY: ROUTE PRISM</text>
+  <text x="36" y="62" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="9.5">ISOCHRONE SCHEDULE DELTA: 15 MIN</text>
+
+  <!-- Bottom Metric Tag -->
+  <rect x="546" y="440" width="230" height="36" fill="#101214" stroke="#22262B" stroke-width="1" rx="4" />
+  <text x="558" y="462" fill="#8EBBC8" font-family="'Fragment Mono', monospace" font-size="10">EVAL: f(t, d) = t_walk + t_prep</text>
+</svg>

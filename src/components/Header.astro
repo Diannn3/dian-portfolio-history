@@ -1,0 +1,73 @@
+---
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  id="site-header"
+  class="fixed top-0 left-0 w-full z-50 transition-all duration-300 py-4 px-6 md:px-12 backdrop-blur-md bg-[#050607]/60 border-b border-[#22262B]/50"
+>
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <!-- Brand Anchor -->
+    <a href="/" class="flex items-center gap-3 group focus:outline-none">
+      <div class="w-7 h-7 flex-shrink-0 transition-transform duration-300 group-hover:scale-105">
+        <img
+          src="/brand/aedrian-a.svg"
+          alt="Aedrian Monolith Mark"
+          width="28"
+          height="28"
+          class="w-full h-full object-contain"
+        />
+      </div>
+      <div class="flex flex-col">
+        <span class="font-display font-bold text-sm tracking-tight text-[#F5F5F7] group-hover:text-[#8EBBC8] transition-colors">
+          Aedrian Ponce
+        </span>
+        <span class="font-mono text-[10px] text-[#8C9296] tracking-wider uppercase">
+          Systems · Math · Agents
+        </span>
+      </div>
+    </a>
+
+    <!-- Navigation Routes -->
+    <nav class="hidden md:flex items-center gap-6 font-mono text-xs text-[#8C9296]">
+      <a
+        href="/"
+        class={`transition-colors hover:text-[#FFFFFF] ${currentPath === '/' ? 'text-[#8EBBC8] font-semibold' : ''}`}
+      >
+        // Index
+      </a>
+      <a
+        href="/work/"
+        class={`transition-colors hover:text-[#FFFFFF] ${currentPath.startsWith('/work') ? 'text-[#8EBBC8] font-semibold' : ''}`}
+      >
+        // Work
+      </a>
+      <a
+        href="/about/"
+        class={`transition-colors hover:text-[#FFFFFF] ${currentPath === '/about/' || currentPath === '/about' ? 'text-[#8EBBC8] font-semibold' : ''}`}
+      >
+        // About
+      </a>
+    </nav>
+
+    <!-- CTAs -->
+    <div class="flex items-center gap-3 font-mono text-xs">
+      <a
+        href="https://github.com/Diannn3"
+        target="_blank"
+        rel="noreferrer noopener"
+        class="hidden sm:inline-flex px-3 py-1.5 border border-[#22262B] bg-[#101214]/80 text-[#C8CDD0] hover:text-[#FFFFFF] hover:border-[#8EBBC8] transition-colors rounded"
+      >
+        GitHub ↗
+      </a>
+      <a
+        href="https://www.linkedin.com/in/aedrian-ponce-a602b0398/"
+        target="_blank"
+        rel="noreferrer noopener"
+        class="px-3.5 py-1.5 bg-[#8EBBC8] text-[#050607] font-semibold hover:bg-[#A5D0DC] transition-colors rounded shadow-sm"
+      >
+        Contact ↗
+      </a>
+    </div>
+  </div>
+</header>

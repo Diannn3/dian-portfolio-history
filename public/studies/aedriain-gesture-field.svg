@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gf_obsidian" x1="50" y1="50" x2="750" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#101214" />
+      <stop offset="100%" stop-color="#050607" />
+    </linearGradient>
+    <linearGradient id="gf_laser" x1="150" y1="200" x2="650" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C8CDD0" />
+      <stop offset="50%" stop-color="#8EBBC8" />
+      <stop offset="100%" stop-color="#558896" />
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#gf_obsidian)" rx="8" />
+
+  <!-- 3D Coordinate Grid Perspective -->
+  <line x1="100" y1="420" x2="700" y2="420" stroke="#22262B" stroke-width="1.5" />
+  <line x1="160" y1="360" x2="640" y2="360" stroke="#1C2024" stroke-width="1" />
+  <line x1="220" y1="300" x2="580" y2="300" stroke="#16191C" stroke-width="1" />
+  
+  <!-- Perspective Ray Lines -->
+  <line x1="400" y1="180" x2="100" y2="420" stroke="#1C2024" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="400" y1="180" x2="250" y2="420" stroke="#1C2024" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="400" y1="180" x2="550" y2="420" stroke="#1C2024" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="400" y1="180" x2="700" y2="420" stroke="#1C2024" stroke-width="1" stroke-dasharray="3 3" />
+
+  <!-- Spatial Hand Skeleton Mesh (21 Landmark Graph) -->
+  <!-- Wrist -->
+  <circle cx="400" cy="380" r="6" fill="#C8CDD0" />
+  <text x="412" y="384" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="10">WRIST (L0)</text>
+
+  <!-- Palm & Knuckles -->
+  <path d="M 400 380 L 330 310 L 370 270 L 410 260 L 450 270 L 480 320 Z" fill="#8EBBC8" fill-opacity="0.08" stroke="#8EBBC8" stroke-width="1.5" />
+
+  <!-- Thumb Bones -->
+  <path d="M 400 380 L 330 310 L 300 260 L 290 220" stroke="#C8CDD0" stroke-width="2" stroke-linecap="round" />
+  <circle cx="330" cy="310" r="4" fill="#8EBBC8" />
+  <circle cx="300" cy="260" r="4" fill="#8EBBC8" />
+  <circle cx="290" cy="220" r="5" fill="#FFFFFF" />
+  <text x="210" y="224" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="10">THUMB_TIP (L4)</text>
+
+  <!-- Index Finger Bones (Pointing / Pinch Vector) -->
+  <path d="M 370 270 L 360 210 L 355 160 L 350 120" stroke="#8EBBC8" stroke-width="2" stroke-linecap="round" />
+  <circle cx="360" cy="210" r="4" fill="#8EBBC8" />
+  <circle cx="355" cy="160" r="4" fill="#8EBBC8" />
+  <circle cx="350" cy="120" r="6" fill="#8EBBC8" />
+  <circle cx="350" cy="120" r="12" stroke="#8EBBC8" stroke-width="1" stroke-dasharray="2 2" />
+  <text x="366" y="124" fill="#8EBBC8" font-family="'Fragment Mono', monospace" font-size="10" font-weight="bold">INDEX_TIP (PINCH ORIGIN)</text>
+
+  <!-- Middle, Ring, Pinky Bones -->
+  <path d="M 410 260 L 415 190 L 420 145 L 425 110" stroke="#4A5560" stroke-width="1.5" />
+  <path d="M 450 270 L 460 210 L 470 170 L 475 135" stroke="#4A5560" stroke-width="1.5" />
+  <path d="M 480 320 L 505 280 L 520 245 L 530 210" stroke="#4A5560" stroke-width="1.5" />
+
+  <!-- Holographic Window Bounding Plane -->
+  <polygon points="460,80 680,60 700,220 480,240" fill="#181B1E" fill-opacity="0.8" stroke="#8EBBC8" stroke-width="1.5" stroke-dasharray="4 2" />
+  <text x="490" y="110" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="10" font-weight="bold">HOLO_WINDOW: NOTES.MD</text>
+  <line x1="350" y1="120" x2="480" y2="150" stroke="#8EBBC8" stroke-width="1.5" stroke-dasharray="3 3" />
+
+  <!-- Top Left Header Box -->
+  <rect x="24" y="24" width="250" height="58" fill="#101214" stroke="#22262B" stroke-width="1" rx="4" />
+  <text x="36" y="44" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="11" font-weight="bold">SYSTEM STUDY: GESTURE FIELD</text>
+  <text x="36" y="62" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="9.5">WORKER POOL: 60 FPS NON-BLOCKING</text>
+
+  <!-- Bottom Metric Tag -->
+  <rect x="526" y="440" width="250" height="36" fill="#101214" stroke="#22262B" stroke-width="1" rx="4" />
+  <text x="538" y="462" fill="#8EBBC8" font-family="'Fragment Mono', monospace" font-size="10">TRANSFER: Transferable ArrayBuffer</text>
+</svg>

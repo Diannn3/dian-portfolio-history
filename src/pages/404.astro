@@ -1,0 +1,47 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="404 — Node Not Found · Aedrian Ponce"
+  description="Requested resource does not exist in the current architecture."
+>
+  <div class="w-full min-h-[75vh] flex items-center justify-center bg-[#050607] text-[#F5F5F7] px-6 py-24">
+    <div class="max-w-md w-full p-8 bg-[#101214] border border-[#22262B] rounded-lg text-center space-y-6">
+      <div class="w-16 h-16 mx-auto">
+        <img
+          src="/brand/aedrian-a.svg"
+          alt="Aedrian A Mark"
+          class="w-full h-full object-contain opacity-80"
+        />
+      </div>
+
+      <div class="space-y-2">
+        <div class="font-mono text-xs text-[#8EBBC8] uppercase tracking-widest">
+          ERROR_CODE: 404 // NODE_NULL
+        </div>
+        <h1 class="text-3xl font-display font-bold text-[#F5F5F7]">
+          Coordinate Not Found
+        </h1>
+        <p class="font-body text-sm text-[#8C9296] leading-relaxed">
+          The requested path does not exist in this system topography or has been relocated.
+        </p>
+      </div>
+
+      <div class="pt-4 flex flex-col sm:flex-row gap-3 justify-center font-mono text-xs">
+        <a
+          href="/"
+          class="px-4 py-2.5 bg-[#8EBBC8] text-[#050607] font-bold hover:bg-[#A5D0DC] transition-colors rounded"
+        >
+          // Return to Index
+        </a>
+        <a
+          href="/work/"
+          class="px-4 py-2.5 border border-[#22262B] bg-[#181B1E] text-[#C8CDD0] hover:text-[#FFFFFF] hover:border-[#8EBBC8] transition-colors rounded"
+        >
+          // Browse Work
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

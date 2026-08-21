@@ -1,0 +1,153 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="About Aedrian Ponce — Systems Engineer & Applied Mathematician"
+  description="Background, academic focus at UPLB, systems engineering philosophy, and technical stack of Aedrian Ponce."
+>
+  <div class="atmospheric-wrapper min-h-screen bg-[#050607]">
+    <div class="atmospheric-grain" aria-hidden="true"></div>
+    <div class="atmospheric-grid" aria-hidden="true"></div>
+    <div class="atmospheric-glow" aria-hidden="true"></div>
+
+    <div class="relative z-10 w-full text-[#F5F5F7] pt-32 pb-24 px-6 md:px-12">
+      <div class="max-w-4xl mx-auto space-y-16">
+        
+        <!-- Biography Intro -->
+        <section class="space-y-6">
+          <div class="flex items-center gap-2 font-mono text-xs text-[#8EBBC8] uppercase tracking-widest">
+            <span class="w-2 h-2 rounded-full bg-[#8EBBC8] animate-pulse"></span>
+            <span>Aedrian Ponce // Dian · UPLB Applied Math</span>
+          </div>
+
+          <h1 class="text-4xl sm:text-6xl md:text-7xl font-display font-bold tracking-tight text-[#F5F5F7] leading-[0.95]">
+            Applied Mathematics student, distributed systems engineer, AI agent builder.
+          </h1>
+
+          <p class="font-body text-lg md:text-xl text-[#C8CDD0] leading-relaxed font-light">
+            I am a multidisciplinary student builder studying Applied Mathematics at the University of the Philippines Los Baños (UPLB). My engineering focus sits at the convergence of rigorous mathematical abstractions, low-latency web systems, and autonomous AI agent loop architectures.
+          </p>
+        </section>
+
+        <!-- Engineering Principles -->
+        <section class="p-8 lg:p-10 bg-[#101214] border border-[#22262B] rounded-xl space-y-8 shadow-xl">
+          <h2 class="text-2xl lg:text-3xl font-display font-bold text-[#F5F5F7]">
+            Core Engineering Principles
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 font-body text-sm text-[#8C9296] leading-relaxed">
+            <div class="space-y-2.5">
+              <h3 class="font-mono text-xs text-[#8EBBC8] font-bold uppercase tracking-wider">01 / Mathematical Grounding</h3>
+              <p>
+                I treat software systems as discrete mathematical objects. Whether calculating route isochrones, evaluating directed graph traversals with $A^*$, or modeling memory layouts, mathematical rigor precedes code syntax.
+              </p>
+            </div>
+
+            <div class="space-y-2.5">
+              <h3 class="font-mono text-xs text-[#8EBBC8] font-bold uppercase tracking-wider">02 / Non-Blocking Concurrency</h3>
+              <p>
+                Heavy computational workloads—such as computer vision tensor inference, matrix transformations, and streaming parsers—must never block the main thread. I rely on dedicated Web Workers, typed ArrayBuffers, and demand-based frame loops.
+              </p>
+            </div>
+
+            <div class="space-y-2.5">
+              <h3 class="font-mono text-xs text-[#8EBBC8] font-bold uppercase tracking-wider">03 / Privacy by Construction</h3>
+              <p>
+                User privacy is an architectural invariant. Student academic records remain in local browser IndexedDB; camera landmark tensors stay on-device; and personal travel data never touches a centralized server.
+              </p>
+            </div>
+
+            <div class="space-y-2.5">
+              <h3 class="font-mono text-xs text-[#8EBBC8] font-bold uppercase tracking-wider">04 / Anti-Vibecode Discipline</h3>
+              <p>
+                I eliminate generic AI boilerplate and template slop. Every layout, design token, 3D shader, and component is crafted with purpose, verified by unit tests, and audited across real mobile viewports.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Technical Stack Matrix -->
+        <section class="space-y-8">
+          <h2 class="text-3xl font-display font-bold text-[#F5F5F7] tracking-tight">
+            Technical Stack & Tooling
+          </h2>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="p-6 bg-[#101214] border border-[#22262B] rounded-xl space-y-3 shadow-sm">
+              <h3 class="font-mono text-xs text-[#8EBBC8] uppercase font-bold tracking-wider">Languages & Runtimes</h3>
+              <div class="flex flex-wrap gap-2">
+                {['TypeScript', 'JavaScript (ESNext)', 'Python 3', 'SQL (PLpgSQL)', 'HTML5 / CSS3'].map((item) => (
+                  <span class="px-2.5 py-1 bg-[#181B1E] border border-[#22262B] text-xs font-mono text-[#F5F5F7] rounded">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div class="p-6 bg-[#101214] border border-[#22262B] rounded-xl space-y-3 shadow-sm">
+              <h3 class="font-mono text-xs text-[#8EBBC8] uppercase font-bold tracking-wider">Frameworks & 3D Graphics</h3>
+              <div class="flex flex-wrap gap-2">
+                {['Astro 5', 'Svelte / SvelteKit', 'React 19', 'Three.js / R3F', 'Tailwind CSS v4', 'GSAP'].map((item) => (
+                  <span class="px-2.5 py-1 bg-[#181B1E] border border-[#22262B] text-xs font-mono text-[#F5F5F7] rounded">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div class="p-6 bg-[#101214] border border-[#22262B] rounded-xl space-y-3 shadow-sm">
+              <h3 class="font-mono text-xs text-[#8EBBC8] uppercase font-bold tracking-wider">Systems, Data & Edge</h3>
+              <div class="flex flex-wrap gap-2">
+                {['Supabase (PostgreSQL / RLS)', 'IndexedDB Local-First', 'Vercel Edge', 'Web Workers', 'MediaPipe AI', 'Electron'].map((item) => (
+                  <span class="px-2.5 py-1 bg-[#181B1E] border border-[#22262B] text-xs font-mono text-[#F5F5F7] rounded">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div class="p-6 bg-[#101214] border border-[#22262B] rounded-xl space-y-3 shadow-sm">
+              <h3 class="font-mono text-xs text-[#8EBBC8] uppercase font-bold tracking-wider">Testing, QA & Modeling</h3>
+              <div class="flex flex-wrap gap-2">
+                {['Vitest', 'Playwright E2E', 'Blender 5.0 (Python API)', 'Git / GitHub', 'Model Context Protocol (MCP)'].map((item) => (
+                  <span class="px-2.5 py-1 bg-[#181B1E] border border-[#22262B] text-xs font-mono text-[#F5F5F7] rounded">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Verification Boundary Note -->
+        <section class="p-6 bg-[#101214] border border-[#22262B] rounded-xl space-y-3 font-mono text-xs text-[#8C9296]">
+          <div class="text-[#F5F5F7] font-bold">PUBLIC EVIDENCE INTEGRITY NOTE</div>
+          <p class="leading-relaxed">
+            This portfolio is maintained under strict clean-room evidence gating. All project claims, code repositories, and technical roles are tied directly to public verifiable repositories (`github.com/Diannn3`). Unconfirmed roles or outcomes retain explicit confirmation gates.
+          </p>
+        </section>
+
+        <!-- Call to Action -->
+        <div class="pt-8 flex flex-col sm:flex-row items-center gap-4 font-mono text-xs">
+          <a
+            href="https://www.linkedin.com/in/aedrian-ponce-a602b0398/"
+            target="_blank"
+            rel="noreferrer noopener"
+            class="w-full sm:w-auto px-6 py-3.5 bg-[#8EBBC8] text-[#050607] font-bold text-center hover:bg-[#A5D0DC] transition-colors rounded shadow-md"
+          >
+            Let’s build a system together ↗
+          </a>
+          <a
+            href="https://github.com/Diannn3"
+            target="_blank"
+            rel="noreferrer noopener"
+            class="w-full sm:w-auto px-6 py-3.5 border border-[#22262B] bg-[#101214] text-[#C8CDD0] hover:text-[#FFFFFF] hover:border-[#8EBBC8] transition-colors rounded text-center"
+          >
+            Explore GitHub Profile ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

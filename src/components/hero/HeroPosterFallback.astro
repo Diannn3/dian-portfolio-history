@@ -1,0 +1,27 @@
+---
+interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+---
+
+<div class={`hero-poster-fallback absolute inset-0 flex items-center justify-center pointer-events-none ${className}`}>
+  <img
+    src="/brand/aedrian-a-transparent.png"
+    alt="Aedrian Ponce 3D Obsidian A Monolith Fallback Poster"
+    width="1024"
+    height="1024"
+    class="w-full max-w-xl max-h-[70vh] object-contain select-none filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+    loading="eager"
+    decoding="async"
+  />
+</div>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-poster-fallback {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,322 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HeroStage from '../components/hero/HeroStage.astro';
+import Badge from '../components/ui/Badge.astro';
+import EvidenceBadge from '../components/ui/EvidenceBadge.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import SystemsExplorer from '../components/systems/SystemsExplorer';
+import { getCollection } from 'astro:content';
+
+const allWork = await getCollection('work');
+const sortedWork = allWork.sort((a, b) => a.data.order - b.data.order);
+---
+
+<Layout showChapterRail={true}>
+  <!-- 1. Cinematic 3D Monolith Hero (210svh scroll choreography) -->
+  <HeroStage />
+
+  <!-- Atmospheric Texture & Environment Wrapper -->
+  <div class="atmospheric-wrapper">
+    <div class="atmospheric-grain" aria-hidden="true"></div>
+    <div class="atmospheric-grid" aria-hidden="true"></div>
+    <div class="atmospheric-glow" aria-hidden="true"></div>
+
+    <!-- 2. Manifesto / Engineering Philosophy -->
+    <section id="philosophy" class="w-full bg-[#050607] text-[#F5F5F7] py-28 px-6 md:px-12 border-t border-[#22262B]">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div class="lg:col-span-4 sticky top-28 space-y-2">
+          <div class="flex items-center gap-3 font-mono text-xs text-[#8EBBC8] uppercase tracking-widest">
+            <span class="w-2.5 h-0.5 bg-[#8EBBC8]"></span>
+            <span>02 // Philosophy</span>
+          </div>
+          <div class="font-mono text-[11px] text-[#666B6E]">
+            THE AEDRIAN STANDARD
+          </div>
+        </div>
+
+        <div class="lg:col-span-8 space-y-8">
+          <h2 class="text-3xl sm:text-5xl md:text-6xl font-display font-bold tracking-tight text-[#F5F5F7] leading-[1.05]">
+            The web has enough fragile systems. We engineer with <em class="text-[#8EBBC8] not-italic">mathematical rigor</em> and <em class="text-[#C8CDD0] not-italic">architectural restraint.</em>
+          </h2>
+
+          <p class="font-body text-lg md:text-xl text-[#C8CDD0] leading-relaxed max-w-2xl font-light">
+            Generic boilerplate and superficial decorations create brittle software. Every system I build starts with mathematical foundations: memory boundaries, graph topology, tensor transformations, and verifiable constraints.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-6 border-t border-[#22262B] font-body text-sm text-[#8C9296] leading-relaxed">
+            <p>
+              I treat software architecture as applied mathematics. From $A^*$ directed graphs in campus wayfinding to isochrone schedule boundaries in routing engines, algorithmic correctness precedes visual polish.
+            </p>
+            <p>
+              When visual layers are added—whether Three.js WebGL monoliths or hand-tracking interfaces—they operate on non-blocking worker threads with zero idle frame rendering, protecting battery life and user attention.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marquee Ticker Tape -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <div class="marquee-group">
+          <span>Discrete Systems <i>♦</i></span>
+          <span>Applied Mathematics <i>♦</i></span>
+          <span>Topological Routing <i>♦</i></span>
+          <span>Spatial Computing <i>♦</i></span>
+          <span>AI Agent Loops <i>♦</i></span>
+          <span>Deterministic QA <i>♦</i></span>
+        </div>
+        <div class="marquee-group">
+          <span>Discrete Systems <i>♦</i></span>
+          <span>Applied Mathematics <i>♦</i></span>
+          <span>Topological Routing <i>♦</i></span>
+          <span>Spatial Computing <i>♦</i></span>
+          <span>AI Agent Loops <i>♦</i></span>
+          <span>Deterministic QA <i>♦</i></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Mineral Canvas: Selected Work Chapters -->
+    <section id="work" class="w-full bg-[#E7E4DC] text-[#101214] py-32 px-6 md:px-12 border-t border-[#C5C3BC]">
+      <div class="max-w-7xl mx-auto">
+        <SectionHeading
+          eyebrow="03 // Selected Work"
+          title="Engineered Systems & Architecture"
+          description="Publicly verified case studies across distributed routing, spatial interfaces, indoor wayfinding, and static delivery architectures."
+        />
+
+        <div class="space-y-28 mt-16">
+          {sortedWork.map((project, idx) => (
+            <article class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center pb-24 border-b border-[#C5C3BC] last:border-b-0 last:pb-0">
+              <!-- Media Visual (Programmatic System Study) -->
+              <div class={`lg:col-span-7 ${idx % 2 === 1 ? 'lg:order-2' : ''}`}>
+                <a href={`/work/${project.id}/`} class="group block overflow-hidden rounded-xl border border-[#C5C3BC] shadow-xl bg-[#050607]">
+                  <div class="relative aspect-[16/10] overflow-hidden">
+                    <img
+                      src={project.data.visual.asset}
+                      alt={project.data.visual.alt}
+                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div class="absolute bottom-3 left-3 bg-[#050607]/85 backdrop-blur-md px-3 py-1 rounded text-[11px] font-mono text-[#8EBBC8] border border-[#22262B]">
+                      {project.data.visual.caption}
+                    </div>
+                  </div>
+                </a>
+              </div>
+
+              <!-- Project Narrative & Metadata -->
+              <div class={`lg:col-span-5 ${idx % 2 === 1 ? 'lg:order-1' : ''} space-y-5`}>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="font-mono text-xs text-[#666B6E] font-bold">
+                    CHAPTER 0{idx + 1} //
+                  </span>
+                  <Badge status={project.data.status} />
+                  <EvidenceBadge state={project.data.visual.evidenceState} />
+                </div>
+
+                <h3 class="text-3xl sm:text-4xl font-display font-bold text-[#101214] tracking-tight">
+                  <a href={`/work/${project.id}/`} class="hover:text-[#4A7582] transition-colors">
+                    {project.data.title}
+                  </a>
+                </h3>
+
+                <p class="font-body text-base text-[#666B6E] leading-relaxed">
+                  {project.data.summary}
+                </p>
+
+                <!-- Stack Chips -->
+                <div class="flex flex-wrap gap-1.5 pt-1">
+                  {project.data.stack.map((tech) => (
+                    <span class="px-2.5 py-1 bg-[#DCD9D1] text-[#101214] text-xs font-mono rounded border border-[#C5C3BC]">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+
+                <!-- Action Link -->
+                <div class="pt-4">
+                  <a
+                    href={`/work/${project.id}/`}
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#101214] text-[#F5F5F7] hover:bg-[#8EBBC8] hover:text-[#050607] transition-all duration-200 rounded font-mono text-xs font-semibold shadow-sm"
+                  >
+                    <span>Inspect Deep Case Study</span>
+                    <span>→</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Interactive Systems Architecture Matrix / Explorer -->
+    <section id="explorer" class="w-full bg-[#050607] text-[#F5F5F7] py-32 px-6 md:px-12 border-t border-[#22262B]">
+      <div class="max-w-7xl mx-auto space-y-12">
+        <SectionHeading
+          eyebrow="04 // Live Architecture"
+          title="Interactive Systems Matrix"
+          description="Explore telemetry, complexity constraints, and implementation specifications across my 4 core engineering domains."
+          dark={true}
+        />
+
+        <SystemsExplorer client:idle />
+      </div>
+    </section>
+
+    <!-- 5. Capabilities Constellation -->
+    <section id="constellation" class="w-full bg-[#101214] text-[#F5F5F7] py-28 px-6 md:px-12 border-t border-[#22262B]">
+      <div class="max-w-7xl mx-auto">
+        <SectionHeading
+          eyebrow="05 // Constellation"
+          title="Core Capabilities & Focus Areas"
+          description="Unified technical capabilities bridging mathematical abstractions and production software."
+          dark={true}
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
+          <div class="p-7 bg-[#050607] border border-[#22262B] rounded-xl space-y-4 hover:border-[#8EBBC8] transition-colors duration-300">
+            <div class="font-mono text-xs text-[#8EBBC8] uppercase tracking-wider">01 / Systems</div>
+            <h4 class="text-xl font-display font-bold text-[#F5F5F7]">Distributed Systems</h4>
+            <p class="font-body text-sm text-[#8C9296] leading-relaxed">
+              Edge-first architectures, low-latency API composition, fault-tolerant state boundaries, and deterministic data flow.
+            </p>
+            <ul class="font-mono text-xs text-[#666B6E] space-y-1.5 pt-3 border-t border-[#22262B]">
+              <li>• Edge CDN Caching</li>
+              <li>• PostgreSQL RLS / RPCs</li>
+              <li>• Event Loop Isolation</li>
+            </ul>
+          </div>
+
+          <div class="p-7 bg-[#050607] border border-[#22262B] rounded-xl space-y-4 hover:border-[#8EBBC8] transition-colors duration-300">
+            <div class="font-mono text-xs text-[#8EBBC8] uppercase tracking-wider">02 / Mathematics</div>
+            <h4 class="text-xl font-display font-bold text-[#F5F5F7]">Applied Mathematics</h4>
+            <p class="font-body text-sm text-[#8C9296] leading-relaxed">
+              Graph topology, pathfinding heuristics ($A^*$, Dijkstra), optimization models, and spatial vector transformations.
+            </p>
+            <ul class="font-mono text-xs text-[#666B6E] space-y-1.5 pt-3 border-t border-[#22262B]">
+              <li>• Directed Graph Routing</li>
+              <li>• Isochrone Geometries</li>
+              <li>• Euclidean Tensor Vectors</li>
+            </ul>
+          </div>
+
+          <div class="p-7 bg-[#050607] border border-[#22262B] rounded-xl space-y-4 hover:border-[#8EBBC8] transition-colors duration-300">
+            <div class="font-mono text-xs text-[#8EBBC8] uppercase tracking-wider">03 / Interfaces</div>
+            <h4 class="text-xl font-display font-bold text-[#F5F5F7]">Spatial & 3D Web</h4>
+            <p class="font-body text-sm text-[#8C9296] leading-relaxed">
+              Demand-driven WebGL / Three.js, computer vision gesture input, zero-blocking worker threads, and GPU optimization.
+            </p>
+            <ul class="font-mono text-xs text-[#666B6E] space-y-1.5 pt-3 border-t border-[#22262B]">
+              <li>• Three.js / React Three Fiber</li>
+              <li>• MediaPipe Web Workers</li>
+              <li>• Zero-Frame Idle Renders</li>
+            </ul>
+          </div>
+
+          <div class="p-7 bg-[#050607] border border-[#22262B] rounded-xl space-y-4 hover:border-[#8EBBC8] transition-colors duration-300">
+            <div class="font-mono text-xs text-[#8EBBC8] uppercase tracking-wider">04 / Agents</div>
+            <h4 class="text-xl font-display font-bold text-[#F5F5F7]">Autonomous AI Agents</h4>
+            <p class="font-body text-sm text-[#8C9296] leading-relaxed">
+              Tool-augmented LLM orchestrations, Model Context Protocol (MCP) servers, context engineering, and automated verification loops.
+            </p>
+            <ul class="font-mono text-xs text-[#666B6E] space-y-1.5 pt-3 border-t border-[#22262B]">
+              <li>• MCP Server Architecture</li>
+              <li>• ReAct Execution Engines</li>
+              <li>• Multi-Agent Coordination</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Working Method Process Rail -->
+    <section id="method" class="w-full bg-[#E7E4DC] text-[#101214] py-32 px-6 md:px-12 border-t border-[#C5C3BC]">
+      <div class="max-w-7xl mx-auto">
+        <SectionHeading
+          eyebrow="06 // Method"
+          title="Working Method & Engineering Discipline"
+          description="A three-stage framework prioritizing mathematical boundaries before visual realization."
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+          <div class="p-8 bg-[#DCD9D1] border border-[#C5C3BC] rounded-xl space-y-4 shadow-sm">
+            <div class="font-mono text-xs text-[#666B6E] font-bold">STAGE 01 //</div>
+            <h4 class="text-2xl font-display font-bold text-[#101214]">Strict Problem Boundaries</h4>
+            <p class="font-body text-sm text-[#666B6E] leading-relaxed">
+              Every project begins with hard constraints: memory budgets, network realities, privacy guarantees, and verifiable requirements.
+            </p>
+          </div>
+
+          <div class="p-8 bg-[#DCD9D1] border border-[#C5C3BC] rounded-xl space-y-4 shadow-sm">
+            <div class="font-mono text-xs text-[#666B6E] font-bold">STAGE 02 //</div>
+            <h4 class="text-2xl font-display font-bold text-[#101214]">Mathematical Modeling</h4>
+            <p class="font-body text-sm text-[#666B6E] leading-relaxed">
+              Abstracting domain complexity into pure algorithms: topological node graphs, isochrone fields, and deterministic state transitions.
+            </p>
+          </div>
+
+          <div class="p-8 bg-[#DCD9D1] border border-[#C5C3BC] rounded-xl space-y-4 shadow-sm">
+            <div class="font-mono text-xs text-[#666B6E] font-bold">STAGE 03 //</div>
+            <h4 class="text-2xl font-display font-bold text-[#101214]">Deterministic Verification</h4>
+            <p class="font-body text-sm text-[#666B6E] leading-relaxed">
+              Automated unit tests, Playwright visual regression checks across all viewports, and zero tolerance for unverified claims.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. About Excerpt -->
+    <section id="about" class="w-full bg-[#050607] text-[#F5F5F7] py-28 px-6 md:px-12 border-t border-[#22262B]">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-8 space-y-6">
+          <div class="flex items-center gap-2 font-mono text-xs text-[#8EBBC8] uppercase tracking-widest">
+            <span class="w-2 h-0.5 bg-[#8EBBC8]"></span>
+            <span>About Aedrian Ponce</span>
+          </div>
+          <h3 class="text-3xl md:text-5xl font-display font-bold text-[#F5F5F7] tracking-tight">
+            Mathematics student, systems engineer, and builder.
+          </h3>
+          <p class="font-body text-base md:text-lg text-[#8C9296] leading-relaxed max-w-2xl">
+            Based in the Philippines, studying Applied Mathematics at UPLB. Building at the intersection of rigorous mathematical algorithms, high-performance web systems, and autonomous agent loops.
+          </p>
+          <div class="pt-2">
+            <a
+              href="/about/"
+              class="inline-flex items-center gap-2 px-5 py-3 border border-[#22262B] bg-[#101214] text-[#C8CDD0] hover:text-[#FFFFFF] hover:border-[#8EBBC8] transition-colors rounded font-mono text-xs"
+            >
+              <span>Read full background & engineering philosophy</span>
+              <span>→</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4 p-8 bg-[#101214] border border-[#22262B] rounded-xl space-y-4 font-mono text-xs text-[#8C9296]">
+          <div class="text-[#F5F5F7] font-bold border-b border-[#22262B] pb-3">SYSTEM INTEGRITY PROFILE</div>
+          <div class="space-y-2.5 text-[11.5px]">
+            <div class="flex justify-between">
+              <span class="text-[#666B6E]">ACADEMIC:</span>
+              <span class="text-[#C8CDD0]">UPLB Applied Math</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[#666B6E]">3D MONOLITH:</span>
+              <span class="text-[#8EBBC8]">14.86 KB glTF 2.0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[#666B6E]">ATMOSPHERE:</span>
+              <span class="text-[#C8CDD0]">Tactile Grain + Orbit Glow</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[#666B6E]">STACK:</span>
+              <span class="text-[#C8CDD0]">Astro 5 + TS Strict</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>

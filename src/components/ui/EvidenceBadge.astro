@@ -1,0 +1,25 @@
+---
+interface Props {
+  state: 'verified' | 'conceptual' | 'needs-confirmation';
+  className?: string;
+}
+
+const { state, className = '' } = Astro.props;
+
+const labels = {
+  verified: 'Verified Record',
+  conceptual: 'Conceptual System Study',
+  'needs-confirmation': 'Needs Aedrian Confirmation'
+};
+
+const styles = {
+  verified: 'text-[#48BB78] border-[#48BB78]/30 bg-[#48BB78]/5',
+  conceptual: 'text-[#8EBBC8] border-[#8EBBC8]/30 bg-[#8EBBC8]/5',
+  'needs-confirmation': 'text-[#E5A93C] border-[#E5A93C]/30 bg-[#E5A93C]/5'
+};
+---
+
+<span class={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono border rounded ${styles[state]} ${className}`}>
+  <span class="w-1.5 h-1.5 rounded-full bg-current opacity-80"></span>
+  {labels[state]}
+</span>

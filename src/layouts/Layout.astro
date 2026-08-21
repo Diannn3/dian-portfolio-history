@@ -1,0 +1,144 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ChapterRail from '../components/ChapterRail.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  showChapterRail?: boolean;
+}
+
+const {
+  title = 'Aedrian Ponce — Systems Engineer · Applied Math · AI Agent Developer',
+  description = 'Personal portfolio and technical case studies for Aedrian Ponce. Focused on distributed systems, mathematical optimization, and autonomous agent loops.',
+  image = '/brand/aedrian-a-transparent.png',
+  showChapterRail = false
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://aedrianponce.dev');
+
+const schemaData = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Aedrian Ponce',
+  alternateName: 'Dian',
+  url: canonicalURL.toString(),
+  sameAs: [
+    'https://github.com/Diannn3',
+    'https://www.linkedin.com/in/aedrian-ponce-a602b0398/'
+  ],
+  jobTitle: 'Systems Engineer · Applied Mathematician · AI Agent Developer',
+  knowsAbout: [
+    'Applied Mathematics',
+    'Discrete Graph Theory',
+    'Distributed Systems',
+    'AI Agents',
+    'Computer Vision',
+    'TypeScript',
+    'Three.js',
+    'Astro'
+  ]
+};
+---
+
+<!doctype html>
+<html lang="en" class="bg-[#050607] text-[#F5F5F7] scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/brand/aedrian-a.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+
+    <!-- OpenGraph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={image} />
+
+    <!-- Preload Critical Brand Font Assets -->
+    <link
+      rel="preload"
+      href="/fonts/BricolageGrotesque-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/InstrumentSans-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/FragmentMono-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!-- Structured Data -->
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+  </head>
+  <body class="min-h-screen flex flex-col selection:bg-[#8EBBC8] selection:text-[#050607]">
+    <Header />
+    <main class="flex-1 w-full" id="top">
+      <slot />
+    </main>
+    {showChapterRail && <ChapterRail />}
+    <Footer />
+
+    <!-- Atmospheric Glow Cursor Tracking & Lenis Smooth Scroll -->
+    <script>
+      import Lenis from 'lenis';
+
+      // 1. Lenis Smooth Scrolling
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!prefersReducedMotion) {
+        const lenis = new Lenis({
+          duration: 1.1,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          touchMultiplier: 1.5
+        });
+
+        function raf(time: number) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+
+        requestAnimationFrame(raf);
+      }
+
+      // 2. Atmospheric Radial Glow Pointer Tracker
+      const atmosphericWrappers = document.querySelectorAll('.atmospheric-wrapper');
+      if (atmosphericWrappers.length > 0 && !prefersReducedMotion) {
+        window.addEventListener('pointermove', (e) => {
+          const x = `${(e.clientX / window.innerWidth) * 100}%`;
+          const y = `${(e.clientY / window.innerHeight) * 100}%`;
+
+          atmosphericWrappers.forEach((wrapper) => {
+            wrapper.classList.add('is-tracking');
+            (wrapper as HTMLElement).style.setProperty('--x', x);
+            (wrapper as HTMLElement).style.setProperty('--y', y);
+          });
+        }, { passive: true });
+      }
+    </script>
+  </body>
+</html>
