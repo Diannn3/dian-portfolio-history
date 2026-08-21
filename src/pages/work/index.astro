@@ -1,0 +1,99 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Badge from '../../components/ui/Badge.astro';
+import EvidenceBadge from '../../components/ui/EvidenceBadge.astro';
+import SectionHeading from '../../components/ui/SectionHeading.astro';
+import { getCollection } from 'astro:content';
+
+const allWork = await getCollection('work');
+const sortedWork = allWork.sort((a, b) => a.data.order - b.data.order);
+---
+
+<Layout
+  title="Selected Work & Systems Directory — Aedrian Ponce"
+  description="Comprehensive case studies covering route-aware campus apps, hand-tracked spatial computing shells, indoor wayfinding graphs, and static delivery architectures."
+>
+  <div class="atmospheric-wrapper min-h-screen bg-[#050607]">
+    <div class="atmospheric-grain" aria-hidden="true"></div>
+    <div class="atmospheric-grid" aria-hidden="true"></div>
+    <div class="atmospheric-glow" aria-hidden="true"></div>
+
+    <div class="relative z-10 w-full text-[#F5F5F7] pt-32 pb-28 px-6 md:px-12 border-b border-[#22262B]">
+      <div class="max-w-7xl mx-auto">
+        <SectionHeading
+          eyebrow="Architectural Catalog"
+          title="Verified Systems & Case Studies"
+          description="Every project below is documented with its honest evidence state, technical constraints, architectural decisions, and public repository references."
+          dark={true}
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+          {sortedWork.map((project) => (
+            <article class="bg-[#101214] border border-[#22262B] rounded-xl overflow-hidden flex flex-col justify-between hover:border-[#8EBBC8] transition-all duration-300 group shadow-xl">
+              <div>
+                <!-- Visual Study Header -->
+                <a href={`/work/${project.id}/`} class="block relative aspect-[16/9] overflow-hidden bg-[#0A0C0E] border-b border-[#22262B]">
+                  <img
+                    src={project.data.visual.asset}
+                    alt={project.data.visual.alt}
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="absolute bottom-2.5 left-2.5 bg-[#050607]/90 px-2.5 py-1 rounded text-[10.5px] font-mono text-[#8EBBC8] border border-[#22262B]">
+                    {project.data.visual.caption}
+                  </div>
+                </a>
+
+                <!-- Card Content -->
+                <div class="p-7 space-y-4">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <Badge status={project.data.status} />
+                    <EvidenceBadge state={project.data.visual.evidenceState} />
+                  </div>
+
+                  <h3 class="text-2xl lg:text-3xl font-display font-bold text-[#F5F5F7] group-hover:text-[#8EBBC8] transition-colors">
+                    <a href={`/work/${project.id}/`}>
+                      {project.data.title}
+                    </a>
+                  </h3>
+
+                  <p class="font-body text-sm text-[#8C9296] leading-relaxed">
+                    {project.data.summary}
+                  </p>
+
+                  <div class="flex flex-wrap gap-1.5 pt-2">
+                    {project.data.stack.map((tech) => (
+                      <span class="px-2.5 py-0.5 bg-[#181B1E] border border-[#22262B] text-[#C8CDD0] text-xs font-mono rounded">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer Meta -->
+              <div class="p-7 pt-0 flex items-center justify-between border-t border-[#22262B]/50 mt-4 font-mono text-xs text-[#8C9296]">
+                <a
+                  href={project.data.repository}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  class="hover:text-[#FFFFFF] transition-colors"
+                >
+                  GitHub Repository ↗
+                </a>
+                <a
+                  href={`/work/${project.id}/`}
+                  class="text-[#8EBBC8] font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5"
+                >
+                  <span>Read Study</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

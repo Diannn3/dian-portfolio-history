@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none" width="100%" height="100%">
+  <defs>
+    <linearGradient id="df_obsidian" x1="100" y1="50" x2="700" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#101214" />
+      <stop offset="100%" stop-color="#050607" />
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#df_obsidian)" rx="8" />
+
+  <!-- Delivery Architecture Wireframe Panels -->
+  <!-- Panel 1: Design Tokens & Astro Engine -->
+  <rect x="60" y="140" width="190" height="240" fill="#14171A" stroke="#2D343B" stroke-width="1.5" rx="4" />
+  <rect x="60" y="140" width="190" height="32" fill="#1C2024" rx="4 4 0 0" />
+  <text x="75" y="161" fill="#C8CDD0" font-family="'Fragment Mono', monospace" font-size="10" font-weight="bold">01_TOKENS.JSON</text>
+  <line x1="75" y1="190" x2="220" y2="190" stroke="#374149" stroke-width="2" />
+  <line x1="75" y1="210" x2="180" y2="210" stroke="#374149" stroke-width="2" />
+  <line x1="75" y1="230" x2="200" y2="230" stroke="#8EBBC8" stroke-width="2" />
+  <text x="75" y="270" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="9.5">TAILWIND V4 STRICT</text>
+  <text x="75" y="290" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="9.5">TYPOGRAPHY CADENCE</text>
+  <text x="75" y="310" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="9.5">8PT GRID HARMONY</text>
+
+  <!-- Panel 2: Trust & Schema Middleware -->
+  <rect x="300" y="120" width="200" height="270" fill="#16191C" stroke="#8EBBC8" stroke-width="1.5" rx="4" />
+  <rect x="300" y="120" width="200" height="32" fill="#1F2428" rx="4 4 0 0" />
+  <text x="315" y="141" fill="#8EBBC8" font-family="'Fragment Mono', monospace" font-size="10" font-weight="bold">02_TRUST_FRAME.TS</text>
+  <circle cx="325" cy="180" r="4" fill="#8EBBC8" />
+  <text x="338" y="184" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="9.5">LOCALBUSINESS JSON-LD</text>
+  <circle cx="325" cy="210" r="4" fill="#8EBBC8" />
+  <text x="338" y="214" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="9.5">OFFICIAL PERMIT BADGE</text>
+  <circle cx="325" cy="240" r="4" fill="#8EBBC8" />
+  <text x="338" y="244" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="9.5">DIRECT WHATSAPP LINK</text>
+  <circle cx="325" cy="270" r="4" fill="#8EBBC8" />
+  <text x="338" y="274" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="9.5">ANTI-SCAM VERIFIER</text>
+
+  <!-- Panel 3: Global Edge Deployment -->
+  <rect x="550" y="140" width="190" height="240" fill="#14171A" stroke="#2D343B" stroke-width="1.5" rx="4" />
+  <rect x="550" y="140" width="190" height="32" fill="#1C2024" rx="4 4 0 0" />
+  <text x="565" y="161" fill="#C8CDD0" font-family="'Fragment Mono', monospace" font-size="10" font-weight="bold">03_EDGE_DIST</text>
+  <text x="565" y="200" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="10">PERFORMANCE SCORE:</text>
+  <text x="565" y="235" fill="#8EBBC8" font-family="'Fragment Mono', monospace" font-size="28" font-weight="bold">100/100</text>
+  <text x="565" y="270" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="9.5">LCP &lt; 0.8s</text>
+  <text x="565" y="290" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="9.5">CLS = 0.00</text>
+  <text x="565" y="310" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="9.5">ZERO RUNTIME JS DB</text>
+
+  <!-- Connecting Pipeline Connectors -->
+  <path d="M 250 250 L 300 250" stroke="#8EBBC8" stroke-width="2" stroke-dasharray="3 3" />
+  <polygon points="298,246 304,250 298,254" fill="#8EBBC8" />
+  <path d="M 500 250 L 550 250" stroke="#8EBBC8" stroke-width="2" stroke-dasharray="3 3" />
+  <polygon points="548,246 554,250 548,254" fill="#8EBBC8" />
+
+  <!-- Header Telemetry Box -->
+  <rect x="24" y="24" width="280" height="58" fill="#101214" stroke="#22262B" stroke-width="1" rx="4" />
+  <text x="36" y="44" fill="#F5F5F7" font-family="'Fragment Mono', monospace" font-size="11" font-weight="bold">SYSTEM STUDY: DELIVERY FRAME</text>
+  <text x="36" y="62" fill="#8C9296" font-family="'Fragment Mono', monospace" font-size="9.5">STATIC EDGE DEPLOYMENT ARCHITECTURE</text>
+
+  <!-- Bottom Metric Tag -->
+  <rect x="526" y="440" width="250" height="36" fill="#101214" stroke="#22262B" stroke-width="1" rx="4" />
+  <text x="538" y="462" fill="#8EBBC8" font-family="'Fragment Mono', monospace" font-size="10">AUDIT: Playwright Visual QA Baseline</text>
+</svg>

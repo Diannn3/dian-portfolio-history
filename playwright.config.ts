@@ -1,28 +1,42 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
-  fullyParallel: true,
-  forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 1 : 0,
-  // Keep local runs on the same bounded concurrency as CI. The portfolio has
-  // a shared preview server and deliberate WebGL/fallback branches; an
-  // unconstrained worker count makes the harness race its own server.
-  workers: 2,
-  reporter: process.env.CI ? 'github' : 'list',
+  fullyParallel: false,
+  forbidOnly: !!process.env.CI,
+  retries: 0,
+  workers: 1,
+  reporter: 'list',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
+    baseURL: 'http://127.0.0.1:4399',
+    trace: 'on-first-retry'
   },
   projects: [
-    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile-chromium', use: { ...devices['iPhone 13'] } },
+    {
+      name: 'Mobile-Small-320',
+      use: { viewport: { width: 320, height: 568 } }
+    },
+    {
+      name: 'Mobile-390',
+      use: { viewport: { width: 390, height: 844 } }
+    },
+    {
+      name: 'Tablet-768',
+      use: { viewport: { width: 768, height: 1024 } }
+    },
+    {
+      name: 'Desktop-1280',
+      use: { viewport: { width: 1280, height: 800 } }
+    },
+    {
+      name: 'Desktop-Large-1440',
+      use: { viewport: { width: 1440, height: 900 } }
+    }
   ],
   webServer: {
-    command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4173',
-    url: 'http://127.0.0.1:4173',
+    command: 'npm run preview',
+    url: 'http://127.0.0.1:4399',
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+    timeout: 120000
+  }
 });

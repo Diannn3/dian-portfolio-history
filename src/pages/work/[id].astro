@@ -1,0 +1,162 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Badge from '../../components/ui/Badge.astro';
+import EvidenceBadge from '../../components/ui/EvidenceBadge.astro';
+
+export async function getStaticPaths() {
+  const workEntries = await getCollection('work');
+  return workEntries.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const allWork = await getCollection('work');
+const sortedWork = allWork.sort((a, b) => a.data.order - b.data.order);
+const currentIndex = sortedWork.findIndex((w) => w.id === entry.id);
+const prevProject = currentIndex > 0 ? sortedWork[currentIndex - 1] : null;
+const nextProject = currentIndex < sortedWork.length - 1 ? sortedWork[currentIndex + 1] : null;
+---
+
+<Layout
+  title={`${entry.data.title} — Architectural Case Study · Aedrian Ponce`}
+  description={entry.data.summary}
+>
+  <div class="atmospheric-wrapper min-h-screen bg-[#050607]">
+    <div class="atmospheric-grain" aria-hidden="true"></div>
+    <div class="atmospheric-grid" aria-hidden="true"></div>
+    <div class="atmospheric-glow" aria-hidden="true"></div>
+
+    <article class="relative z-10 w-full text-[#F5F5F7] pt-32 pb-24 px-6 md:px-12">
+      <div class="max-w-5xl mx-auto space-y-14">
+        
+        <!-- Back Navigation Breadcrumb -->
+        <div>
+          <a
+            href="/work/"
+            class="inline-flex items-center gap-2 font-mono text-xs text-[#8C9296] hover:text-[#8EBBC8] transition-colors"
+          >
+            <span>←</span>
+            <span>// Return to Selected Work Directory</span>
+          </a>
+        </div>
+
+        <!-- Case Study Header -->
+        <header class="space-y-6 pb-10 border-b border-[#22262B]">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <Badge status={entry.data.status} />
+            <EvidenceBadge state={entry.data.visual.evidenceState} />
+          </div>
+
+          <h1 class="text-4xl sm:text-6xl md:text-7xl font-display font-bold tracking-tight text-[#F5F5F7] leading-[0.95]">
+            {entry.data.title}
+          </h1>
+
+          <p class="font-body text-lg md:text-2xl text-[#C8CDD0] leading-relaxed max-w-3xl font-light">
+            {entry.data.summary}
+          </p>
+
+          <!-- Technical Metadata Rail Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-[#101214] border border-[#22262B] rounded-xl font-mono text-xs shadow-lg">
+            <div>
+              <div class="text-[#666B6E] text-[10px] uppercase">STATUS</div>
+              <div class="text-[#F5F5F7] font-bold mt-1 uppercase">{entry.data.status}</div>
+            </div>
+            <div>
+              <div class="text-[#666B6E] text-[10px] uppercase">YEAR</div>
+              <div class="text-[#F5F5F7] font-bold mt-1">{entry.data.year}</div>
+            </div>
+            <div>
+              <div class="text-[#666B6E] text-[10px] uppercase">ROLE</div>
+              <div class="text-[#F5F5F7] font-bold mt-1 truncate">{entry.data.role}</div>
+            </div>
+            <div>
+              <div class="text-[#666B6E] text-[10px] uppercase">SOURCE REPOSITORY</div>
+              <a
+                href={entry.data.repository}
+                target="_blank"
+                rel="noreferrer noopener"
+                class="text-[#8EBBC8] hover:underline font-bold mt-1 block truncate"
+              >
+                GitHub ↗
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <!-- Programmatic System Study Visual Hero -->
+        <section class="space-y-4">
+          <div class="font-mono text-xs text-[#8C9296] flex items-center justify-between">
+            <span class="font-bold text-[#F5F5F7]">SYSTEM ARCHITECTURE BLUEPRINT</span>
+            <span class="text-[#8EBBC8] px-2 py-0.5 bg-[#101214] border border-[#22262B] rounded">{entry.data.visual.kind}</span>
+          </div>
+          <div class="overflow-hidden rounded-xl border border-[#22262B] bg-[#0A0C0E] shadow-2xl">
+            <img
+              src={entry.data.visual.asset}
+              alt={entry.data.visual.alt}
+              class="w-full h-auto object-cover"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+          <div class="font-mono text-xs text-[#666B6E] flex items-center gap-2 pt-1">
+            <span class="text-[#8EBBC8]">ℹ</span>
+            <span>{entry.data.visual.caption}</span>
+          </div>
+        </section>
+
+        <!-- 12-Section Case Study Markdown Body -->
+        <div class="prose prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-[#F5F5F7] prose-h2:text-3xl prose-h2:pt-8 prose-h2:border-t prose-h2:border-[#22262B] prose-h3:text-xl prose-p:text-[#8C9296] prose-p:leading-relaxed prose-p:text-base prose-li:text-[#8C9296] prose-code:font-mono prose-code:text-[#8EBBC8] prose-code:bg-[#101214] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-a:text-[#8EBBC8] prose-a:no-underline hover:prose-a:underline pt-8 border-t border-[#22262B]">
+          <Content />
+        </div>
+
+        <!-- Prev / Next Navigation & Contact Action -->
+        <div class="pt-16 border-t border-[#22262B] space-y-8">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
+            {prevProject ? (
+              <a
+                href={`/work/${prevProject.id}/`}
+                class="p-5 bg-[#101214] border border-[#22262B] hover:border-[#8EBBC8] rounded-lg transition-colors flex flex-col gap-1 group"
+              >
+                <span class="text-[#666B6E] uppercase text-[10px]">← Previous System Study</span>
+                <span class="text-[#F5F5F7] font-bold text-sm group-hover:text-[#8EBBC8] transition-colors">{prevProject.data.title}</span>
+              </a>
+            ) : <div />}
+
+            {nextProject ? (
+              <a
+                href={`/work/${nextProject.id}/`}
+                class="p-5 bg-[#101214] border border-[#22262B] hover:border-[#8EBBC8] rounded-lg transition-colors flex flex-col gap-1 text-right group"
+              >
+                <span class="text-[#666B6E] uppercase text-[10px]">Next System Study →</span>
+                <span class="text-[#F5F5F7] font-bold text-sm group-hover:text-[#8EBBC8] transition-colors">{nextProject.data.title}</span>
+              </a>
+            ) : <div />}
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-6 pt-4 font-mono text-xs">
+            <a
+              href="/work/"
+              class="px-5 py-3 border border-[#22262B] bg-[#101214] text-[#C8CDD0] hover:text-[#FFFFFF] hover:border-[#8EBBC8] transition-colors rounded"
+            >
+              // All Case Studies
+            </a>
+
+            <a
+              href="https://www.linkedin.com/in/aedrian-ponce-a602b0398/"
+              target="_blank"
+              rel="noreferrer noopener"
+              class="px-6 py-3 bg-[#8EBBC8] text-[#050607] font-bold hover:bg-[#A5D0DC] transition-colors rounded shadow-md"
+            >
+              Discuss this architecture with Aedrian ↗
+            </a>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+</Layout>

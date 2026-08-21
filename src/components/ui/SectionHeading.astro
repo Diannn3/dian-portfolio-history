@@ -1,0 +1,25 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description?: string;
+  dark?: boolean;
+}
+
+const { eyebrow, title, description, dark = false } = Astro.props;
+---
+
+<div class="mb-12">
+  <div class="flex items-center gap-2 font-mono text-xs tracking-widest uppercase mb-2">
+    <span class={`w-2 h-0.5 ${dark ? 'bg-[#8EBBC8]' : 'bg-[#101214]'}`}></span>
+    <span class={dark ? 'text-[#8EBBC8]' : 'text-[#666B6E]'}>{eyebrow}</span>
+  </div>
+  <h2 class={`text-3xl md:text-4xl font-display font-bold tracking-tight ${dark ? 'text-[#F5F5F7]' : 'text-[#101214]'}`}>
+    {title}
+  </h2>
+  {description && (
+    <p class={`mt-3 text-base max-w-2xl font-body leading-relaxed ${dark ? 'text-[#8C9296]' : 'text-[#666B6E]'}`}>
+      {description}
+    </p>
+  )}
+</div>

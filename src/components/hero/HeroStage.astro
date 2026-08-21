@@ -1,0 +1,160 @@
+---
+import AedrianHeroCanvas from './AedrianHeroCanvas';
+import HeroPosterFallback from './HeroPosterFallback.astro';
+---
+
+<section id="hero-scroll-stage" class="relative w-full h-[210svh] md:h-[210svh] max-md:h-[140svh] bg-[#050607]">
+  <!-- Sticky Viewport Stage -->
+  <div class="sticky top-0 left-0 w-full h-[100svh] overflow-hidden flex flex-col justify-between z-10">
+    
+    <!-- Background 3D Canvas Island -->
+    <div class="absolute inset-0 z-0">
+      <AedrianHeroCanvas client:idle quality="desktop" />
+      <HeroPosterFallback />
+    </div>
+
+    <!-- Spatial HUD Overlay: Systems / Mathematics / Agents (45-72% scroll) -->
+    <div id="spatial-labels" class="absolute inset-0 pointer-events-none z-10 flex items-center justify-center opacity-0 transition-opacity duration-500">
+      <div class="w-full max-w-5xl px-6 flex justify-between text-[#8EBBC8] font-mono text-xs tracking-widest uppercase">
+        <span class="border border-[#22262B] bg-[#101214]/80 px-3.5 py-1.5 backdrop-blur-sm rounded shadow-lg">01 // Systems</span>
+        <span class="border border-[#22262B] bg-[#101214]/80 px-3.5 py-1.5 backdrop-blur-sm rounded shadow-lg">02 // Mathematics</span>
+        <span class="border border-[#22262B] bg-[#101214]/80 px-3.5 py-1.5 backdrop-blur-sm rounded shadow-lg">03 // Agents</span>
+      </div>
+    </div>
+
+    <!-- Top Identity Anchor (Becomes compressed rail) -->
+    <header id="hero-identity-top" class="relative z-20 pt-24 px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-8 pointer-events-auto transition-opacity duration-300">
+      <div class="max-w-3xl space-y-4">
+        <div class="inline-flex items-center gap-2.5 px-3 py-1 bg-[#101214]/80 border border-[#22262B] rounded-full backdrop-blur-sm">
+          <span class="inline-block w-2 h-2 bg-[#8EBBC8] rounded-full animate-pulse"></span>
+          <span class="font-mono text-[11px] text-[#8C9296] tracking-wider uppercase">
+            Aedrian Ponce // Dian · UPLB Applied Mathematics
+          </span>
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl md:text-7xl font-display font-bold text-[#F5F5F7] tracking-tight leading-[0.95]">
+          <span class="reveal-line"><span>Discrete systems built with</span></span>
+          <span class="reveal-line text-[#8EBBC8]"><em>mathematical rigor.</em></span>
+        </h1>
+
+        <p class="font-body text-base md:text-lg text-[#8C9296] max-w-xl leading-relaxed pt-1">
+          Engineering resilient distributed architectures, topological pathfinding models, and autonomous AI agent execution loops in the Philippines.
+        </p>
+
+        <!-- Primary Action Group -->
+        <div class="flex flex-wrap items-center gap-4 pt-3 font-mono text-xs">
+          <a
+            href="https://www.linkedin.com/in/aedrian-ponce-a602b0398/"
+            target="_blank"
+            rel="noreferrer noopener"
+            class="px-5 py-3 bg-[#8EBBC8] text-[#050607] font-bold hover:bg-[#A5D0DC] transition-all duration-200 rounded shadow-md hover:shadow-[#8EBBC8]/20 hover:scale-[1.02] flex items-center gap-2"
+          >
+            <span>Let’s build a system together</span>
+            <span>↗</span>
+          </a>
+          <a
+            href="#work"
+            class="px-4 py-3 border border-[#22262B] bg-[#101214]/90 text-[#C8CDD0] hover:text-[#FFFFFF] hover:border-[#8EBBC8] transition-colors rounded"
+          >
+            // Explore Selected Work ↓
+          </a>
+          <a
+            href="https://github.com/Diannn3"
+            target="_blank"
+            rel="noreferrer noopener"
+            class="px-4 py-3 border border-[#22262B] bg-[#101214]/90 text-[#8C9296] hover:text-[#FFFFFF] hover:border-[#8EBBC8] transition-colors rounded"
+          >
+            GitHub ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Live Telemetry Card -->
+      <div class="hidden lg:block p-5 bg-[#101214]/80 border border-[#22262B] rounded-lg backdrop-blur-sm font-mono text-[11px] text-[#8C9296] space-y-2 max-w-xs">
+        <div class="text-[#F5F5F7] font-bold flex items-center justify-between border-b border-[#22262B] pb-2">
+          <span>MONOLITH_RUNTIME</span>
+          <span class="text-[#8EBBC8]">ACTIVE</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-[#666B6E]">GEOMETRY:</span>
+          <span class="text-[#C8CDD0]">Procedural Chamfered A</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-[#666B6E]">SHADER:</span>
+          <span class="text-[#C8CDD0]">Obsidian / Palladium</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-[#666B6E]">RENDER_MODE:</span>
+          <span class="text-[#8EBBC8]">Demand (Zero GPU Idle)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Bottom Telemetry & Scroll Cue -->
+    <footer id="hero-identity-bottom" class="relative z-20 pb-8 px-6 md:px-12 max-w-7xl mx-auto w-full flex justify-between items-end pointer-events-auto font-mono text-xs text-[#666B6E]">
+      <div class="space-y-1">
+        <div>OBJECT: MONOLITH_PROCEDURAL_A</div>
+        <div class="text-[#8C9296]">MAT: OBSIDIAN CERAMIC / PALLADIUM</div>
+      </div>
+      <div class="flex items-center gap-2 text-[#8EBBC8] animate-bounce">
+        <span>SCROLL TO TRAVERSE ARCHITECTURE</span>
+        <span>↓</span>
+      </div>
+    </footer>
+
+    <!-- Mineral Light Transition Mask -->
+    <div id="mineral-fade-overlay" class="absolute inset-0 bg-[#E7E4DC] pointer-events-none opacity-0 z-30 transition-opacity duration-300"></div>
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const stage = document.getElementById('hero-scroll-stage');
+  const topIdentity = document.getElementById('hero-identity-top');
+  const bottomIdentity = document.getElementById('hero-identity-bottom');
+  const spatialLabels = document.getElementById('spatial-labels');
+  const mineralFade = document.getElementById('mineral-fade-overlay');
+
+  if (stage && topIdentity && bottomIdentity && spatialLabels && mineralFade) {
+    ScrollTrigger.create({
+      trigger: stage,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.3,
+      onUpdate: (self) => {
+        const p = self.progress;
+
+        // 1. Initial 0-18% - Fully Visible
+        // 2. 18-45% - Identity fades / compresses
+        if (p < 0.18) {
+          topIdentity.style.opacity = '1';
+          bottomIdentity.style.opacity = '1';
+          spatialLabels.style.opacity = '0';
+        } else if (p >= 0.18 && p < 0.45) {
+          const fadeP = (p - 0.18) / (0.45 - 0.18);
+          topIdentity.style.opacity = String(1 - fadeP * 0.75);
+          bottomIdentity.style.opacity = String(1 - fadeP);
+          spatialLabels.style.opacity = '0';
+        } 
+        // 3. 45-72% - Spatial Labels Emerge
+        else if (p >= 0.45 && p < 0.72) {
+          topIdentity.style.opacity = '0.25';
+          bottomIdentity.style.opacity = '0';
+          spatialLabels.style.opacity = '1';
+          mineralFade.style.opacity = '0';
+        } 
+        // 4. 72-100% - Pullback and Mineral Transition
+        else if (p >= 0.72) {
+          const transP = (p - 0.72) / (1.0 - 0.72);
+          topIdentity.style.opacity = String(Math.max(0, 0.25 - transP));
+          spatialLabels.style.opacity = String(Math.max(0, 1 - transP * 1.5));
+          mineralFade.style.opacity = String(transP);
+        }
+      }
+    });
+  }
+</script>
