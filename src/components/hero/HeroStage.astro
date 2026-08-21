@@ -3,17 +3,17 @@ import AedrianHeroCanvas from './AedrianHeroCanvas';
 import HeroPosterFallback from './HeroPosterFallback.astro';
 ---
 
-<section id="hero-scroll-stage" class="relative w-full h-[210svh] md:h-[210svh] max-md:h-[140svh] bg-[#050607]">
+<section id="hero-scroll-stage" class="relative w-full h-[210svh] md:h-[210svh] max-md:h-[180svh] bg-[#050607]" data-hero-progress="0">
   <!-- Sticky Viewport Stage -->
   <div class="sticky top-0 left-0 w-full h-[100svh] overflow-hidden flex flex-col justify-between z-10">
     
     <!-- Background 3D Canvas Island -->
     <div class="absolute inset-0 z-0">
-      <AedrianHeroCanvas client:idle quality="desktop" />
+      <AedrianHeroCanvas client:idle quality="auto" />
       <HeroPosterFallback />
     </div>
 
-    <!-- Spatial HUD Overlay: Systems / Mathematics / Agents (45-72% scroll) -->
+    <!-- Spatial HUD Overlay: Systems / Mathematics / Agents (42-70% scroll) -->
     <div id="spatial-labels" class="absolute inset-0 pointer-events-none z-10 flex items-center justify-center opacity-0 transition-opacity duration-500">
       <div class="w-full max-w-5xl px-6 flex justify-between text-[#8EBBC8] font-mono text-xs tracking-widest uppercase">
         <span class="border border-[#22262B] bg-[#101214]/80 px-3.5 py-1.5 backdrop-blur-sm rounded shadow-lg">01 // Systems</span>
@@ -22,9 +22,9 @@ import HeroPosterFallback from './HeroPosterFallback.astro';
       </div>
     </div>
 
-    <!-- Top Identity Anchor (Becomes compressed rail) -->
-    <header id="hero-identity-top" class="relative z-20 pt-24 px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-8 pointer-events-auto transition-opacity duration-300">
-      <div class="max-w-3xl space-y-4">
+    <!-- Top Identity Anchor (Copy-Safe Region) -->
+    <header id="hero-identity-top" class="relative z-20 pt-20 sm:pt-24 px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-8 pointer-events-auto transition-all duration-300">
+      <div class="max-w-xl lg:max-w-2xl space-y-4">
         <div class="inline-flex items-center gap-2.5 px-3 py-1 bg-[#101214]/80 border border-[#22262B] rounded-full backdrop-blur-sm">
           <span class="inline-block w-2 h-2 bg-[#8EBBC8] rounded-full animate-pulse"></span>
           <span class="font-mono text-[11px] text-[#8C9296] tracking-wider uppercase">
@@ -37,7 +37,7 @@ import HeroPosterFallback from './HeroPosterFallback.astro';
           <span class="reveal-line text-[#8EBBC8]"><em>mathematical rigor.</em></span>
         </h1>
 
-        <p class="font-body text-base md:text-lg text-[#8C9296] max-w-xl leading-relaxed pt-1">
+        <p class="font-body text-base md:text-lg text-[#8C9296] max-w-lg leading-relaxed pt-1">
           Engineering resilient distributed architectures, topological pathfinding models, and autonomous AI agent execution loops in the Philippines.
         </p>
 
@@ -70,7 +70,7 @@ import HeroPosterFallback from './HeroPosterFallback.astro';
       </div>
 
       <!-- Live Telemetry Card -->
-      <div class="hidden lg:block p-5 bg-[#101214]/80 border border-[#22262B] rounded-lg backdrop-blur-sm font-mono text-[11px] text-[#8C9296] space-y-2 max-w-xs">
+      <div class="hidden xl:block p-5 bg-[#101214]/80 border border-[#22262B] rounded-lg backdrop-blur-sm font-mono text-[11px] text-[#8C9296] space-y-2 max-w-xs pointer-events-none select-none">
         <div class="text-[#F5F5F7] font-bold flex items-center justify-between border-b border-[#22262B] pb-2">
           <span>MONOLITH_RUNTIME</span>
           <span class="text-[#8EBBC8]">ACTIVE</span>
@@ -91,7 +91,7 @@ import HeroPosterFallback from './HeroPosterFallback.astro';
     </header>
 
     <!-- Bottom Telemetry & Scroll Cue -->
-    <footer id="hero-identity-bottom" class="relative z-20 pb-8 px-6 md:px-12 max-w-7xl mx-auto w-full flex justify-between items-end pointer-events-auto font-mono text-xs text-[#666B6E]">
+    <footer id="hero-identity-bottom" class="relative z-20 pb-8 px-6 md:px-12 max-w-7xl mx-auto w-full flex justify-between items-end pointer-events-auto font-mono text-xs text-[#666B6E] transition-opacity duration-300">
       <div class="space-y-1">
         <div>OBJECT: MONOLITH_PROCEDURAL_A</div>
         <div class="text-[#8C9296]">MAT: OBSIDIAN CERAMIC / PALLADIUM</div>
@@ -128,33 +128,54 @@ import HeroPosterFallback from './HeroPosterFallback.astro';
       onUpdate: (self) => {
         const p = self.progress;
 
-        // 1. Initial 0-18% - Fully Visible
-        // 2. 18-45% - Identity fades / compresses
+        // Store progress on dataset for any mounting islands
+        stage.setAttribute('data-hero-progress', String(p));
+
+        // Dispatch authoritative custom event
+        window.dispatchEvent(
+          new CustomEvent('aedrian:hero-progress', {
+            detail: { progress: p }
+          })
+        );
+
+        // 1. Initial 0-18% - Full Headline & Identity Clearly Visible
         if (p < 0.18) {
           topIdentity.style.opacity = '1';
+          topIdentity.style.transform = 'translateY(0)';
+          topIdentity.style.pointerEvents = 'auto';
           bottomIdentity.style.opacity = '1';
           spatialLabels.style.opacity = '0';
-        } else if (p >= 0.18 && p < 0.45) {
-          const fadeP = (p - 0.18) / (0.45 - 0.18);
-          topIdentity.style.opacity = String(1 - fadeP * 0.75);
+          mineralFade.style.opacity = '0';
+        } 
+        // 2. 18-42% - Gradual Copy Exit while 3D Model Remains Recognizable
+        else if (p >= 0.18 && p < 0.42) {
+          const fadeP = (p - 0.18) / (0.42 - 0.18);
+          topIdentity.style.opacity = String(1 - fadeP);
+          topIdentity.style.transform = `translateY(-${fadeP * 24}px)`;
+          topIdentity.style.pointerEvents = fadeP > 0.5 ? 'none' : 'auto';
           bottomIdentity.style.opacity = String(1 - fadeP);
           spatialLabels.style.opacity = '0';
+          mineralFade.style.opacity = '0';
         } 
-        // 3. 45-72% - Spatial Labels Emerge
-        else if (p >= 0.45 && p < 0.72) {
-          topIdentity.style.opacity = '0.25';
+        // 3. 42-70% - Detail View / Spatial HUD Emerge
+        else if (p >= 0.42 && p < 0.70) {
+          topIdentity.style.opacity = '0';
+          topIdentity.style.pointerEvents = 'none';
           bottomIdentity.style.opacity = '0';
           spatialLabels.style.opacity = '1';
           mineralFade.style.opacity = '0';
         } 
-        // 4. 72-100% - Pullback and Mineral Transition
-        else if (p >= 0.72) {
-          const transP = (p - 0.72) / (1.0 - 0.72);
-          topIdentity.style.opacity = String(Math.max(0, 0.25 - transP));
-          spatialLabels.style.opacity = String(Math.max(0, 1 - transP * 1.5));
-          mineralFade.style.opacity = String(transP);
+        // 4. 70-100% - Apex Traverse into Mineral Light Transition
+        else if (p >= 0.70) {
+          topIdentity.style.opacity = '0';
+          topIdentity.style.pointerEvents = 'none';
+          bottomIdentity.style.opacity = '0';
+          const transP = (p - 0.70) / (1.0 - 0.70);
+          spatialLabels.style.opacity = String(Math.max(0, 1 - transP * 2));
+          mineralFade.style.opacity = String(Math.min(1, transP));
         }
       }
     });
   }
 </script>
+

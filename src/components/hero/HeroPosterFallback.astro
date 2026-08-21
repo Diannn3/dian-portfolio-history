@@ -6,13 +6,13 @@ interface Props {
 const { className = '' } = Astro.props;
 ---
 
-<div class={`hero-poster-fallback absolute inset-0 flex items-center justify-center pointer-events-none ${className}`}>
+<div class={`hero-poster-fallback absolute inset-0 flex items-center justify-center lg:justify-end lg:pr-24 max-md:items-end max-md:pb-8 pointer-events-none ${className}`}>
   <img
     src="/brand/aedrian-a-transparent.png"
     alt="Aedrian Ponce 3D Obsidian A Monolith Fallback Poster"
     width="1024"
     height="1024"
-    class="w-full max-w-xl max-h-[70vh] object-contain select-none filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+    class="w-full max-w-md lg:max-w-lg max-h-[65vh] max-md:max-h-[42vh] object-contain select-none filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
     loading="eager"
     decoding="async"
   />
@@ -25,3 +25,4 @@ const { className = '' } = Astro.props;
     }
   }
 </style>
+
