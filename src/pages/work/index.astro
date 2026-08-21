@@ -27,73 +27,165 @@ const sortedWork = allWork.sort((a, b) => a.data.order - b.data.order);
           dark={true}
         />
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-          {sortedWork.map((project) => (
-            <article class="bg-[#101214] border border-[#22262B] rounded-xl overflow-hidden flex flex-col justify-between hover:border-[#8EBBC8] transition-all duration-300 group shadow-xl">
-              <div>
-                <!-- Visual Study Header -->
-                <a href={`/work/${project.id}/`} class="block relative aspect-[16/9] overflow-hidden bg-[#0A0C0E] border-b border-[#22262B]">
-                  <img
-                    src={project.data.visual.asset}
-                    alt={project.data.visual.alt}
-                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div class="absolute bottom-2.5 left-2.5 bg-[#050607]/90 px-2.5 py-1 rounded text-[10.5px] font-mono text-[#8EBBC8] border border-[#22262B]">
-                    {project.data.visual.caption}
-                  </div>
-                </a>
+        <!-- Catalog Telemetry Summary Bar -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 mt-8 bg-[#101214] border border-[#22262B] rounded-xl font-mono text-xs shadow-md">
+          <div>
+            <div class="text-[#666B6E] text-[10px] uppercase">VERIFIED REPOSITORIES</div>
+            <div class="text-[#8EBBC8] font-bold mt-1 text-sm">4 Public Studies</div>
+          </div>
+          <div>
+            <div class="text-[#666B6E] text-[10px] uppercase">EVIDENCE STANDARD</div>
+            <div class="text-[#F5F5F7] font-bold mt-1 text-sm">Clean-Room Gated</div>
+          </div>
+          <div>
+            <div class="text-[#666B6E] text-[10px] uppercase">AUTOMATED TEST RIG</div>
+            <div class="text-[#8EBBC8] font-bold mt-1 text-sm">100 E2E / 12 Unit</div>
+          </div>
+          <div>
+            <div class="text-[#666B6E] text-[10px] uppercase">ACADEMIC FOUNDATION</div>
+            <div class="text-[#F5F5F7] font-bold mt-1 text-sm">UPLB Applied Math</div>
+          </div>
+        </div>
 
-                <!-- Card Content -->
-                <div class="p-7 space-y-4">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <Badge status={project.data.status} />
-                    <EvidenceBadge state={project.data.visual.evidenceState} />
-                  </div>
+        <!-- Domain Filter Bar -->
+        <div class="flex flex-wrap items-center gap-2 pt-8 font-mono text-xs" id="work-filter-bar">
+          <button
+            type="button"
+            data-filter="all"
+            class="filter-btn active px-3.5 py-1.5 rounded bg-[#8EBBC8] text-[#050607] font-bold transition-colors cursor-pointer"
+          >
+            All Systems (4)
+          </button>
+          <button
+            type="button"
+            data-filter="routing"
+            class="filter-btn px-3.5 py-1.5 rounded bg-[#101214] border border-[#22262B] text-[#8C9296] hover:text-[#F5F5F7] hover:border-[#8EBBC8] transition-colors cursor-pointer"
+          >
+            Applied Math & Routing (2)
+          </button>
+          <button
+            type="button"
+            data-filter="spatial"
+            class="filter-btn px-3.5 py-1.5 rounded bg-[#101214] border border-[#22262B] text-[#8C9296] hover:text-[#F5F5F7] hover:border-[#8EBBC8] transition-colors cursor-pointer"
+          >
+            Spatial 3D & Workers (1)
+          </button>
+          <button
+            type="button"
+            data-filter="static"
+            class="filter-btn px-3.5 py-1.5 rounded bg-[#101214] border border-[#22262B] text-[#8C9296] hover:text-[#F5F5F7] hover:border-[#8EBBC8] transition-colors cursor-pointer"
+          >
+            Static & Delivery (1)
+          </button>
+        </div>
 
-                  <h3 class="text-2xl lg:text-3xl font-display font-bold text-[#F5F5F7] group-hover:text-[#8EBBC8] transition-colors">
-                    <a href={`/work/${project.id}/`}>
-                      {project.data.title}
-                    </a>
-                  </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8" id="work-grid">
+          {sortedWork.map((project) => {
+            const domainCategory =
+              project.id === 'uppetite' || project.id === 'ims-academic-hub'
+                ? 'routing'
+                : project.id === 'aedriain'
+                ? 'spatial'
+                : 'static';
 
-                  <p class="font-body text-sm text-[#8C9296] leading-relaxed">
-                    {project.data.summary}
-                  </p>
+            return (
+              <article
+                data-domain={domainCategory}
+                class="work-card bg-[#101214] border border-[#22262B] rounded-xl overflow-hidden flex flex-col justify-between hover:border-[#8EBBC8] transition-all duration-300 group shadow-xl"
+              >
+                <div>
+                  <!-- Visual Study Header -->
+                  <a href={`/work/${project.id}/`} class="block relative aspect-[16/9] overflow-hidden bg-[#0A0C0E] border-b border-[#22262B]">
+                    <img
+                      src={project.data.visual.asset}
+                      alt={project.data.visual.alt}
+                      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div class="absolute bottom-2.5 left-2.5 bg-[#050607]/90 px-2.5 py-1 rounded text-[10.5px] font-mono text-[#8EBBC8] border border-[#22262B]">
+                      {project.data.visual.caption}
+                    </div>
+                  </a>
 
-                  <div class="flex flex-wrap gap-1.5 pt-2">
-                    {project.data.stack.map((tech) => (
-                      <span class="px-2.5 py-0.5 bg-[#181B1E] border border-[#22262B] text-[#C8CDD0] text-xs font-mono rounded">
-                        {tech}
-                      </span>
-                    ))}
+                  <!-- Card Content -->
+                  <div class="p-7 space-y-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <Badge status={project.data.status} />
+                      <EvidenceBadge state={project.data.visual.evidenceState} />
+                    </div>
+
+                    <h3 class="text-2xl lg:text-3xl font-display font-bold text-[#F5F5F7] group-hover:text-[#8EBBC8] transition-colors">
+                      <a href={`/work/${project.id}/`}>
+                        {project.data.title}
+                      </a>
+                    </h3>
+
+                    <p class="font-body text-sm text-[#8C9296] leading-relaxed">
+                      {project.data.summary}
+                    </p>
+
+                    <div class="flex flex-wrap gap-1.5 pt-2">
+                      {project.data.stack.map((tech) => (
+                        <span class="px-2.5 py-0.5 bg-[#181B1E] border border-[#22262B] text-[#C8CDD0] text-xs font-mono rounded">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- Footer Meta -->
-              <div class="p-7 pt-0 flex items-center justify-between border-t border-[#22262B]/50 mt-4 font-mono text-xs text-[#8C9296]">
-                <a
-                  href={project.data.repository}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  class="hover:text-[#FFFFFF] transition-colors"
-                >
-                  GitHub Repository ↗
-                </a>
-                <a
-                  href={`/work/${project.id}/`}
-                  class="text-[#8EBBC8] font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5"
-                >
-                  <span>Read Study</span>
-                  <span>→</span>
-                </a>
-              </div>
-            </article>
-          ))}
+                <!-- Footer Meta -->
+                <div class="p-7 pt-0 flex items-center justify-between border-t border-[#22262B]/50 mt-4 font-mono text-xs text-[#8C9296]">
+                  <a
+                    href={project.data.repository}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    class="hover:text-[#FFFFFF] transition-colors"
+                  >
+                    GitHub Repository ↗
+                  </a>
+                  <a
+                    href={`/work/${project.id}/`}
+                    class="text-[#8EBBC8] font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5"
+                  >
+                    <span>Read Study</span>
+                    <span>→</span>
+                  </a>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    const filterButtons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const workCards = document.querySelectorAll<HTMLElement>('.work-card');
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.getAttribute('data-filter');
+
+        filterButtons.forEach((b) => {
+          b.classList.remove('active', 'bg-[#8EBBC8]', 'text-[#050607]', 'font-bold');
+          b.classList.add('bg-[#101214]', 'border', 'border-[#22262B]', 'text-[#8C9296]');
+        });
+
+        btn.classList.remove('bg-[#101214]', 'border', 'border-[#22262B]', 'text-[#8C9296]');
+        btn.classList.add('active', 'bg-[#8EBBC8]', 'text-[#050607]', 'font-bold');
+
+        workCards.forEach((card) => {
+          const cardDomain = card.getAttribute('data-domain');
+          if (filter === 'all' || cardDomain === filter) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
 </Layout>
