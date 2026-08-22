@@ -15,9 +15,9 @@ The A-mark is a procedural, architectural 3D monolith composed of three interloc
 | Asset | Path | Format | Size | Purpose | Status |
 |---|---|---|---|---|---|
 | Master Scene | `brand/aedrian-a.blend` | Blender 5.0 | ~250 KB | Authoritative procedural source | Verified |
-| Web Model | `public/brand/aedrian-a.glb` | glTF 2.0 Binary | 14.5 KB (Target $\le 150$ KB) | R3F 3D Hero Island | Verified |
-| Presentation Render | `public/brand/aedrian-a-transparent.png` | 2048x2048 RGBA PNG | 2742.9 KB | High-res showcase & press | Verified |
-| Hero Poster Fallback | `src/assets/brand/aedrian-a-poster.webp` | 1920x1440 WebP | 41.6 KB (Target $\le 180$ KB) | Reduced-motion & WebGL fallback | Verified |
+| Web Model | `public/brand/aedrian-a.glb` | glTF 2.0 Binary | 12.9 KB (Target $\le 150$ KB) | R3F 3D Hero Island | Verified |
+| Presentation Render | `public/brand/aedrian-a-transparent.png` | 2048x2048 RGBA PNG | 2711.7 KB | High-res showcase & press | Verified |
+| Hero Poster Fallback | `src/assets/brand/aedrian-a-poster.webp` | 1920x1440 WebP | 33.0 KB (Target $\le 180$ KB) | Reduced-motion & WebGL fallback | Verified |
 | Vector Silhouette | `public/brand/aedrian-a.svg` | SVG Vector | ~2.5 KB | Header icon, favicon, metadata | Verified |
 
 ---

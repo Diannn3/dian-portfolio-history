@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
@@ -11,6 +11,11 @@ interface CameraKeypoint {
   progress: number;
   pos: THREE.Vector3;
   look: THREE.Vector3;
+}
+
+// Converts Blender Z-up coordinates [x, y, z] to Three.js Y-up coordinates [x, z, -y]
+function blenderToThree(x: number, y: number, z: number): THREE.Vector3 {
+  return new THREE.Vector3(x, z, -y);
 }
 
 // --- DREAM TEXTURES PROCEDURAL PBR SYNTHESIZERS ---
@@ -73,107 +78,6 @@ function createRoughnessMap(width = 512, height = 512, base = 42, variance = 14)
   return tex;
 }
 
-// --- DETERMINISTIC PROCEDURAL 3D MONOLITH SCULPT ---
-function buildProceduralAMonolith(
-  obsidianMat: THREE.Material,
-  palladiumMat: THREE.Material
-): THREE.Group {
-  const root = new THREE.Group();
-  root.name = 'Procedural_A_Monolith';
-
-  const beamLength = 4.4;
-  const beamWidth = 0.68;
-  const beamDepth = 0.58;
-  const angleRad = (18.5 * Math.PI) / 180;
-
-  // 1. Left Structural Beam
-  const leftGroup = new THREE.Group();
-  leftGroup.position.set(-0.96, -0.05, 0);
-  leftGroup.rotation.z = angleRad;
-
-  const leftBody = new THREE.Mesh(new THREE.BoxGeometry(beamWidth, beamLength, beamDepth), obsidianMat);
-  leftBody.castShadow = true;
-  leftBody.receiveShadow = true;
-  leftGroup.add(leftBody);
-
-  // Left Outer Palladium Bevel Trim
-  const leftOuterTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(0.18, beamLength * 0.99, beamDepth * 0.96),
-    palladiumMat
-  );
-  leftOuterTrim.position.set(-beamWidth / 2 - 0.05, 0, 0.02);
-  leftGroup.add(leftOuterTrim);
-
-  // Left Inner Palladium Bevel Trim
-  const leftInnerTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(0.12, beamLength * 0.99, beamDepth * 0.96),
-    palladiumMat
-  );
-  leftInnerTrim.position.set(beamWidth / 2 + 0.03, 0, 0.02);
-  leftGroup.add(leftInnerTrim);
-
-  root.add(leftGroup);
-
-  // 2. Right Structural Beam
-  const rightGroup = new THREE.Group();
-  rightGroup.position.set(0.96, -0.05, 0);
-  rightGroup.rotation.z = -angleRad;
-
-  const rightBody = new THREE.Mesh(new THREE.BoxGeometry(beamWidth, beamLength, beamDepth), obsidianMat);
-  rightBody.castShadow = true;
-  rightBody.receiveShadow = true;
-  rightGroup.add(rightBody);
-
-  // Right Outer Palladium Bevel Trim (Catches Cold-Arc Rim Light)
-  const rightOuterTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(0.18, beamLength * 0.99, beamDepth * 0.96),
-    palladiumMat
-  );
-  rightOuterTrim.position.set(beamWidth / 2 + 0.05, 0, 0.02);
-  rightGroup.add(rightOuterTrim);
-
-  // Right Inner Palladium Bevel Trim
-  const rightInnerTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(0.12, beamLength * 0.99, beamDepth * 0.96),
-    palladiumMat
-  );
-  rightInnerTrim.position.set(-beamWidth / 2 - 0.03, 0, 0.02);
-  rightGroup.add(rightInnerTrim);
-
-  root.add(rightGroup);
-
-  // 3. Interlocking Crossbar Assembly
-  const crossGroup = new THREE.Group();
-  crossGroup.position.set(0, -0.22, 0.08);
-
-  const crossBody = new THREE.Mesh(new THREE.BoxGeometry(1.76, 0.50, 0.52), obsidianMat);
-  crossBody.castShadow = true;
-  crossBody.receiveShadow = true;
-  crossGroup.add(crossBody);
-
-  // Crossbar Gleaming Palladium Front Plate
-  const crossInlay = new THREE.Mesh(
-    new THREE.BoxGeometry(1.72, 0.42, 0.14),
-    palladiumMat
-  );
-  crossInlay.position.set(0, 0.02, 0.26);
-  crossGroup.add(crossInlay);
-
-  root.add(crossGroup);
-
-  // 4. Apex Chamfered Cap
-  const apexMesh = new THREE.Mesh(new THREE.BoxGeometry(1.02, 0.54, beamDepth * 1.04), obsidianMat);
-  apexMesh.position.set(0, 1.98, 0);
-  root.add(apexMesh);
-
-  // Apex Palladium Crown Inlay
-  const crownMesh = new THREE.Mesh(new THREE.BoxGeometry(0.88, 0.16, beamDepth * 1.06), palladiumMat);
-  crownMesh.position.set(0, 2.26, 0.02);
-  root.add(crownMesh);
-
-  return root;
-}
-
 export default function AedrianHeroCanvas({
   modelUrl = '/brand/aedrian-a.glb',
   quality = 'auto'
@@ -181,6 +85,7 @@ export default function AedrianHeroCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current || quality === 'static') return;
@@ -189,6 +94,7 @@ export default function AedrianHeroCanvas({
     let scene: THREE.Scene | null = null;
     let camera: THREE.PerspectiveCamera | null = null;
     let pivotGroup: THREE.Group | null = null;
+    let modelScene: THREE.Group | null = null;
     let animationFrameId: number | null = null;
     let isVisible = true;
 
@@ -285,18 +191,18 @@ export default function AedrianHeroCanvas({
         const aspect = width / height;
 
         if (width >= 1024) {
-          // Desktop: Dedicated right 62-92% stage, strictly right of typography
-          const shiftX = Math.min(2.10, Math.max(1.75, (aspect - 1.2) * 1.2 + 1.2));
+          // Desktop: Dedicated right 58-92% stage, strictly right of typography
+          const shiftX = Math.min(1.75, Math.max(1.35, (aspect - 1.2) * 0.9 + 1.15));
           pivotGroup.position.set(shiftX, 0.0, 0);
-          pivotGroup.scale.set(0.56, 0.56, 0.56);
+          pivotGroup.scale.set(0.52, 0.52, 0.52);
         } else if (width >= 768) {
           // Tablet: Lower right quadrant
-          pivotGroup.position.set(1.0, -0.35, 0);
-          pivotGroup.scale.set(0.48, 0.48, 0.48);
+          pivotGroup.position.set(0.75, -0.30, 0);
+          pivotGroup.scale.set(0.44, 0.44, 0.44);
         } else {
           // Mobile: Clean lower placement with zero CTA overlap
-          pivotGroup.position.set(0.0, -1.65, 0);
-          pivotGroup.scale.set(0.40, 0.40, 0.40);
+          pivotGroup.position.set(0.0, -1.35, 0);
+          pivotGroup.scale.set(0.36, 0.36, 0.36);
         }
       };
 
@@ -332,7 +238,7 @@ export default function AedrianHeroCanvas({
 
       // Enhanced High-End Physical Materials with Gleaming Facets
       const obsidianMat = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(0x222830),
+        color: new THREE.Color(0x1a2028),
         roughness: 0.12,
         metalness: 0.32,
         clearcoat: 1.0,
@@ -349,38 +255,47 @@ export default function AedrianHeroCanvas({
         normalScale: new THREE.Vector2(0.20, 0.20)
       });
 
-      // 6. Instantiate Deterministic Procedural Monolith
-      const proceduralMonolith = buildProceduralAMonolith(obsidianMat, palladiumMat);
-      pivotGroup.add(proceduralMonolith);
-
-      // 7. Optional GLB Loader for enhanced assets
+      // 6. Load the Canonical Original 3D A Monolith GLB
       const loader = new GLTFLoader();
       loader.load(
         modelUrl,
         (gltf) => {
-          const loadedScene = gltf.scene;
-          const box = new THREE.Box3().setFromObject(loadedScene);
+          modelScene = gltf.scene;
+
+          // Center the original GLB mesh relative to its bounding box
+          const box = new THREE.Box3().setFromObject(modelScene);
           const center = box.getCenter(new THREE.Vector3());
 
-          loadedScene.position.x = -center.x;
-          loadedScene.position.y = -center.y;
-          loadedScene.position.z = -center.z;
+          modelScene.position.x = -center.x;
+          modelScene.position.y = -center.y;
+          modelScene.position.z = -center.z;
 
-          loadedScene.traverse((child) => {
+          // Apply upgraded Dream Textures PBR materials to mesh parts
+          modelScene.traverse((child) => {
             if ((child as THREE.Mesh).isMesh) {
               const mesh = child as THREE.Mesh;
               mesh.castShadow = true;
               mesh.receiveShadow = true;
+
+              if (mesh.name.toLowerCase().includes('palladium') || mesh.name.toLowerCase().includes('inlay')) {
+                mesh.material = palladiumMat;
+              } else {
+                mesh.material = obsidianMat;
+              }
             }
           });
+
+          pivotGroup?.add(modelScene);
+          setIsLoaded(true);
         },
         undefined,
-        (_err) => {
-          // Fallback handled by procedural model
+        (err) => {
+          console.warn('GLB load error, using fallback:', err);
+          setHasError(true);
         }
       );
 
-      // 8. Single Authoritative Scroll Event Listener
+      // 7. Single Authoritative Scroll Event Listener
       const handleHeroProgress = (e: Event) => {
         const customEvent = e as CustomEvent<{ progress: number }>;
         if (typeof customEvent.detail?.progress === 'number') {
@@ -390,7 +305,7 @@ export default function AedrianHeroCanvas({
 
       window.addEventListener('aedrian:hero-progress', handleHeroProgress, { passive: true });
 
-      // 9. Pointer Parallax
+      // 8. Pointer Parallax
       const hasFinePointer = typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
 
       const handlePointerMove = (e: PointerEvent) => {
@@ -408,7 +323,7 @@ export default function AedrianHeroCanvas({
         window.addEventListener('pointermove', handlePointerMove, { passive: true });
       }
 
-      // 10. Resize Handler
+      // 9. Resize Handler
       const handleResize = () => {
         if (!containerRef.current || !renderer || !camera) return;
         const width = containerRef.current.clientWidth;
@@ -424,7 +339,7 @@ export default function AedrianHeroCanvas({
 
       window.addEventListener('resize', handleResize, { passive: true });
 
-      // 11. Intersection Observer
+      // 10. Intersection Observer
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -438,7 +353,7 @@ export default function AedrianHeroCanvas({
         observer.observe(containerRef.current);
       }
 
-      // 12. Continuous Active Animation Loop
+      // 11. Continuous Active Animation Loop
       const animate = () => {
         animationFrameId = requestAnimationFrame(animate);
         if (!isVisible || !renderer || !scene || !camera) return;
