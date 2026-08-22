@@ -13,14 +13,9 @@ interface CameraKeypoint {
   look: THREE.Vector3;
 }
 
-// Converts Blender Z-up coordinates [x, y, z] to Three.js Y-up coordinates [x, z, -y]
-function blenderToThree(x: number, y: number, z: number): THREE.Vector3 {
-  return new THREE.Vector3(x, z, -y);
-}
-
 // --- DREAM TEXTURES PROCEDURAL PBR SYNTHESIZERS ---
 
-// 1. Synthesize high-frequency brushed anisotropic normal map for palladium inlays
+// 1. High-Frequency Anisotropic Brushed Normal Map
 function createBrushedNormalMap(width = 512, height = 512): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = width;
@@ -34,8 +29,8 @@ function createBrushedNormalMap(width = 512, height = 512): THREE.CanvasTexture 
   for (let i = 0; i < data.length; i += 4) {
     const x = (i / 4) % width;
     const y = Math.floor((i / 4) / width);
-    const noiseX = (Math.sin(x * 0.05) * 0.3 + (Math.random() - 0.5)) * 12;
-    const noiseY = (Math.sin(y * 0.1) * 0.5 + (Math.random() - 0.5)) * 14;
+    const noiseX = (Math.sin(x * 0.08) * 0.4 + (Math.random() - 0.5)) * 14;
+    const noiseY = (Math.sin(y * 0.12) * 0.6 + (Math.random() - 0.5)) * 16;
 
     data[i] = Math.min(255, Math.max(0, 128 + noiseX));
     data[i + 1] = Math.min(255, Math.max(0, 128 + noiseY));
@@ -51,8 +46,8 @@ function createBrushedNormalMap(width = 512, height = 512): THREE.CanvasTexture 
   return tex;
 }
 
-// 2. Synthesize micro-roughness breakup map for obsidian ceramic body
-function createRoughnessMap(width = 512, height = 512, base = 48, variance = 14): THREE.CanvasTexture {
+// 2. Micro-Roughness Breakup Map for Obsidian Ceramic
+function createRoughnessMap(width = 512, height = 512, base = 48, variance = 16): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -78,7 +73,7 @@ function createRoughnessMap(width = 512, height = 512, base = 48, variance = 14)
   return tex;
 }
 
-// --- DETERMINISTIC PROCEDURAL MANIFOLD 3D MONOLITH GEOMETRY ---
+// --- DETERMINISTIC PROCEDURAL 3D MONOLITH SCULPT ---
 function buildProceduralAMonolith(
   obsidianMat: THREE.Material,
   palladiumMat: THREE.Material
@@ -87,76 +82,93 @@ function buildProceduralAMonolith(
   root.name = 'Procedural_A_Monolith';
 
   const beamLength = 4.2;
-  const beamWidth = 0.58;
-  const beamDepth = 0.52;
-  const angleRad = (17.5 * Math.PI) / 180;
+  const beamWidth = 0.62;
+  const beamDepth = 0.54;
+  const angleRad = (18.5 * Math.PI) / 180;
 
-  // 1. Left Beam Assembly
+  // 1. Left Structural Beam
   const leftGroup = new THREE.Group();
-  leftGroup.position.set(-0.95, -0.05, 0);
+  leftGroup.position.set(-0.92, -0.05, 0);
   leftGroup.rotation.z = angleRad;
 
-  const leftBodyGeo = new THREE.BoxGeometry(beamWidth, beamLength, beamDepth);
-  const leftBodyMesh = new THREE.Mesh(leftBodyGeo, obsidianMat);
-  leftBodyMesh.castShadow = true;
-  leftBodyMesh.receiveShadow = true;
-  leftGroup.add(leftBodyMesh);
+  const leftBody = new THREE.Mesh(new THREE.BoxGeometry(beamWidth, beamLength, beamDepth), obsidianMat);
+  leftBody.castShadow = true;
+  leftBody.receiveShadow = true;
+  leftGroup.add(leftBody);
 
-  // Left Palladium Inlay Trim along outer bevel
-  const leftInlayGeo = new THREE.BoxGeometry(0.08, beamLength * 0.98, beamDepth * 0.92);
-  const leftInlayMesh = new THREE.Mesh(leftInlayGeo, palladiumMat);
-  leftInlayMesh.position.set(-beamWidth / 2 - 0.02, 0, 0.02);
-  leftGroup.add(leftInlayMesh);
+  // Left Outer Palladium Trim
+  const leftOuterTrim = new THREE.Mesh(
+    new THREE.BoxGeometry(0.14, beamLength * 0.99, beamDepth * 0.96),
+    palladiumMat
+  );
+  leftOuterTrim.position.set(-beamWidth / 2 - 0.04, 0, 0.02);
+  leftGroup.add(leftOuterTrim);
+
+  // Left Inner Palladium Trim
+  const leftInnerTrim = new THREE.Mesh(
+    new THREE.BoxGeometry(0.08, beamLength * 0.99, beamDepth * 0.96),
+    palladiumMat
+  );
+  leftInnerTrim.position.set(beamWidth / 2 + 0.02, 0, 0.02);
+  leftGroup.add(leftInnerTrim);
 
   root.add(leftGroup);
 
-  // 2. Right Beam Assembly
+  // 2. Right Structural Beam
   const rightGroup = new THREE.Group();
-  rightGroup.position.set(0.95, -0.05, 0);
+  rightGroup.position.set(0.92, -0.05, 0);
   rightGroup.rotation.z = -angleRad;
 
-  const rightBodyGeo = new THREE.BoxGeometry(beamWidth, beamLength, beamDepth);
-  const rightBodyMesh = new THREE.Mesh(rightBodyGeo, obsidianMat);
-  rightBodyMesh.castShadow = true;
-  rightBodyMesh.receiveShadow = true;
-  rightGroup.add(rightBodyMesh);
+  const rightBody = new THREE.Mesh(new THREE.BoxGeometry(beamWidth, beamLength, beamDepth), obsidianMat);
+  rightBody.castShadow = true;
+  rightBody.receiveShadow = true;
+  rightGroup.add(rightBody);
 
-  // Right Palladium Inlay Trim along outer bevel
-  const rightInlayGeo = new THREE.BoxGeometry(0.08, beamLength * 0.98, beamDepth * 0.92);
-  const rightInlayMesh = new THREE.Mesh(rightInlayGeo, palladiumMat);
-  rightInlayMesh.position.set(beamWidth / 2 + 0.02, 0, 0.02);
-  rightGroup.add(rightInlayMesh);
+  // Right Outer Palladium Trim (Catches Cold-Arc Rim Light)
+  const rightOuterTrim = new THREE.Mesh(
+    new THREE.BoxGeometry(0.14, beamLength * 0.99, beamDepth * 0.96),
+    palladiumMat
+  );
+  rightOuterTrim.position.set(beamWidth / 2 + 0.04, 0, 0.02);
+  rightGroup.add(rightOuterTrim);
+
+  // Right Inner Palladium Trim
+  const rightInnerTrim = new THREE.Mesh(
+    new THREE.BoxGeometry(0.08, beamLength * 0.99, beamDepth * 0.96),
+    palladiumMat
+  );
+  rightInnerTrim.position.set(-beamWidth / 2 - 0.02, 0, 0.02);
+  rightGroup.add(rightInnerTrim);
 
   root.add(rightGroup);
 
   // 3. Interlocking Crossbar Assembly
   const crossGroup = new THREE.Group();
-  crossGroup.position.set(0, -0.28, 0.04);
+  crossGroup.position.set(0, -0.22, 0.06);
 
-  const crossBodyGeo = new THREE.BoxGeometry(1.68, 0.44, 0.46);
-  const crossBodyMesh = new THREE.Mesh(crossBodyGeo, obsidianMat);
-  crossBodyMesh.castShadow = true;
-  crossBodyMesh.receiveShadow = true;
-  crossGroup.add(crossBodyMesh);
+  const crossBody = new THREE.Mesh(new THREE.BoxGeometry(1.68, 0.46, 0.48), obsidianMat);
+  crossBody.castShadow = true;
+  crossBody.receiveShadow = true;
+  crossGroup.add(crossBody);
 
-  // Crossbar Palladium Inlay Channel
-  const crossInlayGeo = new THREE.BoxGeometry(1.58, 0.09, 0.48);
-  const crossInlayMesh = new THREE.Mesh(crossInlayGeo, palladiumMat);
-  crossInlayMesh.position.set(0, 0.22, 0);
-  crossGroup.add(crossInlayMesh);
+  // Crossbar Gleaming Palladium Front Plate
+  const crossInlay = new THREE.Mesh(
+    new THREE.BoxGeometry(1.64, 0.38, 0.12),
+    palladiumMat
+  );
+  crossInlay.position.set(0, 0.02, 0.25);
+  crossGroup.add(crossInlay);
 
   root.add(crossGroup);
 
   // 4. Apex Chamfered Cap
-  const apexGeo = new THREE.BoxGeometry(0.92, 0.48, beamDepth * 1.02);
-  const apexMesh = new THREE.Mesh(apexGeo, obsidianMat);
-  apexMesh.position.set(0, 1.88, 0);
+  const apexMesh = new THREE.Mesh(new THREE.BoxGeometry(0.94, 0.50, beamDepth * 1.04), obsidianMat);
+  apexMesh.position.set(0, 1.90, 0);
   root.add(apexMesh);
 
   // Apex Palladium Crown Inlay
-  const crownGeo = new THREE.BoxGeometry(0.72, 0.08, beamDepth * 1.04);
-  const crownMesh = new THREE.Mesh(crownGeo, palladiumMat);
-  crownMesh.position.set(0, 2.12, 0.01);
+  const crownMesh = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.12, beamDepth * 1.06), palladiumMat);
+  crownMesh.position.set(0, 2.16, 0.02);
   root.add(crownMesh);
 
   return root;
@@ -186,21 +198,21 @@ export default function AedrianHeroCanvas({
     let mouseCurrentX = 0;
     let mouseCurrentY = 0;
 
-    // Converted Camera Storyboards (Blender -> Three.js Y-Up)
+    // Storyboard Camera Keypoints
     const desktopKeypoints: CameraKeypoint[] = [
-      { progress: 0.0,  pos: blenderToThree(1.8, -4.8, 1.6), look: blenderToThree(0.0, 0.0, 0.0) },
-      { progress: 0.18, pos: blenderToThree(1.6, -4.4, 1.4), look: blenderToThree(0.0, 0.0, 0.0) },
-      { progress: 0.45, pos: blenderToThree(0.9, -2.4, 0.9), look: blenderToThree(-0.1, 0.0, 0.5) },
-      { progress: 0.72, pos: blenderToThree(0.0, -1.2, 0.3), look: blenderToThree(0.0, 1.4, 0.2) },
-      { progress: 1.0,  pos: blenderToThree(0.0, -5.2, 0.6), look: blenderToThree(0.0, 0.0, 0.0) }
+      { progress: 0.0,  pos: new THREE.Vector3(0.0, 0.2, 4.6),  look: new THREE.Vector3(0.0, 0.0, 0.0) },
+      { progress: 0.20, pos: new THREE.Vector3(0.0, 0.2, 4.2),  look: new THREE.Vector3(0.0, 0.0, 0.0) },
+      { progress: 0.50, pos: new THREE.Vector3(0.4, 0.2, 2.6),  look: new THREE.Vector3(0.8, 0.0, 0.3) },
+      { progress: 0.75, pos: new THREE.Vector3(0.6, 0.4, 1.8),  look: new THREE.Vector3(1.2, 1.0, 0.2) },
+      { progress: 1.0,  pos: new THREE.Vector3(0.0, 0.5, 4.8),  look: new THREE.Vector3(0.0, 0.0, 0.0) }
     ];
 
     const mobileKeypoints: CameraKeypoint[] = [
-      { progress: 0.0,  pos: blenderToThree(1.4, -5.0, 1.4), look: blenderToThree(0.0, 0.0, 0.0) },
-      { progress: 0.20, pos: blenderToThree(1.2, -4.6, 1.3), look: blenderToThree(0.0, 0.0, 0.0) },
-      { progress: 0.50, pos: blenderToThree(0.7, -2.8, 0.8), look: blenderToThree(0.0, 0.0, 0.4) },
-      { progress: 0.75, pos: blenderToThree(0.0, -1.8, 0.4), look: blenderToThree(0.0, 1.0, 0.2) },
-      { progress: 1.0,  pos: blenderToThree(0.0, -5.0, 0.5), look: blenderToThree(0.0, 0.0, 0.0) }
+      { progress: 0.0,  pos: new THREE.Vector3(0.0, 0.0, 4.8),  look: new THREE.Vector3(0.0, -0.6, 0.0) },
+      { progress: 0.20, pos: new THREE.Vector3(0.0, 0.0, 4.4),  look: new THREE.Vector3(0.0, -0.6, 0.0) },
+      { progress: 0.50, pos: new THREE.Vector3(0.0, 0.2, 3.0),  look: new THREE.Vector3(0.0, 0.0, 0.4) },
+      { progress: 0.75, pos: new THREE.Vector3(0.0, 0.4, 2.0),  look: new THREE.Vector3(0.0, 1.0, 0.2) },
+      { progress: 1.0,  pos: new THREE.Vector3(0.0, 0.5, 4.8),  look: new THREE.Vector3(0.0, 0.0, 0.0) }
     ];
 
     const stageEl = document.getElementById('hero-scroll-stage');
@@ -208,7 +220,6 @@ export default function AedrianHeroCanvas({
       ? parseFloat(stageEl.dataset.heroProgress) 
       : 0;
 
-    // Storyboard Interpolator
     function getInterpolatedCamera(t: number) {
       const clampedT = Math.max(0, Math.min(1, t));
       const currentKeypoints = containerRef.current && containerRef.current.clientWidth < 768 
@@ -232,33 +243,6 @@ export default function AedrianHeroCanvas({
       };
     }
 
-    // Demand Render Frame
-    function renderFrame() {
-      if (!isVisible || !renderer || !scene || !camera) return;
-
-      const dx = mouseTargetX - mouseCurrentX;
-      const dy = mouseTargetY - mouseCurrentY;
-      if (Math.abs(dx) > 0.0001 || Math.abs(dy) > 0.0001) {
-        mouseCurrentX += dx * 0.06;
-        mouseCurrentY += dy * 0.06;
-      }
-
-      if (pivotGroup) {
-        pivotGroup.rotation.y = mouseCurrentX;
-        pivotGroup.rotation.x = mouseCurrentY;
-      }
-
-      const { pos, look } = getInterpolatedCamera(currentScrollProgress);
-      camera.position.copy(pos);
-      camera.lookAt(look);
-
-      renderer.render(scene, camera);
-
-      if (Math.abs(dx) > 0.0001 || Math.abs(dy) > 0.0001) {
-        animationFrameId = requestAnimationFrame(renderFrame);
-      }
-    }
-
     try {
       const containerWidth = containerRef.current.clientWidth;
       const isMobile = containerWidth < 768;
@@ -278,7 +262,7 @@ export default function AedrianHeroCanvas({
       renderer.setPixelRatio(dpr);
       renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.20;
+      renderer.toneMappingExposure = 1.35;
 
       // 2. Scene & Camera Setup
       scene = new THREE.Scene();
@@ -301,58 +285,66 @@ export default function AedrianHeroCanvas({
         const aspect = width / height;
 
         if (width >= 1024) {
-          // Desktop: Dedicated right 54-94% stage, fully framed with breathing room
-          const shiftX = Math.min(1.95, Math.max(1.65, (aspect - 1.2) * 1.3));
-          pivotGroup.position.set(shiftX, -0.05, 0);
-          pivotGroup.scale.set(0.52, 0.52, 0.52);
+          // Desktop: Dedicated right 62-92% stage, strictly right of typography
+          const shiftX = Math.min(2.10, Math.max(1.75, (aspect - 1.2) * 1.2 + 1.2));
+          pivotGroup.position.set(shiftX, 0.0, 0);
+          pivotGroup.scale.set(0.55, 0.55, 0.55);
         } else if (width >= 768) {
-          // Tablet: Lower right safe quadrant
-          pivotGroup.position.set(0.85, -0.45, 0);
-          pivotGroup.scale.set(0.44, 0.44, 0.44);
+          // Tablet: Lower right quadrant
+          pivotGroup.position.set(1.0, -0.35, 0);
+          pivotGroup.scale.set(0.48, 0.48, 0.48);
         } else {
-          // Mobile: Clean lower 35% placement with full clearance below CTAs
-          pivotGroup.position.set(0.0, -1.85, 0);
-          pivotGroup.scale.set(0.36, 0.36, 0.36);
+          // Mobile: Clean lower placement with zero CTA overlap
+          pivotGroup.position.set(0.0, -1.65, 0);
+          pivotGroup.scale.set(0.40, 0.40, 0.40);
         }
       };
 
       updateSafeZonePosition(containerRef.current.clientWidth, containerRef.current.clientHeight);
 
-      // 4. Studio Lighting Configuration (Diffused & Rim highlights)
-      const keyLight = new THREE.DirectionalLight(0xf5f5f7, 2.2);
-      keyLight.position.copy(blenderToThree(-3.2, -4.5, 3.8));
+      // 4. Studio Lighting Configuration with Target Tracking
+      const keyLight = new THREE.DirectionalLight(0xffffff, 4.5);
+      keyLight.position.set(1.0, 3.5, 4.5);
+      keyLight.target = pivotGroup;
       scene.add(keyLight);
 
-      const rimLight = new THREE.DirectionalLight(0x8ebbc8, 3.2);
-      rimLight.position.copy(blenderToThree(3.8, 3.0, 2.8));
+      const rimLight = new THREE.DirectionalLight(0x8ebbc8, 7.5);
+      rimLight.position.set(4.5, 2.5, 2.5);
+      rimLight.target = pivotGroup;
       scene.add(rimLight);
 
-      const fillLight = new THREE.DirectionalLight(0xd4d8dc, 1.4);
-      fillLight.position.copy(blenderToThree(0.0, -3.8, -1.5));
+      const backRimLight = new THREE.DirectionalLight(0xffffff, 4.5);
+      backRimLight.position.set(2.0, 3.5, -3.0);
+      backRimLight.target = pivotGroup;
+      scene.add(backRimLight);
+
+      const fillLight = new THREE.DirectionalLight(0xdde2e6, 2.2);
+      fillLight.position.set(-1.0, -1.5, 3.5);
+      fillLight.target = pivotGroup;
       scene.add(fillLight);
 
-      const ambientLight = new THREE.AmbientLight(0x181c20, 2.0);
+      const ambientLight = new THREE.AmbientLight(0x323a44, 2.8);
       scene.add(ambientLight);
 
       // 5. Synthesize Dream Textures Procedural PBR Maps
-      const roughnessTex = createRoughnessMap(512, 512, 48, 14);
+      const roughnessTex = createRoughnessMap(512, 512, 45, 16);
       const brushedNormalTex = createBrushedNormalMap(512, 512);
 
-      // Enhanced Physical Materials
+      // Enhanced High-End Physical Materials
       const obsidianMat = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(0x0a0c0e),
-        roughness: 0.22,
-        metalness: 0.08,
-        clearcoat: 0.85,
-        clearcoatRoughness: 0.08,
-        ior: 1.52,
+        color: new THREE.Color(0x181c22),
+        roughness: 0.14,
+        metalness: 0.25,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.05,
+        ior: 1.60,
         roughnessMap: roughnessTex
       });
 
       const palladiumMat = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(0xc8cdd0),
-        roughness: 0.14,
-        metalness: 0.92,
+        color: new THREE.Color(0xf0f4f8),
+        roughness: 0.06,
+        metalness: 0.98,
         normalMap: brushedNormalTex,
         normalScale: new THREE.Vector2(0.18, 0.18)
       });
@@ -360,7 +352,6 @@ export default function AedrianHeroCanvas({
       // 6. Instantiate Deterministic Procedural Monolith
       const proceduralMonolith = buildProceduralAMonolith(obsidianMat, palladiumMat);
       pivotGroup.add(proceduralMonolith);
-      renderFrame();
 
       // 7. Optional GLB Loader for enhanced assets
       const loader = new GLTFLoader();
@@ -382,12 +373,10 @@ export default function AedrianHeroCanvas({
               mesh.receiveShadow = true;
             }
           });
-
-          renderFrame();
         },
         undefined,
         (_err) => {
-          // Clean fallback handled by procedural model
+          // Fallback handled by procedural model
         }
       );
 
@@ -396,7 +385,6 @@ export default function AedrianHeroCanvas({
         const customEvent = e as CustomEvent<{ progress: number }>;
         if (typeof customEvent.detail?.progress === 'number') {
           currentScrollProgress = customEvent.detail.progress;
-          renderFrame();
         }
       };
 
@@ -412,9 +400,8 @@ export default function AedrianHeroCanvas({
         const normX = (e.clientX - halfWidth) / halfWidth;
         const normY = (e.clientY - halfHeight) / halfHeight;
 
-        mouseTargetX = normX * 0.035;
-        mouseTargetY = normY * 0.024;
-        renderFrame();
+        mouseTargetX = normX * 0.045;
+        mouseTargetY = normY * 0.030;
       };
 
       if (hasFinePointer) {
@@ -433,7 +420,6 @@ export default function AedrianHeroCanvas({
         renderer.setSize(width, height);
 
         updateSafeZonePosition(width, height);
-        renderFrame();
       };
 
       window.addEventListener('resize', handleResize, { passive: true });
@@ -443,9 +429,6 @@ export default function AedrianHeroCanvas({
         (entries) => {
           entries.forEach((entry) => {
             isVisible = entry.isIntersecting;
-            if (isVisible) {
-              renderFrame();
-            }
           });
         },
         { threshold: 0.05 }
@@ -454,6 +437,28 @@ export default function AedrianHeroCanvas({
       if (containerRef.current) {
         observer.observe(containerRef.current);
       }
+
+      // 12. Continuous Active Animation Loop
+      const animate = () => {
+        animationFrameId = requestAnimationFrame(animate);
+        if (!isVisible || !renderer || !scene || !camera) return;
+
+        mouseCurrentX += (mouseTargetX - mouseCurrentX) * 0.06;
+        mouseCurrentY += (mouseTargetY - mouseCurrentY) * 0.06;
+
+        if (pivotGroup) {
+          pivotGroup.rotation.y = mouseCurrentX;
+          pivotGroup.rotation.x = mouseCurrentY;
+        }
+
+        const { pos, look } = getInterpolatedCamera(currentScrollProgress);
+        camera.position.copy(pos);
+        camera.lookAt(look);
+
+        renderer.render(scene, camera);
+      };
+
+      animate();
 
       return () => {
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
