@@ -25,9 +25,9 @@ test.describe('Hero Monolith Placement, Choreography & Visual Contract', () => {
     const cta = page.locator('#hero-identity-top a').first();
     await expect(cta).toBeVisible();
 
-    // Canvas or visual monolith check
-    const visualMonolith = page.locator('#hero-scroll-stage canvas, #hero-scroll-stage img[alt*="Monolith"]');
-    await expect(visualMonolith.first()).toBeVisible();
+    // Canvas element check
+    const canvas = page.locator('#hero-scroll-stage canvas');
+    await expect(canvas).toBeVisible();
 
     // Verify no console errors during mount
     expect(consoleErrors).toEqual([]);

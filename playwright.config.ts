@@ -8,11 +8,8 @@ export default defineConfig({
   workers: 1,
   reporter: 'list',
   use: {
-    baseURL: 'http://127.0.0.1:4322',
-    trace: 'on-first-retry',
-    launchOptions: {
-      args: ['--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--ignore-gpu-blocklist']
-    }
+    baseURL: 'http://127.0.0.1:4399',
+    trace: 'on-first-retry'
   },
   projects: [
     {
@@ -38,7 +35,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run preview',
-    url: 'http://127.0.0.1:4322',
+    url: 'http://127.0.0.1:4399',
     reuseExistingServer: !process.env.CI,
     timeout: 120000
   }

@@ -225,6 +225,7 @@ def create_a_monolith():
     # Apex Faces
     apex_faces = [
         [8, 24, 26, 10],
+        [8, 9, 25, 24],
         [10, 11, 27, 26],
     ]
 
@@ -244,6 +245,8 @@ def create_a_monolith():
         [46, 47, 49, 48],
         [50, 51, 52, 53],
         [9, 25, 24, 8],
+        [12, 13, 9, 8],
+        [28, 29, 25, 24],
     ]
 
     for f_indices in (left_faces + right_faces + apex_faces + cross_faces):
@@ -261,8 +264,6 @@ def create_a_monolith():
             f.smooth = True
         except Exception:
             pass
-
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
     bm.to_mesh(mesh)
     bm.free()
