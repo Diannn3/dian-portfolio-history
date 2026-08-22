@@ -47,7 +47,7 @@ function createBrushedNormalMap(width = 512, height = 512): THREE.CanvasTexture 
 }
 
 // 2. Micro-Roughness Breakup Map for Obsidian Ceramic
-function createRoughnessMap(width = 512, height = 512, base = 48, variance = 16): THREE.CanvasTexture {
+function createRoughnessMap(width = 512, height = 512, base = 42, variance = 14): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -81,14 +81,14 @@ function buildProceduralAMonolith(
   const root = new THREE.Group();
   root.name = 'Procedural_A_Monolith';
 
-  const beamLength = 4.2;
-  const beamWidth = 0.62;
-  const beamDepth = 0.54;
+  const beamLength = 4.4;
+  const beamWidth = 0.68;
+  const beamDepth = 0.58;
   const angleRad = (18.5 * Math.PI) / 180;
 
   // 1. Left Structural Beam
   const leftGroup = new THREE.Group();
-  leftGroup.position.set(-0.92, -0.05, 0);
+  leftGroup.position.set(-0.96, -0.05, 0);
   leftGroup.rotation.z = angleRad;
 
   const leftBody = new THREE.Mesh(new THREE.BoxGeometry(beamWidth, beamLength, beamDepth), obsidianMat);
@@ -96,27 +96,27 @@ function buildProceduralAMonolith(
   leftBody.receiveShadow = true;
   leftGroup.add(leftBody);
 
-  // Left Outer Palladium Trim
+  // Left Outer Palladium Bevel Trim
   const leftOuterTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(0.14, beamLength * 0.99, beamDepth * 0.96),
+    new THREE.BoxGeometry(0.18, beamLength * 0.99, beamDepth * 0.96),
     palladiumMat
   );
-  leftOuterTrim.position.set(-beamWidth / 2 - 0.04, 0, 0.02);
+  leftOuterTrim.position.set(-beamWidth / 2 - 0.05, 0, 0.02);
   leftGroup.add(leftOuterTrim);
 
-  // Left Inner Palladium Trim
+  // Left Inner Palladium Bevel Trim
   const leftInnerTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(0.08, beamLength * 0.99, beamDepth * 0.96),
+    new THREE.BoxGeometry(0.12, beamLength * 0.99, beamDepth * 0.96),
     palladiumMat
   );
-  leftInnerTrim.position.set(beamWidth / 2 + 0.02, 0, 0.02);
+  leftInnerTrim.position.set(beamWidth / 2 + 0.03, 0, 0.02);
   leftGroup.add(leftInnerTrim);
 
   root.add(leftGroup);
 
   // 2. Right Structural Beam
   const rightGroup = new THREE.Group();
-  rightGroup.position.set(0.92, -0.05, 0);
+  rightGroup.position.set(0.96, -0.05, 0);
   rightGroup.rotation.z = -angleRad;
 
   const rightBody = new THREE.Mesh(new THREE.BoxGeometry(beamWidth, beamLength, beamDepth), obsidianMat);
@@ -124,51 +124,51 @@ function buildProceduralAMonolith(
   rightBody.receiveShadow = true;
   rightGroup.add(rightBody);
 
-  // Right Outer Palladium Trim (Catches Cold-Arc Rim Light)
+  // Right Outer Palladium Bevel Trim (Catches Cold-Arc Rim Light)
   const rightOuterTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(0.14, beamLength * 0.99, beamDepth * 0.96),
+    new THREE.BoxGeometry(0.18, beamLength * 0.99, beamDepth * 0.96),
     palladiumMat
   );
-  rightOuterTrim.position.set(beamWidth / 2 + 0.04, 0, 0.02);
+  rightOuterTrim.position.set(beamWidth / 2 + 0.05, 0, 0.02);
   rightGroup.add(rightOuterTrim);
 
-  // Right Inner Palladium Trim
+  // Right Inner Palladium Bevel Trim
   const rightInnerTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(0.08, beamLength * 0.99, beamDepth * 0.96),
+    new THREE.BoxGeometry(0.12, beamLength * 0.99, beamDepth * 0.96),
     palladiumMat
   );
-  rightInnerTrim.position.set(-beamWidth / 2 - 0.02, 0, 0.02);
+  rightInnerTrim.position.set(-beamWidth / 2 - 0.03, 0, 0.02);
   rightGroup.add(rightInnerTrim);
 
   root.add(rightGroup);
 
   // 3. Interlocking Crossbar Assembly
   const crossGroup = new THREE.Group();
-  crossGroup.position.set(0, -0.22, 0.06);
+  crossGroup.position.set(0, -0.22, 0.08);
 
-  const crossBody = new THREE.Mesh(new THREE.BoxGeometry(1.68, 0.46, 0.48), obsidianMat);
+  const crossBody = new THREE.Mesh(new THREE.BoxGeometry(1.76, 0.50, 0.52), obsidianMat);
   crossBody.castShadow = true;
   crossBody.receiveShadow = true;
   crossGroup.add(crossBody);
 
   // Crossbar Gleaming Palladium Front Plate
   const crossInlay = new THREE.Mesh(
-    new THREE.BoxGeometry(1.64, 0.38, 0.12),
+    new THREE.BoxGeometry(1.72, 0.42, 0.14),
     palladiumMat
   );
-  crossInlay.position.set(0, 0.02, 0.25);
+  crossInlay.position.set(0, 0.02, 0.26);
   crossGroup.add(crossInlay);
 
   root.add(crossGroup);
 
   // 4. Apex Chamfered Cap
-  const apexMesh = new THREE.Mesh(new THREE.BoxGeometry(0.94, 0.50, beamDepth * 1.04), obsidianMat);
-  apexMesh.position.set(0, 1.90, 0);
+  const apexMesh = new THREE.Mesh(new THREE.BoxGeometry(1.02, 0.54, beamDepth * 1.04), obsidianMat);
+  apexMesh.position.set(0, 1.98, 0);
   root.add(apexMesh);
 
   // Apex Palladium Crown Inlay
-  const crownMesh = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.12, beamDepth * 1.06), palladiumMat);
-  crownMesh.position.set(0, 2.16, 0.02);
+  const crownMesh = new THREE.Mesh(new THREE.BoxGeometry(0.88, 0.16, beamDepth * 1.06), palladiumMat);
+  crownMesh.position.set(0, 2.26, 0.02);
   root.add(crownMesh);
 
   return root;
@@ -262,7 +262,7 @@ export default function AedrianHeroCanvas({
       renderer.setPixelRatio(dpr);
       renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.35;
+      renderer.toneMappingExposure = 1.45;
 
       // 2. Scene & Camera Setup
       scene = new THREE.Scene();
@@ -288,7 +288,7 @@ export default function AedrianHeroCanvas({
           // Desktop: Dedicated right 62-92% stage, strictly right of typography
           const shiftX = Math.min(2.10, Math.max(1.75, (aspect - 1.2) * 1.2 + 1.2));
           pivotGroup.position.set(shiftX, 0.0, 0);
-          pivotGroup.scale.set(0.55, 0.55, 0.55);
+          pivotGroup.scale.set(0.56, 0.56, 0.56);
         } else if (width >= 768) {
           // Tablet: Lower right quadrant
           pivotGroup.position.set(1.0, -0.35, 0);
@@ -302,51 +302,51 @@ export default function AedrianHeroCanvas({
 
       updateSafeZonePosition(containerRef.current.clientWidth, containerRef.current.clientHeight);
 
-      // 4. Studio Lighting Configuration with Target Tracking
-      const keyLight = new THREE.DirectionalLight(0xffffff, 4.5);
-      keyLight.position.set(1.0, 3.5, 4.5);
+      // 4. Vibrant Studio Lighting Setup with Dedicated Model Illumination
+      const keyLight = new THREE.DirectionalLight(0xffffff, 5.5);
+      keyLight.position.set(1.5, 3.5, 4.5);
       keyLight.target = pivotGroup;
       scene.add(keyLight);
 
-      const rimLight = new THREE.DirectionalLight(0x8ebbc8, 7.5);
+      const rimLight = new THREE.DirectionalLight(0x8ebbc8, 8.5);
       rimLight.position.set(4.5, 2.5, 2.5);
       rimLight.target = pivotGroup;
       scene.add(rimLight);
 
-      const backRimLight = new THREE.DirectionalLight(0xffffff, 4.5);
+      const backRimLight = new THREE.DirectionalLight(0xffffff, 5.0);
       backRimLight.position.set(2.0, 3.5, -3.0);
       backRimLight.target = pivotGroup;
       scene.add(backRimLight);
 
-      const fillLight = new THREE.DirectionalLight(0xdde2e6, 2.2);
+      const fillLight = new THREE.DirectionalLight(0xdde2e6, 3.0);
       fillLight.position.set(-1.0, -1.5, 3.5);
       fillLight.target = pivotGroup;
       scene.add(fillLight);
 
-      const ambientLight = new THREE.AmbientLight(0x323a44, 2.8);
+      const ambientLight = new THREE.AmbientLight(0x3a4450, 3.5);
       scene.add(ambientLight);
 
       // 5. Synthesize Dream Textures Procedural PBR Maps
-      const roughnessTex = createRoughnessMap(512, 512, 45, 16);
+      const roughnessTex = createRoughnessMap(512, 512, 40, 14);
       const brushedNormalTex = createBrushedNormalMap(512, 512);
 
-      // Enhanced High-End Physical Materials
+      // Enhanced High-End Physical Materials with Gleaming Facets
       const obsidianMat = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(0x181c22),
-        roughness: 0.14,
-        metalness: 0.25,
+        color: new THREE.Color(0x222830),
+        roughness: 0.12,
+        metalness: 0.32,
         clearcoat: 1.0,
-        clearcoatRoughness: 0.05,
-        ior: 1.60,
+        clearcoatRoughness: 0.04,
+        ior: 1.62,
         roughnessMap: roughnessTex
       });
 
       const palladiumMat = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(0xf0f4f8),
-        roughness: 0.06,
-        metalness: 0.98,
+        color: new THREE.Color(0xf5f8fc),
+        roughness: 0.05,
+        metalness: 0.99,
         normalMap: brushedNormalTex,
-        normalScale: new THREE.Vector2(0.18, 0.18)
+        normalScale: new THREE.Vector2(0.20, 0.20)
       });
 
       // 6. Instantiate Deterministic Procedural Monolith
